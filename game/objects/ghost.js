@@ -13,7 +13,7 @@ Ghost.prototype.init = function() {
 
 Ghost.prototype.killTron = function(tron) {
     this.updatePoints(tron.points);
-    tron.kill();     
+    tron.character.kill();
 };
 
 Ghost.prototype.updatePoints = function(points) {
