@@ -1,4 +1,4 @@
-define(['/character'], function(Character) {
+define(['character'], function(Character) {
 
     var Tron = Character.init;
 
