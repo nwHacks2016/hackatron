@@ -375,7 +375,7 @@ Hackatron.Game.prototype = {
         this.updateCharPos(ghost1.character, 200);
         this.game.physics.arcade.collide(tron1.character, this.layer);
         this.game.physics.arcade.collide(ghost1.character, this.layer);
-        this.game.physics.arcade.collide(tron1.character, collisionHandler, null, this.game);
+        this.game.physics.arcade.collide(ghost1.character, tron1.character, collisionHandler, null, this.game);
     
         this.socket.emit('playerMove', JSON.stringify({
             playerId: this.playerId, 
@@ -471,10 +471,10 @@ Hackatron.Game.prototype = {
 
             player.tron.character.x = data.tron_x;
             player.tron.character.y = data.tron_y;
-            ghost1.character.x = data.ghost_x;
-            ghost1.character.y = data.ghost_y;
-            emitter2.x = data.ghost_x;
-            emitter2.y = data.ghost_y;
+            // ghost1.character.x = data.ghost_x;
+            // ghost1.character.y = data.ghost_y;
+            // emitter2.x = data.ghost_x;
+            // emitter2.y = data.ghost_y;
         }.bind(this));
 
         this.socket.on('gameStarted', function(data) {
