@@ -37,7 +37,16 @@ Hackatron.Game.prototype = {
         var jsonfile = this.cache.getJSON('JSONobj');
         var data = jsonfile.layers[0].data;
         this.pelletHelper(data);
-
+//        var pellet = this.add.sprite(10, 10, 'pellet');
+//            pellet.scale.x = 0.5;
+//            pellet.scale.y = 0.5;
+//
+//        var pellet = this.add.sprite(120, 120, 'pellet');
+//            pellet.scale.x = 0.5;
+//            pellet.scale.y = 0.5;
+//        var pellet = this.add.sprite(20, 20, 'pellet');
+//            pellet.scale.x = 0.5;
+//            pellet.scale.y = 0.5;
 
 
         // Create the map
@@ -122,12 +131,18 @@ Hackatron.Game.prototype = {
                 x++;
             
             if(mapArray[pos] === 0){
-                console.log(x + y);
-                this.add.sprite(x, y, 'pellet');
-
-                //pelletArr.push([x,y]);
+                var pellet = this.add.sprite(x*16+2, y*16+2, 'pellet');
+                pellet.scale.x = 0.05;
+                pellet.scale.y = 0.05;
             }
         }
+        
+//        for(i = 0; i < pelletArr.length ; i++){
+//            var entry = pelletArr[i];
+//            var pellet = this.add.sprite(entry[0], entry[1], 'pellet');
+//            pellet.scale.x = 0.5;
+//            pellet.scale.y = 0.5;
+//        }
     },
 
 
