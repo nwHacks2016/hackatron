@@ -244,7 +244,8 @@ Hackatron.Game.prototype = {
             if (!this.playerList[data.playerId]) {
                 this.playerList[data.playerId] = data;
                 var tron = new Tron();
-                this.playerList[data.playerId].tron = tron.init(this.game, 20, 20, 'tron');
+                tron.init(this.game, 20, 20, 'tron');
+                this.playerList[data.playerId].tron = tron;
                 this.physics.enable(this.playerList[data.playerId].tron, Phaser.Physics.ARCADE);
                 this.playerList[data.playerId].tron.character.scale.x = 0.8;
                 this.playerList[data.playerId].tron.character.scale.y = 0.8;
