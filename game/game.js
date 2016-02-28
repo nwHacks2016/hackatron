@@ -18,6 +18,16 @@ var emitter1;
 var emitter2;
 var tilemapData;
 
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}
+
 Hackatron.Game.prototype = {
     preload: function() {
         this.load.tilemap('map', 'assets/tiles1.json', null, Phaser.Tilemap.TILED_JSON);
@@ -33,6 +43,13 @@ Hackatron.Game.prototype = {
     },
 
     create: function() {
+        this.playerId = guid();
+        this.playerList = [];
+
+        this.socket = io.connect();
+        this.updateClientSideListener();
+
+
         var jsonfile = this.cache.getJSON('JSONobj');
         var data = jsonfile.layers[0].data;
         this.pelletHelper(data);
@@ -123,6 +140,12 @@ Hackatron.Game.prototype = {
         this.game.physics.arcade.collide(tron1.character, this.layer);
         this.game.physics.arcade.collide(ghost1.character, this.layer);
         this.game.physics.arcade.collide(ghost1.character, tron1.character, collisionHandler, null, this.game);
+	
+        this.socket.emit('playerMove', JSON.stringify({
+            playerId: this.playerId, 
+            x: tron1.x, 
+            y: tron1.y
+        }));
     }, 
 
     updateCharPos: function(character, speed) {
@@ -203,6 +226,28 @@ Hackatron.Game.prototype = {
             }
         }
     },
+
+    updateClientSideListener : function () {
+        this.socket.on('playerMove', function(data) {
+            data = JSON.parse(data);
+            // console.log(data);
+
+            if (!this.playerList[data.playerId]) {
+                this.playerList[data.playerId] = data;
+                this.playerList[data.playerId].tron = Tron.init(this, 20, 20, 'tron');
+                this.physics.enable(this.playerList[data.playerId].tron, Phaser.Physics.ARCADE);
+                this.playerList[data.playerId].tron.body.immovable = true;
+                this.playerList[data.playerId].tron.body.collideWorldBounds = true;
+                this.playerList[data.playerId].tron.scale.x = 0.8;
+                this.playerList[data.playerId].tron.scale.y = 0.8;
+            }
+
+            var player = this.playerList[data.playerId];
+
+            player.tron.x = data.x;
+            player.tron.y = data.y;
+        }.bind(this));
+    }
 };
 
 
