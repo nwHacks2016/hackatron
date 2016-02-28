@@ -3,8 +3,11 @@ var Pellet = function(type) {
     this.type = type;
 };
 
-Pellet.init = function(type) {
-    return new Pellet(type);
+Pellet.init = function(game, x, y, key, frame, type) {
+	var pellet = Hackatron.Game.add.sprite(game, x, y, key, frame);
+	pellet.isAlive = true;
+	this.type = type
+    return pellet;
 };
 
 Pellet.prototype.eaten = function() {
