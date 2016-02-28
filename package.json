@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
-    "phaser": "https://github.com/photonstorm/phaser.git"
+    "phaser": "https://github.com/photonstorm/phaser.git",
+    "grunt-contrib-connect": "https://github.com/gruntjs/grunt-contrib-connect.git"
   },
   "main": "index.js",
   "scripts": {
