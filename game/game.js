@@ -8,11 +8,13 @@ Hackatron.Game = function(game) {
 
 var tron1;
 var ghost1;
+var pellet;
 
 var upKey;
 var downKey;
 var leftKey;
 var rightKey;
+var tilemapData;
 
 Hackatron.Game.prototype = {
     preload: function() {
@@ -20,13 +22,27 @@ Hackatron.Game.prototype = {
         this.load.image('tiles', 'assets/part2_tileset.png');
         this.load.spritesheet('tron', 'images/tron.png', 32, 32, 12);
         this.load.spritesheet('ghost', 'images/ghost.png', 32, 32, 12);
+
+        this.load.json('JSONobj', 'assets/tiles1.json');
+        this.load.image('pellet', 'assets/pellet.png');
+        
+
+        //var tilemap = JSON.parse('assets/tiles1.json');
+        //tilemapData = tilemap.layers.data;
+        //console.log(jsonfile);
+        //this.pelletHelper(tilemapData);
     },
 
     create: function() {
+        var jsonfile = this.cache.getJSON('JSONobj');
+        var data = jsonfile.layers[0].data;
+        this.pelletHelper(data);
+
+
+
         // Create the map
         this.map = this.add.tilemap('map');
         this.map.addTilesetImage('Wall', 'tiles');
-
 
         this.layer = this.map.createLayer('Tile Layer 1');
 
@@ -90,7 +106,34 @@ Hackatron.Game.prototype = {
         }
 
         return {x: character.x, y: character.y};
-    }
+    }, 
+
+    pelletHelper: function(mapArray){
+        var pelletArr = [];
+        var x = 0;
+        var y = 0;
+        var pos = 1;
+        for(pos = 1; pos < mapArray.length ; pos++){
+            if(pos % 32 === 0){
+                x = 0;
+                y++;
+            }
+            else
+                x++;
+            
+            if(mapArray[pos] === 0){
+                console.log(x + y);
+                this.add.sprite(x, y, 'pellet');
+
+                //pelletArr.push([x,y]);
+            }
+        }
+    },
+
+
+    // pelletHelper: function(tilemapdata) {
+    //     console.log(tilemapdata);
+    // }
 };
 
 
