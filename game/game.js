@@ -37,8 +37,8 @@ Hackatron.Game.prototype = {
         tron1.animations.add('walkRight', [6,7,8], 3, false, true);
 
         ghost1 = Ghost.init(this, 70, 70, 'ghost');
-        ghost1.scale.x = 0.2;
-        ghost1.scale.y = 0.2;
+        ghost1.scale.x = 0.15;
+        ghost1.scale.y = 0.15;
 
         upKey = this.input.keyboard.addKey(Phaser.Keyboard.UP);
     	downKey = this.input.keyboard.addKey(Phaser.Keyboard.DOWN);
@@ -49,7 +49,6 @@ Hackatron.Game.prototype = {
     	sKey = this.input.keyboard.addKey(Phaser.Keyboard.S);
     	aKey = this.input.keyboard.addKey(Phaser.Keyboard.A);
     	dKey = this.input.keyboard.addKey(Phaser.Keyboard.D);
-
 
         // Add score text
         this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
@@ -90,16 +89,19 @@ Hackatron.Game.prototype = {
 
         // ghost1 controls
         if (wKey.isDown) {
+            ghost1.angle = 90;
             ghost1.y -= 5;
         }
         else if (sKey.isDown)
         {
+            ghost1.angle = 270;
             ghost1.y += 5;
         }
 
         if (aKey.isDown)
         {
             ghost1.x -= 5;
+            ghost1.angle = 0;
             if (ghost1.x < 0) {
                 ghost1.x = this.world.width;
             }
@@ -107,6 +109,7 @@ Hackatron.Game.prototype = {
         else if (dKey.isDown)
         {
             ghost1.x += 5;
+            ghost1.angle = 180;
             if (ghost1.x > this.world.width) {
                 ghost1.x = 0;
             }
