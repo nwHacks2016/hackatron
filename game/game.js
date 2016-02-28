@@ -31,7 +31,7 @@ Hackatron.Game.prototype = {
 
         this.layer = this.map.createLayer('Tile Layer 1');
 
-        tron1 = Tron.init(this, 50, 50, 'tron');
+        tron1 = Tron.init(this, 20, 20, 'tron');
         tron1.animations.add('walkUp', [9,10,11], 3, false, true);
         tron1.animations.add('walkDown', [0,1,2], 3, false, true);
         tron1.animations.add('walkLeft', [3,4,5], 3, false, true);
@@ -41,8 +41,9 @@ Hackatron.Game.prototype = {
     	tron1.downKey = this.input.keyboard.addKey(Phaser.Keyboard.DOWN);
     	tron1.leftKey = this.input.keyboard.addKey(Phaser.Keyboard.LEFT);
     	tron1.rightKey = this.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+        
 
-        ghost1 = Ghost.init(this, 50, 50, 'ghost');
+        ghost1 = Ghost.init(this, 20, 20, 'ghost');
         ghost1.animations.add('walkUp', [9,10,11], 3, false, true);
         ghost1.animations.add('walkDown', [0,1,2], 3, false, true);
         ghost1.animations.add('walkLeft', [3,4,5], 3, false, true);
@@ -53,8 +54,24 @@ Hackatron.Game.prototype = {
     	ghost1.leftKey = this.input.keyboard.addKey(Phaser.Keyboard.A);
     	ghost1.rightKey = this.input.keyboard.addKey(Phaser.Keyboard.D);
 
-		emitter = this.add.emitter(tron1.x, tron1.y, 60);
-		emitter.width = 0.2;
+        // Collision
+        this.physics.enable(this.layer);
+        this.physics.enable(tron1, Phaser.Physics.ARCADE);
+        this.physics.enable(ghost1, Phaser.Physics.ARCADE);
+        this.map.setCollision(18);
+        this.map.setCollision(88);
+        this.map.setCollision(89);
+        this.map.setCollision(53);
+        this.map.setCollision(52);
+
+        tron1.body.immovable = true;
+        tron1.body.collideWorldBounds = true;
+
+        ghost1.body.immovable = true;
+        ghost1.body.collideWorldBounds = true;
+
+		emitter = this.add.emitter(tron1.x, tron1.y, 50);
+		emitter.width = 5;
 		emitter.makeParticles('blueball');
 		emitter.setXSpeed();
 		emitter.setYSpeed();
@@ -69,29 +86,32 @@ Hackatron.Game.prototype = {
     }, 
 
     update: function() {
-        this.updateCharPos(tron1, 3);
-        this.updateCharPos(ghost1, 5);
+        this.physics.arcade.collide(tron1, this.layer)
+        this.physics.arcade.collide(ghost1, this.layer)
+        this.updateCharPos(tron1, 200);
+        this.updateCharPos(ghost1, 200);
     }, 
 
     updateCharPos: function(character, speed) {
+        character.body.velocity.x = 0;
+        character.body.velocity.y = 0;
         if (character.upKey.isDown) {
             character.animations.play('walkUp', 3, false);
-            character.y -= speed;
+            character.body.velocity.y = -speed;
 			if (character == tron1){
 				emitter.x = tron1.x + 15;
 				emitter.y = tron1.y + 35;
 			}
         } else if (character.downKey.isDown) {
             character.animations.play('walkDown', 3, false);
-            character.y += speed;
+            character.body.velocity.y = speed;
 			if (character == tron1){
 				emitter.x = tron1.x + 15;
 				emitter.y = tron1.y - 5;
 			}
-
         } else if (character.leftKey.isDown) {
             character.animations.play('walkLeft', 3, false);
-            character.x -= speed;
+            character.body.velocity.x = -speed;
             if (character.x < 0) {
                 character.x = this.world.width;
             }
@@ -101,7 +121,7 @@ Hackatron.Game.prototype = {
 			}
         } else if (character.rightKey.isDown) {
             character.animations.play('walkRight', 3, false);
-            character.x += speed;
+            character.body.velocity.x = speed;
             if (character.x > this.world.width) {
                 character.x = 0;
             }
