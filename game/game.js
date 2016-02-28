@@ -163,6 +163,7 @@ Hackatron.Game.prototype = {
     }, 
 
     updateCharPos: function(character, speed) {
+        if(!character || !character.body) return;
         character.body.velocity.x = 0;
         character.body.velocity.y = 0;
         if (character.upKey.isDown) {
@@ -211,8 +212,8 @@ Hackatron.Game.prototype = {
             
             if(mapArray[pos] === 0){
                 var pellet = this.add.sprite(x*16+2, y*16+2, 'pellet');
-                pellet.scale.x = 0.05;
-                pellet.scale.y = 0.05;
+                pellet.scale.x = 0.005;
+                pellet.scale.y = 0.005;
             }
         }
     },
