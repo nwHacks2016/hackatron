@@ -139,7 +139,7 @@ Hackatron.Game.prototype = {
     update: function() {
         var collisionHandler = function() {
             ghost1.killTron(tron1);
-            //ghost1.pausePathFinding;
+            //ghost1.stopPathFinding;
             var rebootGhost= function() {
                 //ghost1.startPathFinding;
             };
