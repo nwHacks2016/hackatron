@@ -238,8 +238,8 @@ Hackatron.Game.prototype = {
                 this.physics.enable(this.playerList[data.playerId].tron, Phaser.Physics.ARCADE);
                 // this.playerList[data.playerId].tron.character.body.immovable = true;
                 // this.playerList[data.playerId].tron.character.body.collideWorldBounds = true;
-                this.playerList[data.playerId].tron.scale.x = 0.8;
-                this.playerList[data.playerId].tron.scale.y = 0.8;
+                this.playerList[data.playerId].tron.character.scale.x = 0.8;
+                this.playerList[data.playerId].tron.character.scale.y = 0.8;
             }
 
             var player = this.playerList[data.playerId];
