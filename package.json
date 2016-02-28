@@ -4,7 +4,6 @@
   "description": "",
   "dependencies": {
     "phaser": "https://github.com/photonstorm/phaser.git",
-    "requirejs": "^2.1.22"
   },
   "main": "index.js",
   "scripts": {
