@@ -1,7 +1,7 @@
 var Tron = Character.init;
 
-Tron.init = function(name) {
-    var tron = new Tron(name);
+Tron.init = function(game, x, y, key, frame) {
+    var tron = new Tron(game, x, y, key, frame);
     tron.isAlive = true;
     tron.points = 0;
     return tron;

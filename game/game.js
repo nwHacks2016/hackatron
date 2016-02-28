@@ -30,10 +30,10 @@ Hackatron.Game.prototype = {
         this.layer = this.map.createLayer('Tile Layer 1');
         this.layer.resizeWorld();
 
-        tron1 = this.add.sprite(50, 50, 'tron');
+        tron1 = Tron.init(50, 50, 'tron');
         tron1.scale.x = 0.2;
         tron1.scale.y = 0.2;
-        ghost1 = this.add.sprite(70, 70, 'ghost');
+        ghost1 = Ghost.init(70, 70, 'ghost');
         ghost1.scale.x = 0.2;
         ghost1.scale.y = 0.2;
 
@@ -42,27 +42,26 @@ Hackatron.Game.prototype = {
     	leftKey = this.input.keyboard.addKey(Phaser.Keyboard.LEFT);
     	rightKey = this.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
 
-
+        this.score = new Text(this, 10, 10, "Score: ");
     }, 
 
     update: function() {
 
     	if (upKey.isDown) {
-    		console.log('hi');
-    		//sprite.y--;
+    		tron1.up();
     	}
     	else if (downKey.isDown)
     	{
-        	//sprite.y++;
+        	tron1.down();
     	}
 
     	if (leftKey.isDown)
     	{
-        	//sprite.x--;
+        	tron1.left();
     	}
     	else if (rightKey.isDown)
     	{
-        	//sprite.x++;
+        	tron1.right();
     	}
     }
 };
