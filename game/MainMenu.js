@@ -1,6 +1,3 @@
-Tron = {
-    score: 0
-};
 
 Tron.MainMenu = function(game) {
 };
@@ -8,7 +5,7 @@ Tron.MainMenu = function(game) {
 Tron.MainMenu.prototype = {
     preload: function() {
         this.load.image('menu_background', 'images/mainmenu.png');
-        this.load.image('start_button', 'images/startbutton.png');
+        this.load.spritesheet('start_button', 'images/startbutton_spritesheet.png', 155, 80);
         this.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
     },
 
@@ -16,14 +13,15 @@ Tron.MainMenu.prototype = {
         this.stage.setBackgroundColor(0x2d2d2d);
         this.add.sprite(0, 0, 'menu_background');
 
-        var button = this.add.button(this.world.centerX - 80, 400, 'start_button', this.startGame, this);
+        var button = this.add.button(this.world.centerX, 315, 'start_button', this.startGame, this, 1, 0, 0);
+
         button.anchor.setTo(0.5,0.5);
     },
 
     update: function() {
     },
 
-    startGame: function(){
+    startGame: function(pointer){
         this.state.start('Game');
     }
 }
