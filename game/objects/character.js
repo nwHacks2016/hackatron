@@ -5,7 +5,3 @@ Character.init = function(game, x, y, key) {
 
     return character;
 };
-
-Character.protoype.getPosition = function() {
-    return {x: this.x, y: this.y};
-};
