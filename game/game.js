@@ -61,11 +61,13 @@ Hackatron.Game.prototype = {
 
         var Keyboard = Phaser.Keyboard;
 
-        tron1 = new Tron(this.game, 20, 20, 'tron');
+        tron1 = new Tron();
+        tron1.init(this.game, 20, 20, 'tron');
         addAnimations(tron1.character);
         setKeys(tron1.character, this, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
 
-        ghost1 = new Ghost(this.game, 50, 20, 'ghost');
+        ghost1 = new Ghost();
+        ghost1.init(this.game, 50, 20, 'ghost');
         addAnimations(ghost1.character);
         setKeys(ghost1.character, this, Keyboard.W, Keyboard.S, Keyboard.A, Keyboard.D);
 
@@ -109,13 +111,16 @@ Hackatron.Game.prototype = {
         // Add score text
         this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
         this.scoreText.addColor('White', 0);
+
+
+        this.player1 = tron1
     }, 
 
     update: function() {
         var collisionHandler = function() {
-            //ghost1.killTron(tron1);
-            console.log('collision!');
-
+            ghost1.killTron(tron1);
+            this.player1.character.kill();
+            //console.log('collision!');
         };
 
         this.updateCharPos(tron1.character, 200);
