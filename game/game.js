@@ -30,12 +30,15 @@ Hackatron.Game.prototype = {
         this.map.addTilesetImage('Wall', 'tiles');
 
         this.layer = this.map.createLayer('Tile Layer 1');
+        this.layer.resizeWorld();
 
         tron1 = Tron.init(this, 20, 20, 'tron');
         tron1.animations.add('walkUp', [9,10,11], 3, false, true);
         tron1.animations.add('walkDown', [0,1,2], 3, false, true);
         tron1.animations.add('walkLeft', [3,4,5], 3, false, true);
         tron1.animations.add('walkRight', [6,7,8], 3, false, true);
+        tron1.scale.x = 0.8;
+        tron1.scale.y = 0.8;
 
         tron1.upKey = this.input.keyboard.addKey(Phaser.Keyboard.UP);
     	tron1.downKey = this.input.keyboard.addKey(Phaser.Keyboard.DOWN);
@@ -48,6 +51,8 @@ Hackatron.Game.prototype = {
         ghost1.animations.add('walkDown', [0,1,2], 3, false, true);
         ghost1.animations.add('walkLeft', [3,4,5], 3, false, true);
         ghost1.animations.add('walkRight', [6,7,8], 3, false, true);
+        ghost1.scale.x = 0.8;
+        ghost1.scale.y = 0.8;
 
     	ghost1.upKey = this.input.keyboard.addKey(Phaser.Keyboard.W);
     	ghost1.downKey = this.input.keyboard.addKey(Phaser.Keyboard.S);
@@ -60,6 +65,7 @@ Hackatron.Game.prototype = {
         this.physics.enable(ghost1, Phaser.Physics.ARCADE);
         this.map.setCollision(18);
         this.map.setCollision(88);
+        this.map.setCollision(54);
         this.map.setCollision(89);
         this.map.setCollision(53);
         this.map.setCollision(52);
@@ -79,8 +85,6 @@ Hackatron.Game.prototype = {
 		emitter.setAlpha(1, 0.01, 800);
 		emitter.setScale(0.05, 0.4, 0.05, 0.4, 2000, Phaser.Easing.Quintic.Out);
 		emitter.start(false,500, 2);
-		
-		
 		
         // Add score text
         this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
