@@ -101,6 +101,7 @@ Hackatron.Game.prototype = {
     		emitter2.setAlpha(1, 0.4, 800);
     		emitter2.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
     		emitter2.start(false,250, 1);
+            ghost1.character.emitter = emitter2;
         }
 
         tron1.character.scale.x = 0.8;
@@ -125,6 +126,7 @@ Hackatron.Game.prototype = {
         emitter1.setAlpha(1, 0.4, 800);
         emitter1.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
         emitter1.start(false,250, 1);
+        tron1.character.emitter = emitter1;
         
 
         // Add score text
@@ -136,6 +138,12 @@ Hackatron.Game.prototype = {
     update: function() {
         var collisionHandler = function() {
             ghost1.killTron(tron1);
+            //ghost1.pausePathFinding;
+            var rebootGhost= function() {
+                //ghost1.startPathFinding;
+            };
+
+            this.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
 
         this.updateCharPos(tron1.character, 200);
@@ -159,53 +167,29 @@ Hackatron.Game.prototype = {
         if (character.upKey.isDown) {
             character.animations.play('walkUp', 3, false);
             character.body.velocity.y = -speed;
-			if (character == tron1.character){
-				emitter1.x = tron1.character.x + 15;
-				emitter1.y = tron1.character.y + 35;
-			}
-			else {
-				emitter2.x = ghost1.character.x + 15;
-				emitter2.y = ghost1.character.y + 35;
-			}
+            character.emitter.x = character.x + 15;
+            character.emitter.y = character.y + 35;
         } else if (character.downKey.isDown) {
             character.animations.play('walkDown', 3, false);
             character.body.velocity.y = speed;
-			if (character == tron1.character){
-				emitter1.x = tron1.character.x + 15;
-				emitter1.y = tron1.character.y - 5;
-			}
-			else {
-				emitter2.x = ghost1.character.x + 15;
-				emitter2.y = ghost1.character.y - 5;
-			}
+            character.emitter.x = character.x + 15;
+            character.emitter.y = character.y + -5;            
         } else if (character.leftKey.isDown) {
             character.animations.play('walkLeft', 3, false);
             character.body.velocity.x = -speed;
+            character.emitter.x = character.x + 30;
+            character.emitter.y = character.y + 15;            
             if (character.x < 0) {
                 character.x = this.world.width;
             }
-			if (character == tron1.character){
-				emitter1.x = tron1.character.x + 30;
-				emitter1.y = tron1.character.y + 15;
-			}
-			else{
-				emitter2.x = ghost1.character.x + 30;
-				emitter2.y = ghost1.character.y + 15;
-			}
         } else if (character.rightKey.isDown) {
             character.animations.play('walkRight', 3, false);
             character.body.velocity.x = speed;
             if (character.x > this.world.width) {
                 character.x = 0;
             }
-			if (character == tron1.character){
-				emitter1.x = tron1.character.x;
-				emitter1.y = tron1.character.y + 15;
-			}
-			else {
-				emitter2.x = ghost1.character.x;
-				emitter2.y = ghost1.character.y + 15;
-			}
+            character.emitter.x = character.x;
+            character.emitter.y = character.y + 15;    
         }
 
         return {x: character.x, y: character.y};
