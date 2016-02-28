@@ -143,8 +143,8 @@ Hackatron.Game.prototype = {
 	
         this.socket.emit('playerMove', JSON.stringify({
             playerId: this.playerId, 
-            x: tron1.x, 
-            y: tron1.y
+            x: tron1.character.x, 
+            y: tron1.character.y
         }));
     }, 
 
@@ -230,22 +230,22 @@ Hackatron.Game.prototype = {
     updateClientSideListener : function () {
         this.socket.on('playerMove', function(data) {
             data = JSON.parse(data);
-            // console.log(data);
+            console.log(data);
 
             if (!this.playerList[data.playerId]) {
                 this.playerList[data.playerId] = data;
-                this.playerList[data.playerId].tron = Tron.init(this, 20, 20, 'tron');
+                this.playerList[data.playerId].tron = new Tron(this, 20, 20, 'tron');
                 this.physics.enable(this.playerList[data.playerId].tron, Phaser.Physics.ARCADE);
-                this.playerList[data.playerId].tron.body.immovable = true;
-                this.playerList[data.playerId].tron.body.collideWorldBounds = true;
+                // this.playerList[data.playerId].tron.character.body.immovable = true;
+                // this.playerList[data.playerId].tron.character.body.collideWorldBounds = true;
                 this.playerList[data.playerId].tron.scale.x = 0.8;
                 this.playerList[data.playerId].tron.scale.y = 0.8;
             }
 
             var player = this.playerList[data.playerId];
 
-            player.tron.x = data.x;
-            player.tron.y = data.y;
+            player.tron.character.x = data.x;
+            player.tron.character.y = data.y;
         }.bind(this));
     }
 };
