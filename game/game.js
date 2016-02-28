@@ -61,24 +61,23 @@ Hackatron.Game.prototype = {
 
         var Keyboard = Phaser.Keyboard;
 
-        tron1 = Tron.init(this.game, 20, 20, 'tron');
-        addAnimations(tron1);
-        setKeys(tron1, this, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
+        tron1 = new Tron(this.game, 20, 20, 'tron');
+        addAnimations(tron1.character);
+        setKeys(tron1.character, this, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
 
-        ghost1 = Ghost.init(this.game, 50, 20, 'ghost');
-        addAnimations(ghost1);
-        setKeys(ghost1, this, Keyboard.W, Keyboard.S, Keyboard.A, Keyboard.D);
+        ghost1 = new Ghost(this.game, 50, 20, 'ghost');
+        addAnimations(ghost1.character);
+        setKeys(ghost1.character, this, Keyboard.W, Keyboard.S, Keyboard.A, Keyboard.D);
 
-        tron1.scale.x = 0.8;
-        tron1.scale.y = 0.8;
+        tron1.character.scale.x = 0.8;
+        tron1.character.scale.y = 0.8;
 
-        ghost1.scale.x = 0.8;
-        ghost1.scale.y = 0.8;
+        ghost1.character.scale.x = 0.8;
+        ghost1.character.scale.y = 0.8;
 
-    
         // Collision
         this.game.physics.arcade.enable(this.layer);
-        this.game.physics.arcade.enable([tron1, ghost1], Phaser.Physics.ARCADE);
+        this.game.physics.arcade.enable([tron1.character, ghost1.character], Phaser.Physics.ARCADE);
         this.map.setCollision(18);
         this.map.setCollision(88);
         this.map.setCollision(54);
@@ -87,7 +86,7 @@ Hackatron.Game.prototype = {
         this.map.setCollision(52);
 
 
-		emitter1 = this.add.emitter(tron1.x, tron1.y, 50);
+		emitter1 = this.add.emitter(tron1.character.x, tron1.character.y, 50);
 		emitter1.width = 5;
 		emitter1.makeParticles('blueball');
 		emitter1.setXSpeed();
@@ -97,7 +96,7 @@ Hackatron.Game.prototype = {
 		emitter1.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
 		emitter1.start(false,250, 1);
 		
-		emitter2 = this.add.emitter(ghost1.x, ghost1.y, 50);
+		emitter2 = this.add.emitter(ghost1.character.x, ghost1.character.y, 50);
 		emitter2.width = 5;
 		emitter2.makeParticles('poop');
 		emitter2.setXSpeed();
@@ -119,11 +118,11 @@ Hackatron.Game.prototype = {
 
         };
 
-        this.updateCharPos(tron1, 200);
-        this.updateCharPos(ghost1, 200);
-        this.game.physics.arcade.collide(tron1, this.layer);
-        this.game.physics.arcade.collide(ghost1, this.layer);
-        this.game.physics.arcade.collide(ghost1, tron1, collisionHandler, null, this.game);
+        this.updateCharPos(tron1.character, 200);
+        this.updateCharPos(ghost1.character, 200);
+        this.game.physics.arcade.collide(tron1.character, this.layer);
+        this.game.physics.arcade.collide(ghost1.character, this.layer);
+        this.game.physics.arcade.collide(ghost1.character, tron1.character, collisionHandler, null, this.game);
     }, 
 
     updateCharPos: function(character, speed) {
@@ -132,24 +131,24 @@ Hackatron.Game.prototype = {
         if (character.upKey.isDown) {
             character.animations.play('walkUp', 3, false);
             character.body.velocity.y = -speed;
-			if (character == tron1){
-				emitter1.x = tron1.x + 15;
-				emitter1.y = tron1.y + 35;
+			if (character == tron1.character){
+				emitter1.x = tron1.character.x + 15;
+				emitter1.y = tron1.character.y + 35;
 			}
 			else {
-				emitter2.x = ghost1.x + 15;
-				emitter2.y = ghost1.y + 35;
+				emitter2.x = ghost1.character.x + 15;
+				emitter2.y = ghost1.character.y + 35;
 			}
         } else if (character.downKey.isDown) {
             character.animations.play('walkDown', 3, false);
             character.body.velocity.y = speed;
-			if (character == tron1){
-				emitter1.x = tron1.x + 15;
-				emitter1.y = tron1.y - 5;
+			if (character == tron1.character){
+				emitter1.x = tron1.character.x + 15;
+				emitter1.y = tron1.character.y - 5;
 			}
 			else {
-				emitter2.x = ghost1.x + 15;
-				emitter2.y = ghost1.y - 5;
+				emitter2.x = ghost1.character.x + 15;
+				emitter2.y = ghost1.character.y - 5;
 			}
         } else if (character.leftKey.isDown) {
             character.animations.play('walkLeft', 3, false);
@@ -157,13 +156,13 @@ Hackatron.Game.prototype = {
             if (character.x < 0) {
                 character.x = this.world.width;
             }
-			if (character == tron1){
-				emitter1.x = tron1.x + 30;
-				emitter1.y = tron1.y + 15;
+			if (character == tron1.character){
+				emitter1.x = tron1.character.x + 30;
+				emitter1.y = tron1.character.y + 15;
 			}
 			else{
-				emitter2.x = ghost1.x + 30;
-				emitter2.y = ghost1.y + 15;
+				emitter2.x = ghost1.character.x + 30;
+				emitter2.y = ghost1.character.y + 15;
 			}
         } else if (character.rightKey.isDown) {
             character.animations.play('walkRight', 3, false);
@@ -171,13 +170,13 @@ Hackatron.Game.prototype = {
             if (character.x > this.world.width) {
                 character.x = 0;
             }
-			if (character == tron1){
-				emitter1.x = tron1.x;
-				emitter1.y = tron1.y + 15;
+			if (character == tron1.character){
+				emitter1.x = tron1.character.x;
+				emitter1.y = tron1.character.y + 15;
 			}
 			else {
-				emitter2.x = ghost1.x;
-				emitter2.y = ghost1.y + 15;
+				emitter2.x = ghost1.character.x;
+				emitter2.y = ghost1.character.y + 15;
 			}
         }
 

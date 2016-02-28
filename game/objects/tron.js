@@ -1,11 +1,10 @@
-var Tron = Character.init;
-
-Tron.init = function(game, x, y, key) {
-    var tron = new Tron(game, x, y, key);
-    tron.isAlive = true;
-    tron.points = 0;
-    return tron;
+var Tron = function(game, x, y, key) {
+    Character.call(this, game, x, y, key);
+    this.isAlive = true;
+    this.points = 0;
 };
+
+Tron.prototype = new Character();
 
 Tron.prototype.kill = function() {
     this.isAlive = false; 
