@@ -1,4 +1,3 @@
-
 Hackatron.MainMenu = function(game) {
 };
 

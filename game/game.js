@@ -3,6 +3,7 @@ Hackatron = {
 };
 
 Hackatron.Game = function(game) {
+    this.player;
 };
 
 var tron1;
@@ -19,15 +20,16 @@ Hackatron.Game.prototype = {
         this.load.image('tron', 'assets/bluesprite.png');
         this.load.image('ghost', 'assets/yellowsprite.png');
         this.load.image('tiles', 'assets/part2_tileset.png');
-        this.load.text();
+        this.load.spritesheet('tron', 'images/tron.png', 32, 32, 12);
     },
 
     create: function() {
+        // Create the map
         this.map = this.add.tilemap('map');
         this.map.addTilesetImage('Wall', 'tiles');
 
+
         this.layer = this.map.createLayer('Tile Layer 1');
-        this.layer.resizeWorld();
 
         tron1 = Tron.init(this, 50, 50, 'tron');
         tron1.scale.x = 0.2;
@@ -41,9 +43,9 @@ Hackatron.Game.prototype = {
     	leftKey = this.input.keyboard.addKey(Phaser.Keyboard.LEFT);
     	rightKey = this.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
 
-        this.score = new Text(this, 10, 10, "Score: ");
-
-        this.scoreText = this.add.bitmapText(8, 360, 'gameFont', 'score: 0', 16);
+        // Add score text
+        this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
+        this.scoreText.addColor('White', 0);
     }, 
 
     update: function() {
@@ -64,7 +66,7 @@ Hackatron.Game.prototype = {
     	{
         	tron1.right();
     	}
-    }
+    }, 
 };
 
 
