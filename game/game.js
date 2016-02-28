@@ -17,6 +17,8 @@ Hackatron.Game.prototype = {
 
         this.layer = this.map.createLayer('Tile Layer 1');
         this.layer.resizeWorld();
+
+        this.score = new Text(this, 10, 10, "Score: ");
     }, 
 
     update: function() {
