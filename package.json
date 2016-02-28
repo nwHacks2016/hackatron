@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
-    "phaser": "https://github.com/photonstorm/phaser.git",
-    "grunt-contrib-connect": "https://github.com/gruntjs/grunt-contrib-connect.git"
+    "phaser": "https://github.com/photonstorm/phaser.git"
   },
   "main": "index.js",
   "scripts": {
@@ -21,6 +20,7 @@
   },
   "homepage": "https://github.com/nwHacks2016/hackatron#readme",
   "devDependencies": {
-    "grunt": "^0.4.5"
+    "grunt": "^0.4.5",
+    "grunt-contrib-connect": "git+https://github.com/gruntjs/grunt-contrib-connect.git",
   }
 }
