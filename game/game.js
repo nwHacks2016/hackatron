@@ -51,9 +51,10 @@ Hackatron.Game.prototype = {
     create: function() {
         this.playerId = guid();
         this.playerList = [];
-
         this.socket = io.connect();
         this.updateClientSideListener();
+        this.sendMessageToBankend();    // tell everyone you started a game
+
 
 
         var jsonfile = this.cache.getJSON('JSONobj');
@@ -84,23 +85,38 @@ Hackatron.Game.prototype = {
 
         var Keyboard = Phaser.Keyboard;
 
-        tron1 = new Tron(this.game, 20, 20, 'tron');
+        tron1 = new Tron();
+        tron1.init(this.game, 20, 20, 'tron');
+        tron1.setName(this.game, this.playerId.substring(0,2));
         addAnimations(tron1.character);
         setKeys(tron1.character, this, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
 
-        ghost1 = new Ghost(this.game, 50, 20, 'ghost');
-        addAnimations(ghost1.character);
-        setKeys(ghost1.character, this, Keyboard.W, Keyboard.S, Keyboard.A, Keyboard.D);
+        if (!ghost1) {
+            ghost1 = new Ghost();
+            ghost1.init(this.game, 50, 20, 'ghost');
+            addAnimations(ghost1.character);
+            setKeys(ghost1.character, this, Keyboard.W, Keyboard.S, Keyboard.A, Keyboard.D);
+            ghost1.character.scale.x = 0.8;
+            ghost1.character.scale.y = 0.8;
+            this.game.physics.arcade.enable([tron1.character, ghost1.character], Phaser.Physics.ARCADE);
+
+    		emitter2 = this.add.emitter(ghost1.character.x, ghost1.character.y, 50);
+    		emitter2.width = 5;
+    		emitter2.makeParticles('poop');
+    		emitter2.setXSpeed();
+    		emitter2.setYSpeed();
+    		emitter2.setRotation();
+    		emitter2.setAlpha(1, 0.4, 800);
+    		emitter2.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
+    		emitter2.start(false,250, 1);
+            ghost1.character.emitter = emitter2;
+        }
 
         tron1.character.scale.x = 0.8;
         tron1.character.scale.y = 0.8;
 
-        ghost1.character.scale.x = 0.8;
-        ghost1.character.scale.y = 0.8;
-
         // Collision
         this.game.physics.arcade.enable(this.layer);
-        this.game.physics.arcade.enable([tron1.character, ghost1.character], Phaser.Physics.ARCADE);
         this.map.setCollision(18);
         this.map.setCollision(88);
         this.map.setCollision(54);
@@ -128,6 +144,8 @@ Hackatron.Game.prototype = {
         emitter2.setAlpha(1, 0.4, 800);
         emitter2.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
         emitter2.start(false,250, 1);
+
+        tron1.character.emitter = emitter1;
 
         // Add score text
         this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
@@ -331,8 +349,8 @@ Hackatron.Game.prototype = {
             //     }
             // }
 
-            ghost1.character.x = currentPath[currentPathIndex].x * 16;
-            ghost1.character.y = currentPath[currentPathIndex].y * 16;
+            ghost1.character.x = Math.floor(currentPath[currentPathIndex].x) * 16;
+            ghost1.character.y = Math.floor(currentPath[currentPathIndex].y) * 16;
 
             //if (currentNextPointX == this.currentGhostXtile && currentNextPointY == this.currentGhostYtile) {
                 if (currentPathIndex < currentPath.length-1) {
@@ -349,9 +367,13 @@ Hackatron.Game.prototype = {
 
     update: function() {
         var collisionHandler = function() {
-            //ghost1.killTron(tron1);
-            console.log('collision!');
+            ghost1.killTron(tron1);
+            //ghost1.stopPathFinding;
+            var rebootGhost= function() {
+                //ghost1.startPathFinding;
+            };
 
+            this.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
 
         this.updateCharPos(tron1.character, 200);
@@ -362,55 +384,40 @@ Hackatron.Game.prototype = {
     
         this.socket.emit('playerMove', JSON.stringify({
             playerId: this.playerId, 
-            x: tron1.character.x, 
-            y: tron1.character.y
+            tron_x: tron1.character.x, 
+            tron_y: tron1.character.y,
+            ghost_x: ghost1.character.x,
+            ghost_y: ghost1.character.y
         }));
 
-        this.currentPlayerXtile = Math.floor(tron1.character.x / 16);
-        this.currentPlayerYtile = Math.floor(tron1.character.y / 16); 
-        this.currentGhostXtile = Math.floor(ghost1.character.x / 16);
-        this.currentGhostYtile = Math.floor(ghost1.character.y / 16); 
+        this.currentPlayerXtile = Math.floor(tron1.character.x / 16) - 1;
+        this.currentPlayerYtile = Math.floor(tron1.character.y / 16) - 1; 
+        this.currentGhostXtile = Math.floor(ghost1.character.x / 16) - 1;
+        this.currentGhostYtile = Math.floor(ghost1.character.y / 16) - 1; 
 
     }, 
 
-    updateCharPos: function(character, speed) {
+     updateCharPos: function(character, speed) {
+        if(!character || !character.body) return;
         character.body.velocity.x = 0;
         character.body.velocity.y = 0;
         if (character.upKey.isDown) {
             character.animations.play('walkUp', 3, false);
             character.body.velocity.y = -speed;
-            if (character == tron1.character){
-                emitter1.x = tron1.character.x + 15;
-                emitter1.y = tron1.character.y + 35;
-            }
-            else {
-                emitter2.x = ghost1.character.x + 15;
-                emitter2.y = ghost1.character.y + 35;
-            }
+            character.emitter.x = character.x + 15;
+            character.emitter.y = character.y + 35;
         } else if (character.downKey.isDown) {
             character.animations.play('walkDown', 3, false);
             character.body.velocity.y = speed;
-            if (character == tron1.character){
-                emitter1.x = tron1.character.x + 15;
-                emitter1.y = tron1.character.y - 5;
-            }
-            else {
-                emitter2.x = ghost1.character.x + 15;
-                emitter2.y = ghost1.character.y - 5;
-            }
+            character.emitter.x = character.x + 15;
+            character.emitter.y = character.y + -5;            
         } else if (character.leftKey.isDown) {
             character.animations.play('walkLeft', 3, false);
             character.body.velocity.x = -speed;
+            character.emitter.x = character.x + 30;
+            character.emitter.y = character.y + 15;            
             if (character.x < 0) {
                 character.x = this.world.width;
-            }
-            if (character == tron1.character){
-                emitter1.x = tron1.character.x + 30;
-                emitter1.y = tron1.character.y + 15;
-            }
-            else{
-                emitter2.x = ghost1.character.x + 30;
-                emitter2.y = ghost1.character.y + 15;
             }
         } else if (character.rightKey.isDown) {
             character.animations.play('walkRight', 3, false);
@@ -418,14 +425,8 @@ Hackatron.Game.prototype = {
             if (character.x > this.world.width) {
                 character.x = 0;
             }
-            if (character == tron1.character){
-                emitter1.x = tron1.character.x;
-                emitter1.y = tron1.character.y + 15;
-            }
-            else {
-                emitter2.x = ghost1.character.x;
-                emitter2.y = ghost1.character.y + 15;
-            }
+            character.emitter.x = character.x;
+            character.emitter.y = character.y + 15;    
         }
 
         return {x: character.x, y: character.y};
@@ -446,8 +447,8 @@ Hackatron.Game.prototype = {
             
             if(mapArray[pos] === 0){
                 var pellet = this.add.sprite(x*16+2, y*16+2, 'pellet');
-                pellet.scale.x = 0.05;
-                pellet.scale.y = 0.05;
+                pellet.scale.x = 0.005;
+                pellet.scale.y = 0.005;
             }
         }
     },
@@ -455,25 +456,50 @@ Hackatron.Game.prototype = {
     updateClientSideListener : function () {
         this.socket.on('playerMove', function(data) {
             data = JSON.parse(data);
-            console.log(data);
+            // console.log(data);
+            // if (!this.playerList) {
+            //     this.playerList = [];
+            // }
 
             if (!this.playerList[data.playerId]) {
                 this.playerList[data.playerId] = data;
-                this.playerList[data.playerId].tron = new Tron(this, 20, 20, 'tron');
+                var tron = new Tron();
+                tron.init(this.game, 20, 20, 'tron');
+                this.playerList[data.playerId].tron = tron;
+                tron.setName(this.game, data.playerId.substring(0,2));
                 this.physics.enable(this.playerList[data.playerId].tron, Phaser.Physics.ARCADE);
-                // this.playerList[data.playerId].tron.character.body.immovable = true;
-                // this.playerList[data.playerId].tron.character.body.collideWorldBounds = true;
                 this.playerList[data.playerId].tron.character.scale.x = 0.8;
                 this.playerList[data.playerId].tron.character.scale.y = 0.8;
             }
 
             var player = this.playerList[data.playerId];
 
-            player.tron.character.x = data.x;
-            player.tron.character.y = data.y;
+            player.tron.character.x = data.tron_x;
+            player.tron.character.y = data.tron_y;
+            ghost1.character.x = data.ghost_x;
+            ghost1.character.y = data.ghost_y;
+            emitter2.x = data.ghost_x;
+            emitter2.y = data.ghost_y;
         }.bind(this));
+
+        this.socket.on('gameStarted', function(data) {
+            data = JSON.parse(data);
+            console.log(data);
+            this.playerList[data.playerId] = data;
+            var tron = new Tron();
+            tron.init(this, 20, 20, 'tron');
+            tron.setName(this.game, data.playerId.substring(0,2));
+            this.playerList[data.playerId].tron = tron;
+            this.physics.enable(this.playerList[data.playerId].tron, Phaser.Physics.ARCADE);
+            this.playerList[data.playerId].tron.character.scale.x = 0.8;
+            this.playerList[data.playerId].tron.character.scale.y = 0.8;
+
+        }.bind(this));
+    },
+    sendMessageToBankend : function () {
+        this.socket.emit('gameStarted', JSON.stringify({
+            playerId: this.playerId,
+            sMessage: this.playerId + "just started a new game"
+        }));
     }
 };
-
-
-
