@@ -30,29 +30,30 @@ Hackatron.Game.prototype = {
         this.map.addTilesetImage('Wall', 'tiles');
 
         this.layer = this.map.createLayer('Tile Layer 1');
+        var addAdminations = function(character) {
+            character.animations.add('walkUp', [9,10,11], 3, false, true);
+            character.animations.add('walkDown', [0,1,2], 3, false, true);
+            character.animations.add('walkLeft', [3,4,5], 3, false, true);
+            character.animations.add('walkRight', [6,7,8], 3, false, true);
+        };
+
+        var setKeys = function(character, up, down, left, right) {
+            character.upKey = this.input.keyboard.addKey(up);
+            character.downKey = this.input.keyboard.addKey(down);
+            character.leftKey = this.input.keyboard.addKey(left);
+            character.rightKey = this.input.keyboard.addKey(right);
+        };
+
+        var keyboard = Phaser.Keyboard;
 
         tron1 = Tron.init(this, 50, 50, 'tron');
-        tron1.animations.add('walkUp', [9,10,11], 3, false, true);
-        tron1.animations.add('walkDown', [0,1,2], 3, false, true);
-        tron1.animations.add('walkLeft', [3,4,5], 3, false, true);
-        tron1.animations.add('walkRight', [6,7,8], 3, false, true);
-
-        tron1.upKey = this.input.keyboard.addKey(Phaser.Keyboard.UP);
-    	tron1.downKey = this.input.keyboard.addKey(Phaser.Keyboard.DOWN);
-    	tron1.leftKey = this.input.keyboard.addKey(Phaser.Keyboard.LEFT);
-    	tron1.rightKey = this.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+        addAdminations(tron1);
+        setKeys(tron1, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
 
         ghost1 = Ghost.init(this, 50, 50, 'ghost');
-        ghost1.animations.add('walkUp', [9,10,11], 3, false, true);
-        ghost1.animations.add('walkDown', [0,1,2], 3, false, true);
-        ghost1.animations.add('walkLeft', [3,4,5], 3, false, true);
-        ghost1.animations.add('walkRight', [6,7,8], 3, false, true);
-
-    	ghost1.upKey = this.input.keyboard.addKey(Phaser.Keyboard.W);
-    	ghost1.downKey = this.input.keyboard.addKey(Phaser.Keyboard.S);
-    	ghost1.leftKey = this.input.keyboard.addKey(Phaser.Keyboard.A);
-    	ghost1.rightKey = this.input.keyboard.addKey(Phaser.Keyboard.D);
-
+        addAdminations(ghost1);
+        setKeys(ghost1, Keyboard.W, Keyboard.S, Keyboard.A, Keyboard.D);
+    
 		emitter = this.add.emitter(tron1.x, tron1.y, 50);
 		emitter.width = 5;
 		emitter.makeParticles('blueball');
