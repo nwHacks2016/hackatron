@@ -30,16 +30,16 @@ function guid() {
 
 Hackatron.Game.prototype = {
     preload: function() {
-        this.load.tilemap('map', 'assets/tiles1.json', null, Phaser.Tilemap.TILED_JSON);
-        this.load.image('tiles', 'assets/part2_tileset.png');
-        this.load.spritesheet('tron', 'images/tron.png', 32, 32, 12);
-        this.load.spritesheet('ghost', 'images/ghost.png', 32, 32, 12);
+        this.load.tilemap('map', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/assets/tiles1.json', null, Phaser.Tilemap.TILED_JSON);
+        this.load.image('tiles', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/assets/part2_tileset.png');
+        this.load.spritesheet('tron', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/Images/tron.png', 32, 32, 12);
+        this.load.spritesheet('ghost', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/Images/ghost.png', 32, 32, 12);
 
-        this.load.json('JSONobj', 'assets/tiles1.json');
-        this.load.image('pellet', 'assets/pellet.png');
+        this.load.json('JSONobj', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/assets/tiles1.json');
+        this.load.image('pellet', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/assets/pellet.png');
         
 		this.load.image('blueball', 'images/blueball.png');
-		this.load.image('poop', 'images/poop.png');
+		this.load.image('poop', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/Images/poop.png');
     },
 
     create: function() {
