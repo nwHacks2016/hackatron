@@ -81,6 +81,7 @@ Hackatron.Game.prototype = {
 
         tron1 = new Tron();
         tron1.init(this.game, 20, 20, 'tron');
+        tron1.setName(this.game, this.playerId.substring(0,2));
         addAnimations(tron1.character);
         setKeys(tron1.character, this, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
 
@@ -231,6 +232,7 @@ Hackatron.Game.prototype = {
                 var tron = new Tron();
                 tron.init(this.game, 20, 20, 'tron');
                 this.playerList[data.playerId].tron = tron;
+                tron.setName(this.game, data.playerId.substring(0,2));
                 this.physics.enable(this.playerList[data.playerId].tron, Phaser.Physics.ARCADE);
                 this.playerList[data.playerId].tron.character.scale.x = 0.8;
                 this.playerList[data.playerId].tron.character.scale.y = 0.8;
@@ -249,9 +251,11 @@ Hackatron.Game.prototype = {
         this.socket.on('gameStarted', function(data) {
             data = JSON.parse(data);
             console.log(data);
-
             this.playerList[data.playerId] = data;
-            this.playerList[data.playerId].tron = new Tron(this, 20, 20, 'tron');
+            var tron = new Tron();
+            tron.init(this, 20, 20, 'tron');
+            tron.setName(this.game, data.playerId.substring(0,2));
+            this.playerList[data.playerId].tron = tron;
             this.physics.enable(this.playerList[data.playerId].tron, Phaser.Physics.ARCADE);
             this.playerList[data.playerId].tron.character.scale.x = 0.8;
             this.playerList[data.playerId].tron.character.scale.y = 0.8;
