@@ -17,6 +17,12 @@ var rightKey;
 var emitter1;
 var emitter2;
 var tilemapData;
+var enemyDirection;
+var posX = 0;
+var posY = 0;
+        var moves = [];
+        var currentPath;
+        var currentPathIndex = 0;
 
 function guid() {
   function s4() {
@@ -38,8 +44,8 @@ Hackatron.Game.prototype = {
         this.load.json('JSONobj', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/assets/tiles1.json');
         this.load.image('pellet', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/assets/pellet.png');
         
-		this.load.image('blueball', 'images/blueball.png');
-		this.load.image('poop', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/Images/poop.png');
+        this.load.image('blueball', 'images/blueball.png');
+        this.load.image('poop', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/Images/poop.png');
     },
 
     create: function() {
@@ -103,29 +109,242 @@ Hackatron.Game.prototype = {
         this.map.setCollision(52);
 
 
-		emitter1 = this.add.emitter(tron1.character.x, tron1.character.y, 50);
-		emitter1.width = 5;
-		emitter1.makeParticles('blueball');
-		emitter1.setXSpeed();
-		emitter1.setYSpeed();
-		emitter1.setRotation();
-		emitter1.setAlpha(1, 0.4, 800);
-		emitter1.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
-		emitter1.start(false,250, 1);
-		
-		emitter2 = this.add.emitter(ghost1.character.x, ghost1.character.y, 50);
-		emitter2.width = 5;
-		emitter2.makeParticles('poop');
-		emitter2.setXSpeed();
-		emitter2.setYSpeed();
-		emitter2.setRotation();
-		emitter2.setAlpha(1, 0.4, 800);
-		emitter2.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
-		emitter2.start(false,250, 1);
+        emitter1 = this.add.emitter(tron1.character.x, tron1.character.y, 50);
+        emitter1.width = 5;
+        emitter1.makeParticles('blueball');
+        emitter1.setXSpeed();
+        emitter1.setYSpeed();
+        emitter1.setRotation();
+        emitter1.setAlpha(1, 0.4, 800);
+        emitter1.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
+        emitter1.start(false,250, 1);
+        
+        emitter2 = this.add.emitter(ghost1.character.x, ghost1.character.y, 50);
+        emitter2.width = 5;
+        emitter2.makeParticles('poop');
+        emitter2.setXSpeed();
+        emitter2.setYSpeed();
+        emitter2.setRotation();
+        emitter2.setAlpha(1, 0.4, 800);
+        emitter2.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
+        emitter2.start(false,250, 1);
 
         // Add score text
         this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
         this.scoreText.addColor('White', 0);
+
+        this.currentPlayerXtile = 0;
+        this.currentPlayerYtile = 0;
+        this.currentGhostXtile = 0;
+        this.currentGhostYtile = 0;
+        var mazeWidth = 32;
+        var mazeHeight = 32;
+
+        var convertedLevel = [];
+        var originalLevel = jsonfile.layers[0].data;
+
+        for (var i = 0, l = originalLevel.length; i < l; ++i) {
+            var x = i % 32;
+            var y = Math.floor(i / 32);
+
+            if (!convertedLevel[x]) {
+                convertedLevel[x] = [];
+            }
+
+            convertedLevel[x][y] = originalLevel[i];
+        }
+
+          
+
+        this.easystar = new EasyStar.js();
+        this.easystar.setGrid(convertedLevel);
+        this.easystar.setAcceptableTiles([0]);
+        // easystar.enableDiagonals();
+        //easystar.disableCornerCutting();
+        // easystar.enableCornerCutting();
+
+        var timeStep = 400;
+
+        setInterval(function() { 
+                            
+          // var posX = this.currentPlayerXtile;
+          // var posY = this.currentPlayerYtile;
+               
+               // var possibleDirections = "";
+               // if(posX+2 > 0 && posX + 2 < this.currentGhostXtile){
+               //      possibleDirections += "S";
+               // }
+               // if(posX-2 > 0 && posX - 2 < this.currentGhostXtile){
+               //      possibleDirections += "N";
+               // }
+               // if(posY-2 > 0 && posY - 2 < this.currentGhostYtile){
+               //      possibleDirections += "W";
+               // }
+               // if(posY+2 > 0 && posY + 2 < this.currentGhostYtile){
+               //      possibleDirections += "E";
+               // }
+               // if(possibleDirections){
+               //      var move = this.game.rnd.between(0, possibleDirections.length - 1);
+               //      switch (possibleDirections[move]){
+               //           case "N": 
+               //                posX -= 2;
+               //                break;
+               //           case "S":
+               //                posX += 2;
+               //                break;
+               //                posY -= 2;
+               //                break;
+               //           case "E":
+               //                posY += 2;
+               //                break;         
+               //      }
+               //      moves.push({x: posX, y: posY});     
+               // }
+               // else if (moves.length) {
+               //      var back = moves.pop();
+               //      posX = Math.floor(back.x / mazeWidth);
+               //      posY = back.y % mazeHeight;
+               // }  
+
+               if (!currentPath) {
+                    this.easystar.findPath(this.currentGhostXtile, this.currentGhostYtile, this.currentPlayerXtile, this.currentPlayerYtile, function( path ) {
+
+                        if (!path || path.length < 2) {
+                            console.log("The path to the destination point was not found.");
+                            return;
+                        }
+
+                        currentPath = path;  
+
+                        // Periodically reset
+                        setTimeout(function() {
+                            currentPathIndex = 0;
+                            currentPath = null;
+                        }, 3000);           
+                    }.bind(this));
+
+               }
+             this.easystar.calculate();
+
+
+        if (currentPath && currentPathIndex < currentPath.length) {
+            // currentNextPointX = currentPath[currentPathIndex].x;
+            // currentNextPointY = currentPath[currentPathIndex].y;
+                
+           //  if (currentNextPointX == this.currentGhostXtile && currentNextPointY < this.currentGhostYtile)
+           //  {
+           //     // up
+                                
+           //     console.log("GO UP");
+                                
+           //     enemyDirection = "N";
+                                
+           //  }
+           // else if (currentNextPointX < this.currentGhostXtile && currentNextPointY == this.currentGhostYtile)
+           // {
+           //    // left
+                                
+           //     console.log("GO LEFT");
+                                
+           //     enemyDirection = "W";
+                                
+           // }
+           // else if (currentNextPointX > this.currentGhostXtile && currentNextPointY == this.currentGhostYtile)
+           // {
+           //    // right
+                                
+           //     console.log("GO RIGHT");
+                                
+           //     enemyDirection = "E";
+                            
+           // }    
+           // else if (currentNextPointX == this.currentGhostXtile && currentNextPointY > this.currentGhostYtile)
+           // {
+           //    // down
+                                
+           //   console.log("GO DOWN");
+                                
+           //   enemyDirection = "S";
+                                
+           // }            
+           // //  else if (currentNextPointX < this.currentGhostXtile && currentNextPointY < this.currentGhostYtile) {
+           // //     // left up
+                                
+           // //     console.log("GO LEFT UP");
+                                
+           // //     enemyDirection = "NW";
+           // //  }
+           // //  else if (currentNextPointX > this.currentGhostXtile && currentNextPointY < this.currentGhostYtile)
+           // //  {
+           // //     // right up
+                                
+           // //     console.log("GO RIGHT UP");
+                                
+           // //     enemyDirection = "NE";
+                                
+           // // }
+           // // else if (currentNextPointX > this.currentGhostXtile && currentNextPointY > this.currentGhostYtile)
+           // // {
+           // //    // right down
+                                
+           // //  console.log("GO RIGHT DOWN");
+                                
+           // //  enemyDirection = "SE";
+                                
+           // // }
+           // // else if (currentNextPointX < this.currentGhostXtile && currentNextPointY > this.currentGhostYtile)
+           // // {
+           // //   // left down
+                                
+           // //  console.log("GO LEFT DOWN");
+                                
+           // //  enemyDirection = "SW";
+                                
+           // // }
+           // else
+           // {
+                                
+           //  enemyDirection = null;//"STOP";
+                                
+           // }
+                            
+           // if (enemyDirection != "STOP") ghost1.character.animations.play(enemyDirection); 
+            // this.currentGhostXtile = posX;
+            // this.currentGhostYtile = posY; 
+            // var enemySpeed = 900;
+
+            // if (enemyDirection) {
+            //     ghost1.character.body.velocity.x = 0;
+            //     ghost1.character.body.velocity.y = 0;
+               
+            //     if (enemyDirection.indexOf('N') !== -1) {
+            //         ghost1.character.body.velocity.y = -enemySpeed;
+            //     }
+            //     if (enemyDirection.indexOf('S') !== -1) {
+            //         ghost1.character.body.velocity.y = enemySpeed;
+            //     }
+            //     if (enemyDirection.indexOf('E') !== -1) {
+            //         ghost1.character.body.velocity.x = enemySpeed;
+            //     }
+            //     if (enemyDirection.indexOf('W') !== -1) {
+            //         ghost1.character.body.velocity.x = -enemySpeed;
+            //     }
+            // }
+
+            ghost1.character.x = currentPath[currentPathIndex].x * 16;
+            ghost1.character.y = currentPath[currentPathIndex].y * 16;
+
+            //if (currentNextPointX == this.currentGhostXtile && currentNextPointY == this.currentGhostYtile) {
+                if (currentPathIndex < currentPath.length-1) {
+                    ++currentPathIndex;
+                } else {
+                    currentPathIndex = 0;
+                    currentPath = null;
+                }
+            //}
+        }
+
+        }.bind(this), 300);
     }, 
 
     update: function() {
@@ -139,13 +358,19 @@ Hackatron.Game.prototype = {
         this.updateCharPos(ghost1.character, 200);
         this.game.physics.arcade.collide(tron1.character, this.layer);
         this.game.physics.arcade.collide(ghost1.character, this.layer);
-        this.game.physics.arcade.collide(ghost1.character, tron1.character, collisionHandler, null, this.game);
-	
+        this.game.physics.arcade.collide(tron1.character, collisionHandler, null, this.game);
+    
         this.socket.emit('playerMove', JSON.stringify({
             playerId: this.playerId, 
             x: tron1.character.x, 
             y: tron1.character.y
         }));
+
+        this.currentPlayerXtile = Math.floor(tron1.character.x / 16);
+        this.currentPlayerYtile = Math.floor(tron1.character.y / 16); 
+        this.currentGhostXtile = Math.floor(ghost1.character.x / 16);
+        this.currentGhostYtile = Math.floor(ghost1.character.y / 16); 
+
     }, 
 
     updateCharPos: function(character, speed) {
@@ -154,53 +379,53 @@ Hackatron.Game.prototype = {
         if (character.upKey.isDown) {
             character.animations.play('walkUp', 3, false);
             character.body.velocity.y = -speed;
-			if (character == tron1.character){
-				emitter1.x = tron1.character.x + 15;
-				emitter1.y = tron1.character.y + 35;
-			}
-			else {
-				emitter2.x = ghost1.character.x + 15;
-				emitter2.y = ghost1.character.y + 35;
-			}
+            if (character == tron1.character){
+                emitter1.x = tron1.character.x + 15;
+                emitter1.y = tron1.character.y + 35;
+            }
+            else {
+                emitter2.x = ghost1.character.x + 15;
+                emitter2.y = ghost1.character.y + 35;
+            }
         } else if (character.downKey.isDown) {
             character.animations.play('walkDown', 3, false);
             character.body.velocity.y = speed;
-			if (character == tron1.character){
-				emitter1.x = tron1.character.x + 15;
-				emitter1.y = tron1.character.y - 5;
-			}
-			else {
-				emitter2.x = ghost1.character.x + 15;
-				emitter2.y = ghost1.character.y - 5;
-			}
+            if (character == tron1.character){
+                emitter1.x = tron1.character.x + 15;
+                emitter1.y = tron1.character.y - 5;
+            }
+            else {
+                emitter2.x = ghost1.character.x + 15;
+                emitter2.y = ghost1.character.y - 5;
+            }
         } else if (character.leftKey.isDown) {
             character.animations.play('walkLeft', 3, false);
             character.body.velocity.x = -speed;
             if (character.x < 0) {
                 character.x = this.world.width;
             }
-			if (character == tron1.character){
-				emitter1.x = tron1.character.x + 30;
-				emitter1.y = tron1.character.y + 15;
-			}
-			else{
-				emitter2.x = ghost1.character.x + 30;
-				emitter2.y = ghost1.character.y + 15;
-			}
+            if (character == tron1.character){
+                emitter1.x = tron1.character.x + 30;
+                emitter1.y = tron1.character.y + 15;
+            }
+            else{
+                emitter2.x = ghost1.character.x + 30;
+                emitter2.y = ghost1.character.y + 15;
+            }
         } else if (character.rightKey.isDown) {
             character.animations.play('walkRight', 3, false);
             character.body.velocity.x = speed;
             if (character.x > this.world.width) {
                 character.x = 0;
             }
-			if (character == tron1.character){
-				emitter1.x = tron1.character.x;
-				emitter1.y = tron1.character.y + 15;
-			}
-			else {
-				emitter2.x = ghost1.character.x;
-				emitter2.y = ghost1.character.y + 15;
-			}
+            if (character == tron1.character){
+                emitter1.x = tron1.character.x;
+                emitter1.y = tron1.character.y + 15;
+            }
+            else {
+                emitter2.x = ghost1.character.x;
+                emitter2.y = ghost1.character.y + 15;
+            }
         }
 
         return {x: character.x, y: character.y};

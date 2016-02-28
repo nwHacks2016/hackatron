@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
-    "express": "^4.13.4",
+    "express": "4.13.4",
     "phaser": "https://github.com/photonstorm/phaser.git",
     "socket.io": "^1.4.5"
   },
