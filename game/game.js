@@ -45,11 +45,10 @@ Hackatron.Game.prototype = {
     	tron1.leftKey = this.input.keyboard.addKey(Phaser.Keyboard.LEFT);
     	tron1.rightKey = this.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
 
-    	wKey = this.input.keyboard.addKey(Phaser.Keyboard.W);
-    	sKey = this.input.keyboard.addKey(Phaser.Keyboard.S);
-    	aKey = this.input.keyboard.addKey(Phaser.Keyboard.A);
-    	dKey = this.input.keyboard.addKey(Phaser.Keyboard.D);
-
+    	ghost1.upKey = this.input.keyboard.addKey(Phaser.Keyboard.W);
+    	ghost1.downKey = this.input.keyboard.addKey(Phaser.Keyboard.S);
+    	ghost1.leftKey = this.input.keyboard.addKey(Phaser.Keyboard.A);
+    	ghost1.rightKey = this.input.keyboard.addKey(Phaser.Keyboard.D);
 
         // Add score text
         this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
@@ -59,52 +58,25 @@ Hackatron.Game.prototype = {
     update: function() {
         var speed = 3;
 
-        // tron1 controls
-        tron1.animations.play('walk', 3, false);
-    	if (upKey.isDown) {
-            tron1.animations.play('walkUp', 3, false);
-    		tron1.y -= speed;
-    	}
-    	else if (downKey.isDown)
-    	{
-            tron1.animations.play('walkDown', 3, false);
-        	tron1.y += speed;
-    	}
-
-    	if (leftKey.isDown)
-    	{
-            tron1.animations.play('walkLeft', 3, false);
-        	tron1.x -= speed;
-            if (tron1.x < 0) {
-                tron1.x = this.world.width;
-            }
-    	}
-    	else if (rightKey.isDown)
-    	{
-            tron1.animations.play('walkRight', 3, false);
-        	tron1.x += speed;
-            if (tron1.x > this.world.width) {
-                tron1.x = 0;
-            }
-    	}
+        this.updateCharPos(tron1);
 
         // ghost1 controls
-        if (wKey.isDown) {
+        if (ghost1.upKey.isDown) {
             ghost1.y -= 5;
         }
-        else if (sKey.isDown)
+        else if (ghost1.downKey.isDown)
         {
             ghost1.y += 5;
         }
 
-        if (aKey.isDown)
+        if (ghost1.leftKey.isDown)
         {
             ghost1.x -= 5;
             if (ghost1.x < 0) {
                 ghost1.x = this.world.width;
             }
         }
-        else if (dKey.isDown)
+        else if (ghost1.rightKey.isDown)
         {
             ghost1.x += 5;
             if (ghost1.x > this.world.width) {
@@ -112,32 +84,35 @@ Hackatron.Game.prototype = {
             }
         }
     }, 
+
+    updateCharPos: function(character) {
+        character.animations.play('walk', 3, false);
+        if (character.upKey.isDown) {
+                tron1.animations.play('walkUp', 3, false);
+
+            character.y -= 5;
+        } else if (character.downKey.isDown) {
+            character.animations.play('walkDown', 3, false);
+            character.y += 5;
+        } else if (character.leftKey.isDown)
+        {
+            character.animations.play('walkLeft', 3, false);
+            character.x -= 5;
+            if (character.x < 0) {
+                character.x = this.world.width;
+            }
+
+        } else if (character.rightKey.isDown) {
+            character.animations.play('walkRight', 3, false);
+            character.x += 5;
+            if (character.x > this.world.width) {
+                character.x = 0;
+            }
+        }
+
+        return {x: character.x, y: character.y};
+    }
 };
 
-var updateCharPos(character) {
-    if (character.upKey.isDown) {
-        character.y -= 5;
-    }
-    else if (character.downKey.isDown)
-    {
-        character.y += 5;
-    }
 
-    if (character.leftKey.isDown)
-    {
-        character.x -= 5;
-        if (character.x < 0) {
-            character.x = this.world.width;
-        }
-    }
-    else if (character.rightKey.isDown)
-    {
-        character.x += 5;
-        if (character.x > this.world.width) {
-            character.x = 0;
-        }
-    }
-
-    return {x: character.x, y: character.y};
-};
 
