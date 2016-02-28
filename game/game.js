@@ -45,9 +45,10 @@ Hackatron.Game.prototype = {
     create: function() {
         this.playerId = guid();
         this.playerList = [];
-
         this.socket = io.connect();
         this.updateClientSideListener();
+        this.sendMessageToBankend();    // tell everyone you started a game
+
 
 
         var jsonfile = this.cache.getJSON('JSONobj');
@@ -235,11 +236,15 @@ Hackatron.Game.prototype = {
     updateClientSideListener : function () {
         this.socket.on('playerMove', function(data) {
             data = JSON.parse(data);
-            console.log(data);
+            // console.log(data);
+            // if (!this.playerList) {
+            //     this.playerList = [];
+            // }
 
             if (!this.playerList[data.playerId]) {
                 this.playerList[data.playerId] = data;
-                this.playerList[data.playerId].tron = new Tron(this, 20, 20, 'tron');
+                var tron = new Tron();
+                this.playerList[data.playerId].tron = tron.init(this.game, 20, 20, 'tron');
                 this.physics.enable(this.playerList[data.playerId].tron, Phaser.Physics.ARCADE);
                 this.playerList[data.playerId].tron.character.scale.x = 0.8;
                 this.playerList[data.playerId].tron.character.scale.y = 0.8;
@@ -254,8 +259,23 @@ Hackatron.Game.prototype = {
             emitter2.x = data.ghost_x;
             emitter2.y = data.ghost_y;
         }.bind(this));
+
+        this.socket.on('gameStarted', function(data) {
+            data = JSON.parse(data);
+            console.log(data);
+
+            this.playerList[data.playerId] = data;
+            this.playerList[data.playerId].tron = new Tron(this, 20, 20, 'tron');
+            this.physics.enable(this.playerList[data.playerId].tron, Phaser.Physics.ARCADE);
+            this.playerList[data.playerId].tron.character.scale.x = 0.8;
+            this.playerList[data.playerId].tron.character.scale.y = 0.8;
+
+        }.bind(this));
+    },
+    sendMessageToBankend : function () {
+        this.socket.emit('gameStarted', JSON.stringify({
+            playerId: this.playerId,
+            sMessage: this.playerId + "just started a new game"
+        }));
     }
 };
-
-
-
