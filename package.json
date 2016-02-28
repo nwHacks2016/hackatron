@@ -1,0 +1,22 @@
+{
+  "name": "hackatron",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "phaser": "https://github.com/photonstorm/phaser.git"
+      },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nwHacks2016/hackatron.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nwHacks2016/hackatron/issues"
+  },
+  "homepage": "https://github.com/nwHacks2016/hackatron#readme"
+}
