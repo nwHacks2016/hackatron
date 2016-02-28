@@ -49,11 +49,11 @@ Hackatron.Game.prototype = {
 
         var Keyboard = Phaser.Keyboard;
 
-        tron1 = Tron.init(this, 20, 20, 'tron');
+        tron1 = Tron.init(this.game, 20, 20, 'tron');
         addAnimations(tron1);
         setKeys(tron1, this, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
 
-        ghost1 = Ghost.init(this, 20, 20, 'ghost');
+        ghost1 = Ghost.init(this.game, 50, 20, 'ghost');
         addAnimations(ghost1);
         setKeys(ghost1, this, Keyboard.W, Keyboard.S, Keyboard.A, Keyboard.D);
 
@@ -65,9 +65,8 @@ Hackatron.Game.prototype = {
 
     
         // Collision
-        this.physics.arcade.enable(this.layer);
-        this.physics.arcade.enable(tron1, Phaser.Physics.ARCADE);
-        this.physics.enable(ghost1, Phaser.Physics.ARCADE);
+        this.game.physics.arcade.enable(this.layer);
+        this.game.physics.arcade.enable([tron1, ghost1], Phaser.Physics.ARCADE);
         this.map.setCollision(18);
         this.map.setCollision(88);
         this.map.setCollision(54);
@@ -75,11 +74,6 @@ Hackatron.Game.prototype = {
         this.map.setCollision(53);
         this.map.setCollision(52);
 
-        tron1.body.immovable = true;
-        tron1.body.collideWorldBounds = true;
-
-        ghost1.body.immovable = true;
-        ghost1.body.collideWorldBounds = true;
 
 		emitter = this.add.emitter(tron1.x, tron1.y, 50);
 		emitter.width = 5;
@@ -99,14 +93,16 @@ Hackatron.Game.prototype = {
 
     update: function() {
         var collisionHandler = function() {
-            console.log('Tron: ', tron1);
-            console.log('Ghost: ', ghost1);
+            //ghost1.killTron(tron1);
+            console.log('collision!');
+
         };
+
         this.updateCharPos(tron1, 200);
         this.updateCharPos(ghost1, 200);
-        this.physics.arcade.collide(tron1, this.layer);
-        this.physics.arcade.collide(ghost1, this.layer);
-        this.physics.arcade.collide(ghost1, tron1, collisionHandler, null, this.game);
+        this.game.physics.arcade.collide(tron1, this.layer);
+        this.game.physics.arcade.collide(ghost1, this.layer);
+        this.game.physics.arcade.collide(ghost1, tron1, collisionHandler, null, this.game);
     }, 
 
     updateCharPos: function(character, speed) {
