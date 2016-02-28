@@ -9,7 +9,18 @@
 </head>
 <body>
   <div id="hackatron"></div>
-  <script src="node_modules/phaser/src/Phaser.js"></script>
+  <script src="node_modules/phaser/build/phaser.js"></script>
   <script src="game/game.js"></script>
+
+    <script type="text/javascript">
+
+    window.onload = function () {
+
+        var game = new Phaser.Game(512, 384, Phaser.CANVAS, 'game');
+
+        game.state.add('Game', Pacman.Game);
+    }
+    </script>
+  
 </body>
 </html>
