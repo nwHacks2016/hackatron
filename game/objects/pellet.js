@@ -1,4 +1,4 @@
-var Pellet = function(type) {
+Pellet = function(type) {
     this.isAlive = true;
     this.type = type;
 };
