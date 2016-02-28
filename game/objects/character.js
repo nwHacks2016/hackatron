@@ -36,4 +36,4 @@ define([], function() {
 	};
 
 	return Character;
-})
+});
