@@ -161,15 +161,10 @@ Hackatron.Game.prototype = {
         var convertedLevel = [];
         var originalLevel = jsonfile.layers[0].data;
 
-        for (var i = 0, l = originalLevel.length; i < l; ++i) {
-            var x = i % 32;
-            var y = Math.floor(i / 32);
+        for (var i = 0, l = Math.floor(originalLevel.length / 32); i < l; ++i) {
+            var row = originalLevel.slice(i * 32, i * 32 + 32);
 
-            if (!convertedLevel[x]) {
-                convertedLevel[x] = [];
-            }
-
-            convertedLevel[x][y] = originalLevel[i];
+            convertedLevel.push(row);
         }
 
           
@@ -362,7 +357,7 @@ Hackatron.Game.prototype = {
             //}
         }
 
-        }.bind(this), 300);
+        }.bind(this), 100);
     }, 
 
     update: function() {
@@ -390,10 +385,10 @@ Hackatron.Game.prototype = {
             ghost_y: ghost1.character.y
         }));
 
-        this.currentPlayerXtile = Math.floor(tron1.character.x / 16) - 1;
-        this.currentPlayerYtile = Math.floor(tron1.character.y / 16) - 1; 
-        this.currentGhostXtile = Math.floor(ghost1.character.x / 16) - 1;
-        this.currentGhostYtile = Math.floor(ghost1.character.y / 16) - 1; 
+        this.currentPlayerXtile = Math.floor(tron1.character.x / 16);
+        this.currentPlayerYtile = Math.floor(tron1.character.y / 16); 
+        this.currentGhostXtile = Math.floor(ghost1.character.x / 16);
+        this.currentGhostYtile = Math.floor(ghost1.character.y / 16); 
 
     }, 
 
