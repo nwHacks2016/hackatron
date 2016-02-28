@@ -23,8 +23,8 @@
     window.onload = function () {
         var game = new Phaser.Game(512, 512, Phaser.CANVAS, 'game');
 
-        game.state.add('MainMenu', Tron.MainMenu);
-        game.state.add('Game', Tron.Game);
+        game.state.add('MainMenu', Hackatron.MainMenu);
+        game.state.add('Game', Hackatron.Game);
 
         game.state.start('MainMenu');
     }

@@ -1,12 +1,13 @@
-Tron = {
+Hackatron = {
     score: 0
 };
 
-Tron.Game = function(game) {
+Hackatron.Game = function(game) {
 };
 
-Tron.Game.prototype = {
+Hackatron.Game.prototype = {
     preload: function() {
+
     },
 
     create: function() {
