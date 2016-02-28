@@ -1,7 +1,7 @@
 var Ghost = Character.init;
 
-Ghost.init = function(name) {
-    var ghost = new Ghost(name);
+Ghost.init = function(game, x, y, key, frame) {
+    var ghost = new Ghost(game, x, y, key, frame);
     ghost.points = 0;
     return ghost
 };
