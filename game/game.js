@@ -51,20 +51,20 @@ Hackatron.Game.prototype = {
     update: function() {
 
     	if (upKey.isDown) {
-    		tron1.up();
+    		tron1.y -= 5;
     	}
     	else if (downKey.isDown)
     	{
-        	tron1.down();
+        	tron1.y += 5;
     	}
 
     	if (leftKey.isDown)
     	{
-        	tron1.left();
+        	tron1.x -= 5;
     	}
     	else if (rightKey.isDown)
     	{
-        	tron1.right();
+        	tron1.x += 5;
     	}
     }, 
 };
