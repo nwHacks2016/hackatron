@@ -3,6 +3,7 @@ var Ghost = Character.init;
 Ghost.init = function(game, x, y, key, frame) {
     var ghost = new Ghost(game, x, y, key, frame);
     ghost.points = 0;
+    game.physics.arcade.enableBody(this);
     return ghost
 };
 

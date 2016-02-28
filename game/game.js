@@ -23,12 +23,12 @@ Hackatron.Game.prototype = {
     },
 
     create: function() {
+        // game.physics.startSystem(Phaser.Physics.ARCADE);
         // Create the map
         this.map = this.add.tilemap('map');
         this.map.addTilesetImage('Wall', 'tiles');
-
-
         this.layer = this.map.createLayer('Tile Layer 1');
+
 
         tron1 = Tron.init(this, 50, 50, 'tron');
         tron1.animations.add('walkUp', [9,10,11], 3, false, true);
@@ -37,9 +37,9 @@ Hackatron.Game.prototype = {
         tron1.animations.add('walkRight', [6,7,8], 3, false, true);
 
         tron1.upKey = this.input.keyboard.addKey(Phaser.Keyboard.UP);
-    	tron1.downKey = this.input.keyboard.addKey(Phaser.Keyboard.DOWN);
-    	tron1.leftKey = this.input.keyboard.addKey(Phaser.Keyboard.LEFT);
-    	tron1.rightKey = this.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+        tron1.downKey = this.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+        tron1.leftKey = this.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+        tron1.rightKey = this.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
 
         ghost1 = Ghost.init(this, 70, 70, 'ghost');
         ghost1.animations.add('walkUp', [9,10,11], 3, false, true);
@@ -47,17 +47,23 @@ Hackatron.Game.prototype = {
         ghost1.animations.add('walkLeft', [3,4,5], 3, false, true);
         ghost1.animations.add('walkRight', [6,7,8], 3, false, true);
 
-    	ghost1.upKey = this.input.keyboard.addKey(Phaser.Keyboard.W);
-    	ghost1.downKey = this.input.keyboard.addKey(Phaser.Keyboard.S);
-    	ghost1.leftKey = this.input.keyboard.addKey(Phaser.Keyboard.A);
-    	ghost1.rightKey = this.input.keyboard.addKey(Phaser.Keyboard.D);
+        ghost1.upKey = this.input.keyboard.addKey(Phaser.Keyboard.W);
+        ghost1.downKey = this.input.keyboard.addKey(Phaser.Keyboard.S);
+        ghost1.leftKey = this.input.keyboard.addKey(Phaser.Keyboard.A);
+        ghost1.rightKey = this.input.keyboard.addKey(Phaser.Keyboard.D);
 
         // Add score text
         this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
         this.scoreText.addColor('White', 0);
+        this.physics.enable(tron1);
+        // this.add(this.layer);
     }, 
 
     update: function() {
+        this.game.physics.arcade.collide(tron1, this.layer, null);
+        this.game.physics.arcade.collide(tron1, this.ghost1, null);
+        this.game.physics.arcade.collide(tron1, this.ghost1, this.damageHandler, null, this);
+
         var speed = 3;
 
         this.updateCharPos(tron1, 3);
@@ -90,6 +96,10 @@ Hackatron.Game.prototype = {
         }
 
         return {x: character.x, y: character.y};
+    }, 
+
+    damageHandler : function() {
+        console.log("it colliide");
     }
 };
 
