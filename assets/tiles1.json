@@ -18,7 +18,7 @@
 
     },
  "renderorder":"right-down",
- "tileheight":32,
+ "tileheight":15.5,
  "tilesets":[
         {
          "columns":18,
@@ -54,7 +54,7 @@
          "tileheight":32,
          "tilewidth":32
         }],
- "tilewidth":32,
+ "tilewidth":15.5,
  "version":1,
  "width":32
 }
