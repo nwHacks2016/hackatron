@@ -93,7 +93,7 @@ Hackatron.Game.prototype = {
 
         if (!ghost1) {
             ghost1 = new Ghost();
-            ghost1.init(this.game, 50, 20, 'ghost');
+            ghost1.init(this.game, 512-16, 20, 'ghost');
             addAnimations(ghost1.character);
             setKeys(ghost1.character, this, Keyboard.W, Keyboard.S, Keyboard.A, Keyboard.D);
             ghost1.character.scale.x = 0.8;
