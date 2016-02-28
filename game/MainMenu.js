@@ -1,8 +1,8 @@
 
-Tron.MainMenu = function(game) {
+Hackatron.MainMenu = function(game) {
 };
 
-Tron.MainMenu.prototype = {
+Hackatron.MainMenu.prototype = {
     preload: function() {
         this.load.image('menu_background', 'images/mainmenu.png');
         this.load.spritesheet('start_button', 'images/startbutton_spritesheet.png', 155, 80);

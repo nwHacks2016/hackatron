@@ -13,7 +13,7 @@ Hackatron.Game.prototype = {
 
     create: function() {
         this.map = this.add.tilemap('map');
-        this.map.addTilesetImage('tile set', 'tiles');
+        this.map.addTilesetImage('Tileset2', 'tiles');
 
         this.layer = this.map.createLayer('Tile Layer 1');
         this.layer.resizeWorld();
