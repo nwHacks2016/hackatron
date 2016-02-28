@@ -27,7 +27,6 @@ Hackatron.Game.prototype = {
         this.map = this.add.tilemap('map');
         this.map.addTilesetImage('Wall', 'tiles');
 
-
         this.layer = this.map.createLayer('Tile Layer 1');
 
         tron1 = Tron.init(this, 50, 50, 'tron');
@@ -41,7 +40,7 @@ Hackatron.Game.prototype = {
     	tron1.leftKey = this.input.keyboard.addKey(Phaser.Keyboard.LEFT);
     	tron1.rightKey = this.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
 
-        ghost1 = Ghost.init(this, 70, 70, 'ghost');
+        ghost1 = Ghost.init(this, 50, 50, 'ghost');
         ghost1.animations.add('walkUp', [9,10,11], 3, false, true);
         ghost1.animations.add('walkDown', [0,1,2], 3, false, true);
         ghost1.animations.add('walkLeft', [3,4,5], 3, false, true);
@@ -58,29 +57,23 @@ Hackatron.Game.prototype = {
     }, 
 
     update: function() {
-        var speed = 3;
-
         this.updateCharPos(tron1, 3);
         this.updateCharPos(ghost1, 5);
     }, 
 
     updateCharPos: function(character, speed) {
-        character.animations.play('walk', 3, false);
         if (character.upKey.isDown) {
-                tron1.animations.play('walkUp', 3, false);
-
+            character.animations.play('walkUp', 3, false);
             character.y -= speed;
         } else if (character.downKey.isDown) {
             character.animations.play('walkDown', 3, false);
             character.y += speed;
-        } else if (character.leftKey.isDown)
-        {
+        } else if (character.leftKey.isDown) {
             character.animations.play('walkLeft', 3, false);
             character.x -= speed;
             if (character.x < 0) {
                 character.x = this.world.width;
             }
-
         } else if (character.rightKey.isDown) {
             character.animations.play('walkRight', 3, false);
             character.x += speed;
