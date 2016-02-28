@@ -23,4 +23,4 @@ define(['/character'], function(Character) {
     }
     
     return Tron;
-}
+});
