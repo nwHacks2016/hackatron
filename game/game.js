@@ -39,6 +39,7 @@ Hackatron.Game.prototype = {
         ghost1 = Ghost.init(this, 70, 70, 'ghost');
         ghost1.scale.x = 0.15;
         ghost1.scale.y = 0.15;
+        ghost1.anchor.set(0.5,0.5);
 
         upKey = this.input.keyboard.addKey(Phaser.Keyboard.UP);
     	downKey = this.input.keyboard.addKey(Phaser.Keyboard.DOWN);
