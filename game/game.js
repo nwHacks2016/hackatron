@@ -26,6 +26,7 @@ Hackatron.Game.prototype = {
 
     create: function() {
         // Create the map
+        this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.map = this.add.tilemap('map');
         this.map.addTilesetImage('Wall', 'tiles');
 
@@ -64,8 +65,8 @@ Hackatron.Game.prototype = {
 
     
         // Collision
-        this.physics.enable(this.layer);
-        this.physics.enable(tron1, Phaser.Physics.ARCADE);
+        this.physics.arcade.enable(this.layer);
+        this.physics.arcade.enable(tron1, Phaser.Physics.ARCADE);
         this.physics.enable(ghost1, Phaser.Physics.ARCADE);
         this.map.setCollision(18);
         this.map.setCollision(88);
@@ -97,10 +98,15 @@ Hackatron.Game.prototype = {
     }, 
 
     update: function() {
-        this.physics.arcade.collide(tron1, this.layer)
-        this.physics.arcade.collide(ghost1, this.layer)
+        var collisionHandler = function() {
+            console.log('Tron: ', tron1);
+            console.log('Ghost: ', ghost1);
+        };
         this.updateCharPos(tron1, 200);
         this.updateCharPos(ghost1, 200);
+        this.physics.arcade.collide(tron1, this.layer);
+        this.physics.arcade.collide(ghost1, this.layer);
+        this.physics.arcade.collide(ghost1, tron1, collisionHandler, null, this.game);
     }, 
 
     updateCharPos: function(character, speed) {
