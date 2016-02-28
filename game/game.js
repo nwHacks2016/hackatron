@@ -42,6 +42,11 @@ Hackatron.Game.prototype = {
     	leftKey = this.input.keyboard.addKey(Phaser.Keyboard.LEFT);
     	rightKey = this.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
 
+    	wKey = this.input.keyboard.addKey(Phaser.Keyboard.W);
+    	sKey = this.input.keyboard.addKey(Phaser.Keyboard.S);
+    	aKey = this.input.keyboard.addKey(Phaser.Keyboard.A);
+    	dKey = this.input.keyboard.addKey(Phaser.Keyboard.D);
+
 
         // Add score text
         this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
@@ -50,6 +55,7 @@ Hackatron.Game.prototype = {
 
     update: function() {
 
+        // tron1 controls
         tron1.animations.play('walk', 3, false);
     	if (upKey.isDown) {
     		tron1.y -= 5;
@@ -73,6 +79,30 @@ Hackatron.Game.prototype = {
                 tron1.x = 0;
             }
     	}
+
+        // ghost1 controls
+        if (wKey.isDown) {
+            ghost1.y -= 5;
+        }
+        else if (sKey.isDown)
+        {
+            ghost1.y += 5;
+        }
+
+        if (aKey.isDown)
+        {
+            ghost1.x -= 5;
+            if (ghost1.x < 0) {
+                ghost1.x = this.world.width;
+            }
+        }
+        else if (dKey.isDown)
+        {
+            ghost1.x += 5;
+            if (ghost1.x > this.world.width) {
+                ghost1.x = 0;
+            }
+        }
     }, 
 };
 
