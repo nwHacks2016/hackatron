@@ -4,7 +4,7 @@
   "description": "",
   "dependencies": {
     "phaser": "https://github.com/photonstorm/phaser.git"
-      },
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/nwHacks2016/hackatron/issues"
   },
-  "homepage": "https://github.com/nwHacks2016/hackatron#readme"
+  "homepage": "https://github.com/nwHacks2016/hackatron#readme",
+  "devDependencies": {
+    "grunt": "^0.4.5"
+  }
 }
