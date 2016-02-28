@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "dependencies": {
-    "phaser": "https://github.com/photonstorm/phaser.git",
+    "phaser": "https://github.com/photonstorm/phaser.git"
   },
   "main": "index.js",
   "scripts": {
