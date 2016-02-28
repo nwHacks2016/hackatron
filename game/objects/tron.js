@@ -16,6 +16,9 @@ define(['/character'], function(Character) {
 
     Tron.prototype.updatePoints = function(points) {
         this.points = this.points + points;
+        if(this.points < 0) {
+            this.points = 0;
+        }
     };
 
     Tron.prototype.eatPellet = function(pellet) {
