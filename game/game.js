@@ -37,10 +37,10 @@ Hackatron.Game.prototype = {
         ghost1.scale.x = 0.2;
         ghost1.scale.y = 0.2;
 
-        upKey = this.input.keyboard.addKey(Phaser.Keyboard.UP);
-    	downKey = this.input.keyboard.addKey(Phaser.Keyboard.DOWN);
-    	leftKey = this.input.keyboard.addKey(Phaser.Keyboard.LEFT);
-    	rightKey = this.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
+        tron1.upKey = this.input.keyboard.addKey(Phaser.Keyboard.UP);
+    	tron1.downKey = this.input.keyboard.addKey(Phaser.Keyboard.DOWN);
+    	tron1.leftKey = this.input.keyboard.addKey(Phaser.Keyboard.LEFT);
+    	tron1.rightKey = this.input.keyboard.addKey(Phaser.Keyboard.RIGHT);
 
 
         // Add score text
@@ -76,5 +76,30 @@ Hackatron.Game.prototype = {
     }, 
 };
 
+var updateCharPos(character) {
+    if (character.upKey.isDown) {
+        character.y -= 5;
+    }
+    else if (character.downKey.isDown)
+    {
+        character.y += 5;
+    }
 
+    if (character.leftKey.isDown)
+    {
+        character.x -= 5;
+        if (character.x < 0) {
+            character.x = this.world.width;
+        }
+    }
+    else if (character.rightKey.isDown)
+    {
+        character.x += 5;
+        if (character.x > this.world.width) {
+            character.x = 0;
+        }
+    }
+
+    return {x: character.x, y: character.y};
+};
 
