@@ -16,10 +16,8 @@ var rightKey;
 Hackatron.Game.prototype = {
     preload: function() {
         this.load.tilemap('map', 'assets/tiles1.json', null, Phaser.Tilemap.TILED_JSON);
-
         this.load.image('tron', 'assets/bluesprite.png');
         this.load.image('ghost', 'assets/yellowsprite.png');
-
         this.load.image('tiles', 'assets/part2_tileset.png');
         this.load.text();
     },
@@ -31,10 +29,10 @@ Hackatron.Game.prototype = {
         this.layer = this.map.createLayer('Tile Layer 1');
         this.layer.resizeWorld();
 
-        tron1 = Tron.init(50, 50, 'tron');
+        tron1 = Tron.init(this, 50, 50, 'tron');
         tron1.scale.x = 0.2;
         tron1.scale.y = 0.2;
-        ghost1 = Ghost.init(70, 70, 'ghost');
+        ghost1 = Ghost.init(this, 70, 70, 'ghost');
         ghost1.scale.x = 0.2;
         ghost1.scale.y = 0.2;
 

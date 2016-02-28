@@ -1,5 +1,7 @@
-Character.init = function(game, x, y, key, frame) {
-    var character = Hackatron.Game.add.sprite(game, x, y, key, frame);
+var Character = {};
+
+Character.init = function(game, x, y, key) {
+    var character = game.add.sprite(x, y, key);
 
     return character;
 };
