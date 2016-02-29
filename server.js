@@ -29,4 +29,7 @@ io.sockets.on('connection', function(socket) {
     });
 });
 
+console.log('\nOpen localhost:8080 on your browser.')
+console.log('.\n.\n.');
+console.log('Listening...');
 server.listen(process.env.PORT || 8080);
