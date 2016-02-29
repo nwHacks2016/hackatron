@@ -36,16 +36,16 @@ function guid() {
 
 Hackatron.Game.prototype = {
     preload: function() {
-        this.load.tilemap('map', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/assets/tiles1.json', null, Phaser.Tilemap.TILED_JSON);
-        this.load.image('tiles', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/assets/part2_tileset.png');
-        this.load.spritesheet('tron', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/Images/tron.png', 32, 32, 12);
-        this.load.spritesheet('ghost', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/Images/ghost.png', 32, 32, 12);
+        this.load.tilemap('map', 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/assets/tiles1.json', null, Phaser.Tilemap.TILED_JSON);
+        this.load.image('tiles', 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/assets/part2_tileset.png');
+        this.load.spritesheet('tron', 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/Images/tron.png', 32, 32, 12);
+        this.load.spritesheet('ghost', 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/Images/ghost.png', 32, 32, 12);
 
-        this.load.json('JSONobj', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/assets/tiles1.json');
-        this.load.image('pellet', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/assets/pellet.png');
+        this.load.json('JSONobj', 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/assets/tiles1.json');
+        this.load.image('pellet', 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/assets/pellet.png');
         
-        this.load.image('blueball', 'images/blueball.png');
-        this.load.image('poop', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/Images/poop.png');
+        this.load.image('blueball', 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/Images/blueball.png');
+        this.load.image('poop', 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/Images/poop.png');
     },
 
     create: function() {
