@@ -44,7 +44,7 @@ Hackatron.Game.prototype = {
         this.load.json('JSONobj', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/assets/tiles1.json');
         this.load.image('pellet', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/assets/pellet.png');
         
-        this.load.image('blueball', 'images/blueball.png');
+        this.load.image('blueball', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/Images/blueball.png');
         this.load.image('poop', 'https://raw.githubusercontent.com/nwHacks2016/hackatron/master/Images/poop.png');
     },
 
