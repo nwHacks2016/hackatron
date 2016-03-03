@@ -52,8 +52,6 @@ Hackatron.Game.prototype = {
         this.playerId = guid();
         this.playerList = [];
         this.socket = io.connect();
-        this.updateClientSideListener();
-        this.sendMessageToBankend();    // tell everyone you started a game
 
 
 
@@ -68,7 +66,7 @@ Hackatron.Game.prototype = {
 
         this.layer = this.map.createLayer('Tile Layer 1');
         this.layer.resizeWorld();
-
+        
         var addAnimations = function(character) {
             character.animations.add('walkUp', [9,10,11], 3, false, true);
             character.animations.add('walkDown', [0,1,2], 3, false, true);
@@ -84,36 +82,59 @@ Hackatron.Game.prototype = {
         };
 
         var Keyboard = Phaser.Keyboard;
+       
+        if(!tron1){
+            tron1 = new Tron();
+            tron1.init(this, 20, 20, 'tron');
+            tron1.setName(this, this.playerId.substring(0,2));
+            addAnimations(tron1.character);
+            setKeys(tron1.character, this, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
 
-        tron1 = new Tron();
-        tron1.init(this.game, 20, 20, 'tron');
-        tron1.setName(this.game, this.playerId.substring(0,2));
-        addAnimations(tron1.character);
-        setKeys(tron1.character, this, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
+            tron1.character.scale.x = 0.8;
+            tron1.character.scale.y = 0.8;
+
+            emitter1 = this.add.emitter(tron1.character.x, tron1.character.y, 50);
+            emitter1.width = 5;
+            emitter1.makeParticles('blueball');
+            emitter1.setXSpeed();
+            emitter1.setYSpeed();
+            emitter1.setRotation();
+            emitter1.setAlpha(1, 0.4, 800);
+            emitter1.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
+            emitter1.start(false,250, 1);
+            
+            tron1.character.emitter = emitter1;
+            
+            tron1.setName(this, this.playerId.substring(0,2));
+            this.physics.enable(tron1, Phaser.Physics.ARCADE);
+
+        }
+
+        this.updateClientSideListener();
+        this.sendMessageToBankend();    // tell everyone you started a game
 
         if (!ghost1) {
             ghost1 = new Ghost();
-            ghost1.init(this.game, 512-20, 20, 'ghost');
+            ghost1.init(this, 512-20, 20, 'ghost');
             addAnimations(ghost1.character);
-            setKeys(ghost1.character, this, Keyboard.W, Keyboard.S, Keyboard.A, Keyboard.D);
             ghost1.character.scale.x = 0.8;
             ghost1.character.scale.y = 0.8;
             this.game.physics.arcade.enable([tron1.character, ghost1.character], Phaser.Physics.ARCADE);
+            setKeys(ghost1.character, this, Keyboard.W, Keyboard.S, Keyboard.A, Keyboard.D);
 
-    		emitter2 = this.add.emitter(ghost1.character.x, ghost1.character.y, 50);
-    		emitter2.width = 5;
-    		emitter2.makeParticles('poop');
-    		emitter2.setXSpeed();
-    		emitter2.setYSpeed();
-    		emitter2.setRotation();
-    		emitter2.setAlpha(1, 0.4, 800);
-    		emitter2.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
-    		emitter2.start(false,250, 1);
+            emitter2 = this.add.emitter(ghost1.character.x, ghost1.character.y, 50);
+            emitter2.width = 5;
+            emitter2.makeParticles('poop');
+            emitter2.setXSpeed();
+            emitter2.setYSpeed();
+            emitter2.setRotation();
+            emitter2.setAlpha(1, 0.4, 800);
+            emitter2.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
+            emitter2.start(false,250, 1);
             ghost1.character.emitter = emitter2;
+            this.playerList.ghost = ghost1;
         }
 
-        tron1.character.scale.x = 0.8;
-        tron1.character.scale.y = 0.8;
 
         // Collision
         this.game.physics.arcade.enable(this.layer);
@@ -125,27 +146,6 @@ Hackatron.Game.prototype = {
         this.map.setCollision(52);
 
 
-        emitter1 = this.add.emitter(tron1.character.x, tron1.character.y, 50);
-        emitter1.width = 5;
-        emitter1.makeParticles('blueball');
-        emitter1.setXSpeed();
-        emitter1.setYSpeed();
-        emitter1.setRotation();
-        emitter1.setAlpha(1, 0.4, 800);
-        emitter1.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
-        emitter1.start(false,250, 1);
-        
-        emitter2 = this.add.emitter(ghost1.character.x, ghost1.character.y, 50);
-        emitter2.width = 5;
-        emitter2.makeParticles('poop');
-        emitter2.setXSpeed();
-        emitter2.setYSpeed();
-        emitter2.setRotation();
-        emitter2.setAlpha(1, 0.4, 800);
-        emitter2.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
-        emitter2.start(false,250, 1);
-
-        tron1.character.emitter = emitter1;
 
         // Add score text
         this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
@@ -179,45 +179,6 @@ Hackatron.Game.prototype = {
         var timeStep = 400;
 
         setInterval(function() { 
-                            
-          // var posX = this.currentPlayerXtile;
-          // var posY = this.currentPlayerYtile;
-               
-               // var possibleDirections = "";
-               // if(posX+2 > 0 && posX + 2 < this.currentGhostXtile){
-               //      possibleDirections += "S";
-               // }
-               // if(posX-2 > 0 && posX - 2 < this.currentGhostXtile){
-               //      possibleDirections += "N";
-               // }
-               // if(posY-2 > 0 && posY - 2 < this.currentGhostYtile){
-               //      possibleDirections += "W";
-               // }
-               // if(posY+2 > 0 && posY + 2 < this.currentGhostYtile){
-               //      possibleDirections += "E";
-               // }
-               // if(possibleDirections){
-               //      var move = this.game.rnd.between(0, possibleDirections.length - 1);
-               //      switch (possibleDirections[move]){
-               //           case "N": 
-               //                posX -= 2;
-               //                break;
-               //           case "S":
-               //                posX += 2;
-               //                break;
-               //                posY -= 2;
-               //                break;
-               //           case "E":
-               //                posY += 2;
-               //                break;         
-               //      }
-               //      moves.push({x: posX, y: posY});     
-               // }
-               // else if (moves.length) {
-               //      var back = moves.pop();
-               //      posX = Math.floor(back.x / mazeWidth);
-               //      posY = back.y % mazeHeight;
-               // }  
 
                if (!currentPath) {
                     this.easystar.findPath(this.currentGhostXtile, this.currentGhostYtile, this.currentPlayerXtile, this.currentPlayerYtile, function( path ) {
@@ -241,141 +202,42 @@ Hackatron.Game.prototype = {
 
 
         if (currentPath && currentPathIndex < currentPath.length) {
-            // currentNextPointX = currentPath[currentPathIndex].x;
-            // currentNextPointY = currentPath[currentPathIndex].y;
-                
-           //  if (currentNextPointX == this.currentGhostXtile && currentNextPointY < this.currentGhostYtile)
-           //  {
-           //     // up
-                                
-           //     console.log("GO UP");
-                                
-           //     enemyDirection = "N";
-                                
-           //  }
-           // else if (currentNextPointX < this.currentGhostXtile && currentNextPointY == this.currentGhostYtile)
-           // {
-           //    // left
-                                
-           //     console.log("GO LEFT");
-                                
-           //     enemyDirection = "W";
-                                
-           // }
-           // else if (currentNextPointX > this.currentGhostXtile && currentNextPointY == this.currentGhostYtile)
-           // {
-           //    // right
-                                
-           //     console.log("GO RIGHT");
-                                
-           //     enemyDirection = "E";
-                            
-           // }    
-           // else if (currentNextPointX == this.currentGhostXtile && currentNextPointY > this.currentGhostYtile)
-           // {
-           //    // down
-                                
-           //   console.log("GO DOWN");
-                                
-           //   enemyDirection = "S";
-                                
-           // }            
-           // //  else if (currentNextPointX < this.currentGhostXtile && currentNextPointY < this.currentGhostYtile) {
-           // //     // left up
-                                
-           // //     console.log("GO LEFT UP");
-                                
-           // //     enemyDirection = "NW";
-           // //  }
-           // //  else if (currentNextPointX > this.currentGhostXtile && currentNextPointY < this.currentGhostYtile)
-           // //  {
-           // //     // right up
-                                
-           // //     console.log("GO RIGHT UP");
-                                
-           // //     enemyDirection = "NE";
-                                
-           // // }
-           // // else if (currentNextPointX > this.currentGhostXtile && currentNextPointY > this.currentGhostYtile)
-           // // {
-           // //    // right down
-                                
-           // //  console.log("GO RIGHT DOWN");
-                                
-           // //  enemyDirection = "SE";
-                                
-           // // }
-           // // else if (currentNextPointX < this.currentGhostXtile && currentNextPointY > this.currentGhostYtile)
-           // // {
-           // //   // left down
-                                
-           // //  console.log("GO LEFT DOWN");
-                                
-           // //  enemyDirection = "SW";
-                                
-           // // }
-           // else
-           // {
-                                
-           //  enemyDirection = null;//"STOP";
-                                
-           // }
-                            
-           // if (enemyDirection != "STOP") ghost1.character.animations.play(enemyDirection); 
-            // this.currentGhostXtile = posX;
-            // this.currentGhostYtile = posY; 
-            // var enemySpeed = 900;
-
-            // if (enemyDirection) {
-            //     ghost1.character.body.velocity.x = 0;
-            //     ghost1.character.body.velocity.y = 0;
-               
-            //     if (enemyDirection.indexOf('N') !== -1) {
-            //         ghost1.character.body.velocity.y = -enemySpeed;
-            //     }
-            //     if (enemyDirection.indexOf('S') !== -1) {
-            //         ghost1.character.body.velocity.y = enemySpeed;
-            //     }
-            //     if (enemyDirection.indexOf('E') !== -1) {
-            //         ghost1.character.body.velocity.x = enemySpeed;
-            //     }
-            //     if (enemyDirection.indexOf('W') !== -1) {
-            //         ghost1.character.body.velocity.x = -enemySpeed;
-            //     }
-            // }
-
             ghost1.character.x = Math.floor(currentPath[currentPathIndex].x) * 16;
             ghost1.character.y = Math.floor(currentPath[currentPathIndex].y) * 16;
 
-            //if (currentNextPointX == this.currentGhostXtile && currentNextPointY == this.currentGhostYtile) {
                 if (currentPathIndex < currentPath.length-1) {
                     ++currentPathIndex;
                 } else {
                     currentPathIndex = 0;
                     currentPath = null;
                 }
-            //}
         }
 
         }.bind(this), 100);
     }, 
 
     update: function() {
+        var self = this;
+        if (!tron1 || !ghost1) return;
         var collisionHandler = function() {
+            self.socket.emit('tronKilled', JSON.stringify({
+                killedTronId: self.playerId
+            }));
+
             ghost1.killTron(tron1);
             //ghost1.stopPathFinding;
             var rebootGhost= function() {
                 //ghost1.startPathFinding;
             };
 
-            this.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
+            self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
 
         this.updateCharPos(tron1.character, 200);
         this.updateCharPos(ghost1.character, 200);
         this.game.physics.arcade.collide(tron1.character, this.layer);
         this.game.physics.arcade.collide(ghost1.character, this.layer);
-        this.game.physics.arcade.collide(ghost1.character, tron1.character, collisionHandler, null, this.game);
+        this.game.physics.arcade.overlap(ghost1.character, tron1.character, collisionHandler, null, this.game);
     
         this.socket.emit('playerMove', JSON.stringify({
             playerId: this.playerId, 
@@ -451,50 +313,101 @@ Hackatron.Game.prototype = {
     updateClientSideListener : function () {
         this.socket.on('playerMove', function(data) {
             data = JSON.parse(data);
-            // console.log(data);
-            // if (!this.playerList) {
-            //     this.playerList = [];
-            // }
+
+            var addAnimations = function(character) {
+                character.animations.add('walkUp', [9,10,11], 3, false, true);
+                character.animations.add('walkDown', [0,1,2], 3, false, true);
+                character.animations.add('walkLeft', [3,4,5], 3, false, true);
+                character.animations.add('walkRight', [6,7,8], 3, false, true);
+            };
 
             if (!this.playerList[data.playerId]) {
                 this.playerList[data.playerId] = data;
                 var tron = new Tron();
-                tron.init(this.game, 20, 20, 'tron');
-                this.playerList[data.playerId].tron = tron;
+                tron.init(this.game, data.tron_x, data.tron_y, 'tron');
+                tron.character.scale.x = 0.8;
+                tron.character.scale.y = 0.8;
                 tron.setName(this.game, data.playerId.substring(0,2));
-                this.physics.enable(this.playerList[data.playerId].tron, Phaser.Physics.ARCADE);
-                this.playerList[data.playerId].tron.character.scale.x = 0.8;
-                this.playerList[data.playerId].tron.character.scale.y = 0.8;
+                this.physics.enable(tron, Phaser.Physics.ARCADE);
+                this.physics.arcade.enable([tron1.character, tron.character], Phaser.Physics.ARCADE);
+                this.playerList[data.playerId].tron = tron;
+            } else {
+                var player = this.playerList[data.playerId];
+                player.tron.character.x = data.tron_x;
+                player.tron.character.y = data.tron_y;
+                
             }
-
-            var player = this.playerList[data.playerId];
-
-            player.tron.character.x = data.tron_x;
-            player.tron.character.y = data.tron_y;
-            // ghost1.character.x = data.ghost_x;
-            // ghost1.character.y = data.ghost_y;
+            if (!this.playerList.ghost) {
+                ghost1 = new Ghost();
+                ghost1.init(this.game, data.ghost_x, data.ghost_y, 'ghost');
+                addAnimations(ghost1.character);
+                ghost1.character.scale.x = 0.8;
+                ghost1.character.scale.y = 0.8;
+                this.game.physics.arcade.enable([tron1.character, ghost1.character], Phaser.Physics.ARCADE);
+                this.playerList.ghost = ghost1;
+            } else {
+                var ghost = this.playerList.ghost;
+                ghost1.character.x = data.ghost_x;
+                ghost1.character.y = data.ghost_y;
+            }
             // emitter2.x = data.ghost_x;
             // emitter2.y = data.ghost_y;
         }.bind(this));
 
-        this.socket.on('gameStarted', function(data) {
+        this.socket.on('newPlayer', function(data) {
             data = JSON.parse(data);
             console.log(data);
-            this.playerList[data.playerId] = data;
-            var tron = new Tron();
-            tron.init(this, 20, 20, 'tron');
-            tron.setName(this.game, data.playerId.substring(0,2));
-            this.playerList[data.playerId].tron = tron;
-            this.physics.enable(this.playerList[data.playerId].tron, Phaser.Physics.ARCADE);
-            this.playerList[data.playerId].tron.character.scale.x = 0.8;
-            this.playerList[data.playerId].tron.character.scale.y = 0.8;
 
+            var addAnimations = function(character) {
+                character.animations.add('walkUp', [9,10,11], 3, false, true);
+                character.animations.add('walkDown', [0,1,2], 3, false, true);
+                character.animations.add('walkLeft', [3,4,5], 3, false, true);
+                character.animations.add('walkRight', [6,7,8], 3, false, true);
+            };
+
+            if(!this.playerList[data.playerId]){
+                var tron = new Tron();
+                tron.init(this, 20, 20, 'tron');
+                tron.setName(this, this.playerId.substring(0,2));
+                addAnimations(tron.character);
+                setKeys(tron.character, this, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
+
+                tron.character.scale.x = 0.8;
+                tron.character.scale.y = 0.8;
+
+                emitter1 = this.add.emitter(tron.character.x, tron.character.y, 50);
+                emitter1.width = 5;
+                emitter1.makeParticles('blueball');
+                emitter1.setXSpeed();
+                emitter1.setYSpeed();
+                emitter1.setRotation();
+                emitter1.setAlpha(1, 0.4, 800);
+                emitter1.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
+                emitter1.start(false,250, 1);
+                
+                tron.character.emitter = emitter1;
+                
+                this.playerList[data.playerId] = data;
+                tron.setName(this, data.playerId.substring(0,2));
+                tron.playerList[data.playerId].tron = tron;
+                tron.physics.enable([tron, tron1], Phaser.Physics.ARCADE);
+            }
+
+        }.bind(this));
+
+        this.socket.on('tronKilled', function(data) {
+            console.log(this.playerList[data.killedTronId] + 'was killed!');
+            data = JSON.parse(data);
+            var tron = this.playerList[data.killedTronId].tron;
+            if(tron) {
+                ghost1.killTron(tron);
+            }
         }.bind(this));
     },
     sendMessageToBankend : function () {
-        this.socket.emit('gameStarted', JSON.stringify({
+        this.socket.emit('newPlayer', JSON.stringify({
             playerId: this.playerId,
-            sMessage: this.playerId + "just started a new game"
+            sMessage: this.playerId + " just joined the game"
         }));
     }
 };
