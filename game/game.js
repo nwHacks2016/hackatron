@@ -233,8 +233,8 @@ Hackatron.Game.prototype = {
             self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
 
-        this.updateCharPos(tron1.character, 200);
-        this.updateCharPos(ghost1.character, 200);
+        var playerDirection = this.updateCharPos(tron1.character, 200);
+        var ghostDirection = this.updateCharPos(ghost1.character, 200);
         this.game.physics.arcade.collide(tron1.character, this.layer);
         this.game.physics.arcade.collide(ghost1.character, this.layer);
         this.game.physics.arcade.overlap(ghost1.character, tron1.character, collisionHandler, null, this.game);
@@ -243,8 +243,10 @@ Hackatron.Game.prototype = {
             playerId: this.playerId, 
             tron_x: tron1.character.x, 
             tron_y: tron1.character.y,
+            playerDirection: playerDirection,
             ghost_x: ghost1.character.x,
-            ghost_y: ghost1.character.y
+            ghost_y: ghost1.character.y,
+            ghostDirection: ghostDirection
         }));
 
         this.currentPlayerXtile = Math.floor(tron1.character.x / 16);
@@ -263,11 +265,13 @@ Hackatron.Game.prototype = {
             character.body.velocity.y = -speed;
             character.emitter.x = character.x + 15;
             character.emitter.y = character.y + 35;
+            return 'walkUp';
         } else if (character.downKey.isDown) {
             character.animations.play('walkDown', 3, false);
             character.body.velocity.y = speed;
             character.emitter.x = character.x + 15;
             character.emitter.y = character.y + -5;            
+            return 'walkDown';
         } else if (character.leftKey.isDown) {
             character.animations.play('walkLeft', 3, false);
             character.body.velocity.x = -speed;
@@ -276,6 +280,7 @@ Hackatron.Game.prototype = {
             if (character.x < 0) {
                 character.x = this.world.width;
             }
+            return 'walkLeft';
         } else if (character.rightKey.isDown) {
             character.animations.play('walkRight', 3, false);
             character.body.velocity.x = speed;
@@ -284,9 +289,9 @@ Hackatron.Game.prototype = {
             }
             character.emitter.x = character.x;
             character.emitter.y = character.y + 15;    
+            return 'walkRight';
         }
 
-        return {x: character.x, y: character.y};
     }, 
 
     pelletHelper: function(mapArray){
@@ -322,19 +327,22 @@ Hackatron.Game.prototype = {
             };
 
             if (!this.playerList[data.playerId]) {
-                this.playerList[data.playerId] = data;
+                this.playerList[data.playerId] = {};
                 var tron = new Tron();
                 tron.init(this.game, data.tron_x, data.tron_y, 'tron');
+                addAnimations(tron.character);
                 tron.character.scale.x = 0.8;
                 tron.character.scale.y = 0.8;
                 tron.setName(this.game, data.playerId.substring(0,2));
                 this.physics.enable(tron, Phaser.Physics.ARCADE);
                 this.physics.arcade.enable([tron1.character, tron.character], Phaser.Physics.ARCADE);
                 this.playerList[data.playerId].tron = tron;
+                tron.character.animations.play(data.characterDirection, 3, false);
             } else {
-                var player = this.playerList[data.playerId];
-                player.tron.character.x = data.tron_x;
-                player.tron.character.y = data.tron_y;
+                var player = this.playerList[data.playerId].tron;
+                player.character.x = data.tron_x;
+                player.character.y = data.tron_y;
+                player.character.animations.play(data.characterDirection, 3, false);
                 
             }
             if (!this.playerList.ghost) {
@@ -346,7 +354,6 @@ Hackatron.Game.prototype = {
                 this.game.physics.arcade.enable([tron1.character, ghost1.character], Phaser.Physics.ARCADE);
                 this.playerList.ghost = ghost1;
             } else {
-                var ghost = this.playerList.ghost;
                 ghost1.character.x = data.ghost_x;
                 ghost1.character.y = data.ghost_y;
             }
@@ -357,7 +364,6 @@ Hackatron.Game.prototype = {
         this.socket.on('newPlayer', function(data) {
             data = JSON.parse(data);
             console.log(data);
-
             var addAnimations = function(character) {
                 character.animations.add('walkUp', [9,10,11], 3, false, true);
                 character.animations.add('walkDown', [0,1,2], 3, false, true);
@@ -390,7 +396,7 @@ Hackatron.Game.prototype = {
                 this.playerList[data.playerId] = data;
                 tron.setName(this, data.playerId.substring(0,2));
                 tron.playerList[data.playerId].tron = tron;
-                tron.physics.enable([tron, tron1], Phaser.Physics.ARCADE);
+                tron.physics.enable(tron, Phaser.Physics.ARCADE);
             }
 
         }.bind(this));
