@@ -78,7 +78,7 @@ Hackatron.Game.prototype = {
             player.sprite.scale.x = 0.8;
             player.sprite.scale.y = 0.8;
 
-            var emitter = this.add.emitter(player.sprite.x, myPlayer.sprite.y, 50);
+            var emitter = this.add.emitter(player.sprite.x, player.sprite.y, 50);
             emitter.width = 5;
             emitter.makeParticles('blueball');
             emitter.setXSpeed();
