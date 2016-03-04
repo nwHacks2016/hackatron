@@ -7,7 +7,16 @@
 ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 ```
 ## Overview
-Hackatron is a multiplayer game developed as a submission for nwHacks 2016.
+Hackatron is a multiplayer game developed as a submission for nwHacks 2016. 
+
+This is a forked version of the [original submission](https://github.com/nwHacks2016/hackatron), which was developed by:
+- [@tony-dinh](https://github.com/tony-dinh)
+- [@mingchia-andy-liu](https://github.com/mingchia-andy-liu)
+- [@ericmuyser](https://github.com/ericmuyser)
+- [@wesleytsai](https://github.com/wesleytsai)
+- [@chan-kelv](https://github.com/chan-kelv)
+- [@stellafang](https://github.com/stellafang)
+- [@angiecho](https://github.com/angiecho)
 
 ## Accomplishments
 Within 24 hours, our team was able to:
