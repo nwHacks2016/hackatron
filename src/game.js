@@ -14,11 +14,11 @@ var tilemapData;
 var enemyDirection;
 var posX = 0;
 var posY = 0;
-        var moves = [];
-        var currentPath;
-        var currentPathIndex = 0;
+var moves = [];
+var currentPath;
+var currentPathIndex = 0;
 
-function guid() {
+function generateId() {
   function s4() {
     return Math.floor((1 + Math.random()) * 0x10000)
       .toString(16)
@@ -34,93 +34,22 @@ Hackatron.Game.prototype = {
     },
 
     create: function() {
-        this.playerId = guid();
+        // Client set-up 
+        this.playerId = generateId();
         this.playerList = [];
         this.socket = io.connect();
+        this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
-
-
+        // Create the map
         var jsonfile = this.cache.getJSON('JSONobj');
         var data = jsonfile.layers[0].data;
         this.pelletHelper(data);
-
-        // Create the map
-        this.game.physics.startSystem(Phaser.Physics.ARCADE);
         this.map = this.add.tilemap('map');
         this.map.addTilesetImage('Wall', 'tiles');
-
         this.layer = this.map.createLayer('Tile Layer 1');
         this.layer.resizeWorld();
-        
-        var addAnimations = function(sprite) {
-            sprite.animations.add('walkUp', [9,10,11], 3, false, true);
-            sprite.animations.add('walkDown', [0,1,2], 3, false, true);
-            sprite.animations.add('walkLeft', [3,4,5], 3, false, true);
-            sprite.animations.add('walkRight', [6,7,8], 3, false, true);
-        };
-
-        var setKeys = function(sprite, game, up, down, left, right) {
-            sprite.upKey = game.input.keyboard.addKey(up);
-            sprite.downKey = game.input.keyboard.addKey(down);
-            sprite.leftKey = game.input.keyboard.addKey(left);
-            sprite.rightKey = game.input.keyboard.addKey(right);
-        };
-
         var Keyboard = Phaser.Keyboard;
-       
-        if(!player){
-            player = new Tron();
-            player.init(this, 20, 20, 'tron');
-            player.setName(this, this.playerId.substring(0,2));
-            addAnimations(player.sprite);
-            setKeys(player.sprite, this, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
-
-            player.sprite.scale.x = 0.8;
-            player.sprite.scale.y = 0.8;
-
-            var emitter = this.add.emitter(player.sprite.x, player.sprite.y, 50);
-            emitter.width = 5;
-            emitter.makeParticles('blueball');
-            emitter.setXSpeed();
-            emitter.setYSpeed();
-            emitter.setRotation();
-            emitter.setAlpha(1, 0.4, 800);
-            emitter.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
-            emitter.start(false,250, 1);
-            
-            player.sprite.emitter = emitter;
-            
-            player.setName(this, this.playerId.substring(0,2));
-            this.physics.enable(player, Phaser.Physics.ARCADE);
-
-        }
-
-        this.updateClientSideListener();
-        this.sendMessageToBankend();    // tell everyone you started a game
-
-        if (!enemy) {
-            enemy = new Ghost();
-            enemy.init(this, 512-20, 20, 'ghost');
-            addAnimations(enemy.sprite);
-            enemy.sprite.scale.x = 0.8;
-            enemy.sprite.scale.y = 0.8;
-            this.game.physics.arcade.enable([player.sprite, enemy.sprite], Phaser.Physics.ARCADE);
-            setKeys(enemy.sprite, this, Keyboard.W, Keyboard.S, Keyboard.A, Keyboard.D);
-
-            var emitter = this.add.emitter(enemy.sprite.x, enemy.sprite.y, 50);
-            emitter.width = 5;
-            emitter.makeParticles('poop');
-            emitter.setXSpeed();
-            emitter.setYSpeed();
-            emitter.setRotation();
-            emitter.setAlpha(1, 0.4, 800);
-            emitter.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
-            emitter.start(false,250, 1);
-            enemy.sprite.emitter = emitter;
-            this.playerList.ghost = enemy;
-        }
-
-
+        
         // Collision
         this.game.physics.arcade.enable(this.layer);
         this.map.setCollision(18);
@@ -129,8 +58,37 @@ Hackatron.Game.prototype = {
         this.map.setCollision(89);
         this.map.setCollision(53);
         this.map.setCollision(52);
+        
+        if(!player){
+            player = new Tron();
+            player.init(this, 20, 20, 'tron');
+            player.setName(this, this.playerId.substring(0,2));
+            this.setUpSprite({
+                sprite: player.sprite,
+                emitterKey: 'blueball',
+                upKey: Keyboard.UP,
+                downKey: Keyboard.DOWN,
+                leftKey: Keyboard.LEFT,
+                rightKey: Keyboard.RIGHT
+            });
+        }
 
+        this.updateClientSideListener();
+        this.sendMessageToBankend();    // tell everyone you started a game
 
+        if (!enemy) {
+            enemy = new Ghost();
+            enemy.init(this, 512-20, 20, 'ghost');
+            this.setUpSprite({
+                sprite: enemy.sprite,
+                emitterKey: 'poop',
+                upKey: Keyboard.W,
+                downKey: Keyboard.S,
+                leftKey: Keyboard.A,
+                rightKey: Keyboard.D
+            });
+            this.playerList.ghost = enemy;
+        }
 
         // Add score text
         this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
@@ -402,8 +360,9 @@ Hackatron.Game.prototype = {
         }));
     },
 
+    // Method for loading all assets/resources at game-level 
+    // Resources loaded from gitHub since Heroku does not compile assets
     loadAssets: function() {
-        // Resources loaded from gitHub since Heroku does not compile assets
         var baseURL = 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/';
         
         // this === Hackatron.Game
@@ -416,5 +375,55 @@ Hackatron.Game.prototype = {
         this.load.spritesheet('ghost', baseURL + 'assets/ghost.png', 32, 32, 12);
         this.load.spritesheet('tron', baseURL + 'assets/tron.png', 32, 32, 12);
         this.load.tilemap('map', baseURL + 'assets/tiles1.json', null, Phaser.Tilemap.TILED_JSON);
+    },
+   
+    // Method for assigning animations to a sprite given that a 3x3
+    // sprite sheet has been loaded.
+    addAnimationsToSprite: function(sprite) {
+        sprite.animations.add('walkUp', [9,10,11], 3, false, true);
+        sprite.animations.add('walkDown', [0,1,2], 3, false, true);
+        sprite.animations.add('walkLeft', [3,4,5], 3, false, true);
+        sprite.animations.add('walkRight', [6,7,8], 3, false, true);
+    },
+
+    // Method for registering hardware keys to a given sprite
+    setUpKeys: function(sprite, up, down, left, right) {
+        if(!(up && down && left && right)) return;
+
+        sprite.upKey = this.input.keyboard.addKey(up);
+        sprite.downKey = this.input.keyboard.addKey(down);
+        sprite.leftKey = this.input.keyboard.addKey(left);
+        sprite.rightKey = this.input.keyboard.addKey(right);
+    },
+    
+    // Method for setting up sprite by passing in params structured
+    // with the following keys:
+    //     {sprite, emitterKey, upKey, downKey, leftKey, rightKey}
+    setUpSprite: function(params) {
+        var sprite = params.sprite;
+        sprite.scale.x = 0.8;
+        sprite.scale.y = 0.8;
+
+        this.game.physics.arcade.enable(sprite, Phaser.Physics.ARCADE);
+        this.addAnimationsToSprite(sprite); 
+        this.setUpKeys(
+            sprite,
+            params.upKey,
+            params.downKey,
+            params.leftKey,
+            params.rightKey
+        );
+        
+        var emitter = this.add.emitter(sprite.x, sprite.y, 50);
+        emitter.width = 5;
+        emitter.makeParticles(params.emitterKey);
+        emitter.setXSpeed();
+        emitter.setYSpeed();
+        emitter.setRotation();
+        emitter.setAlpha(1, 0.4, 800);
+        emitter.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
+        emitter.start(false,250, 1);
+
+        sprite.emitter = emitter;
     }
 };
