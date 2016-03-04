@@ -7,13 +7,13 @@
 ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝
 ```
 ## Overview
-Hackatron is our rendition of the retro game, Pacman. This project was developed as our submission for nwHacks 2016.
+Hackatron is a multiplayer game developed as a submission for nwHacks 2016.
 
 ## Accomplishments
 Within 24 hours, our team was able to:
 - remake on the popular game using phaser.io engine
 - implement a multiplayer game using web technology & frameworks such as `socket.io` & `node.js`, which was new to the entire team.
-- integrate an AI using a pathfinding library.
+- integrate AI using a pathfinding library.
 
 ## What We Learned
 1. JavaScript & Node.js framework
