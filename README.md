@@ -18,17 +18,6 @@ This is a forked version of the [original submission](https://github.com/nwHacks
 - [@stellafang](https://github.com/stellafang)
 - [@angiecho](https://github.com/angiecho)
 
-## Accomplishments
-Within 24 hours, our team was able to:
-- remake on the popular game using phaser.io engine
-- implement a multiplayer game using web technology & frameworks such as `socket.io` & `node.js`, which was new to the entire team.
-- integrate AI using a pathfinding library.
-
-## What We Learned
-1. JavaScript & Node.js framework
-2. Understand basic communication between client-side and server-side networks
-3. How to stay awake for 24+ hours
-
 ## Installation
 Clone the project:
 ```
@@ -46,4 +35,17 @@ Spin up the local host:
 node server.js
 ```
 
-Navigate to `localhost:8080` in your browser & enjoy! :)
+Open `localhost:8080` in your browser & enjoy! :)
+
+## Accomplishments
+Within 24 hours, our team was able to familiarize ourselves with the following web/game development technology to deliver a 2D multiplayer game:
+- `node.js` as a basis for our project
+- `phaser.io` game engine to do the heavy lifting
+- `express.js` to handle routing
+- `socket.io` to handle multiplayer
+
+## What We Learned
+1. JavaScript & Node.js
+2. Understand basic communication between client-side and server-side networks
+3. How to stay awake for 24+ hours
+
