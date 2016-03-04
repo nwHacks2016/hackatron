@@ -9,7 +9,7 @@
 ## Overview
 Hackatron is a multiplayer game developed as a submission for nwHacks 2016. 
 
-This is a forked version of the [original submission](https://github.com/nwHacks2016/hackatron), which was developed by:
+This is a forked version of our [original submission](https://github.com/nwHacks2016/hackatron), which was developed with the help of the following contributors:
 - [@tony-dinh](https://github.com/tony-dinh)
 - [@mingchia-andy-liu](https://github.com/mingchia-andy-liu)
 - [@ericmuyser](https://github.com/ericmuyser)
@@ -30,7 +30,7 @@ cd hackatron
 npm install
 ```
 
-Spin up the local host:
+Spin up a local server:
 ```
 node server.js
 ```

@@ -13,9 +13,9 @@ Ghost.prototype.init = function() {
 
 Ghost.prototype.killTron = function(tron) {
     this.updatePoints(tron.points);
-    tron.character.emitter.destroy();
+    tron.sprite.emitter.destroy();
     tron.nameText.destroy();
-    tron.character.destroy();
+    tron.sprite.destroy();
 };
 
 Ghost.prototype.updatePoints = function(points) {
