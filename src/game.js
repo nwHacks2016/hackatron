@@ -6,7 +6,7 @@ Hackatron.Game = function(game) {
     this.player;
 };
 
-var myPlayer;
+var player;
 var enemy;
 var pellet;
 
@@ -68,17 +68,17 @@ Hackatron.Game.prototype = {
 
         var Keyboard = Phaser.Keyboard;
        
-        if(!myPlayer){
-            myPlayer = new Tron();
-            myPlayer.init(this, 20, 20, 'tron');
-            myPlayer.setName(this, this.playerId.substring(0,2));
-            addAnimations(myPlayer.sprite);
-            setKeys(myPlayer.sprite, this, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
+        if(!player){
+            player = new Tron();
+            player.init(this, 20, 20, 'tron');
+            player.setName(this, this.playerId.substring(0,2));
+            addAnimations(player.sprite);
+            setKeys(player.sprite, this, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
 
-            myPlayer.sprite.scale.x = 0.8;
-            myPlayer.sprite.scale.y = 0.8;
+            player.sprite.scale.x = 0.8;
+            player.sprite.scale.y = 0.8;
 
-            var emitter = this.add.emitter(myPlayer.sprite.x, myPlayer.sprite.y, 50);
+            var emitter = this.add.emitter(player.sprite.x, myPlayer.sprite.y, 50);
             emitter.width = 5;
             emitter.makeParticles('blueball');
             emitter.setXSpeed();
@@ -88,10 +88,10 @@ Hackatron.Game.prototype = {
             emitter.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
             emitter.start(false,250, 1);
             
-            myPlayer.sprite.emitter = emitter;
+            player.sprite.emitter = emitter;
             
-            myPlayer.setName(this, this.playerId.substring(0,2));
-            this.physics.enable(myPlayer, Phaser.Physics.ARCADE);
+            player.setName(this, this.playerId.substring(0,2));
+            this.physics.enable(player, Phaser.Physics.ARCADE);
 
         }
 
@@ -104,7 +104,7 @@ Hackatron.Game.prototype = {
             addAnimations(enemy.sprite);
             enemy.sprite.scale.x = 0.8;
             enemy.sprite.scale.y = 0.8;
-            this.game.physics.arcade.enable([myPlayer.sprite, enemy.sprite], Phaser.Physics.ARCADE);
+            this.game.physics.arcade.enable([player.sprite, enemy.sprite], Phaser.Physics.ARCADE);
             setKeys(enemy.sprite, this, Keyboard.W, Keyboard.S, Keyboard.A, Keyboard.D);
 
             var emitter = this.add.emitter(enemy.sprite.x, enemy.sprite.y, 50);
@@ -203,13 +203,13 @@ Hackatron.Game.prototype = {
 
     update: function() {
         var self = this;
-        if (!myPlayer || !enemy) return;
+        if (!player || !enemy) return;
         var collisionHandler = function() {
             self.socket.emit('tronKilled', JSON.stringify({
                 killedTronId: self.playerId
             }));
 
-            enemy.killTron(myPlayer);
+            enemy.killTron(player);
             //enemy.stopPathFinding;
             var rebootGhost= function() {
                 //enemy.startPathFinding;
@@ -218,24 +218,24 @@ Hackatron.Game.prototype = {
             self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
 
-        var playerDirection = this.updateCharPos(myPlayer.sprite, 200);
+        var playerDirection = this.updateCharPos(player.sprite, 200);
         var ghostDirection = this.updateCharPos(enemy.sprite, 200);
-        this.game.physics.arcade.collide(myPlayer.sprite, this.layer);
+        this.game.physics.arcade.collide(player.sprite, this.layer);
         this.game.physics.arcade.collide(enemy.sprite, this.layer);
-        this.game.physics.arcade.overlap(enemy.sprite, myPlayer.sprite, collisionHandler, null, this.game);
+        this.game.physics.arcade.overlap(enemy.sprite, player.sprite, collisionHandler, null, this.game);
     
         this.socket.emit('playerMove', JSON.stringify({
             playerId: this.playerId, 
-            tron_x: myPlayer.sprite.x, 
-            tron_y: myPlayer.sprite.y,
+            tron_x: player.sprite.x, 
+            tron_y: player.sprite.y,
             playerDirection: playerDirection,
             ghost_x: enemy.sprite.x,
             ghost_y: enemy.sprite.y,
             ghostDirection: ghostDirection
         }));
 
-        this.currentPlayerXtile = Math.floor(myPlayer.sprite.x / 16);
-        this.currentPlayerYtile = Math.floor(myPlayer.sprite.y / 16); 
+        this.currentPlayerXtile = Math.floor(player.sprite.x / 16);
+        this.currentPlayerYtile = Math.floor(player.sprite.y / 16); 
         this.currentGhostXtile = Math.floor(enemy.sprite.x / 16);
         this.currentGhostYtile = Math.floor(enemy.sprite.y / 16); 
 
@@ -320,7 +320,7 @@ Hackatron.Game.prototype = {
                 tron.sprite.scale.y = 0.8;
                 tron.setName(this.game, data.playerId.substring(0,2));
                 this.physics.enable(tron, Phaser.Physics.ARCADE);
-                this.physics.arcade.enable([myPlayer.sprite, tron.sprite], Phaser.Physics.ARCADE);
+                this.physics.arcade.enable([player.sprite, tron.sprite], Phaser.Physics.ARCADE);
                 this.playerList[data.playerId].tron = tron;
                 tron.sprite.animations.play(data.spriteDirection, 3, false);
             } else {
@@ -336,7 +336,7 @@ Hackatron.Game.prototype = {
                 addAnimations(enemy.sprite);
                 enemy.sprite.scale.x = 0.8;
                 enemy.sprite.scale.y = 0.8;
-                this.game.physics.arcade.enable([myPlayer.sprite, enemy.sprite], Phaser.Physics.ARCADE);
+                this.game.physics.arcade.enable([player.sprite, enemy.sprite], Phaser.Physics.ARCADE);
                 this.playerList.ghost = enemy;
             } else {
                 enemy.sprite.x = data.ghost_x;
@@ -407,6 +407,7 @@ Hackatron.Game.prototype = {
         var baseURL = 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/';
         
         // this === Hackatron.Game
+        // load all resources/assets here
         this.load.image('blueball', baseURL + 'assets/blueball.png');
         this.load.image('pellet', baseURL + 'assets/pellet.png');
         this.load.image('poop', baseURL + 'assets/poop.png');
