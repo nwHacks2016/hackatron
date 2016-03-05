@@ -3,7 +3,11 @@ Hackatron = {
 };
 
 Hackatron.Game = function(game) {
+    this.enemy;
+    this.hostId;
     this.player;
+    this.playerId;
+    this.playerList;
 };
 
 var player;
@@ -36,7 +40,8 @@ Hackatron.Game.prototype = {
     create: function() {
         // Client set-up 
         this.playerId = generateId();
-        this.playerList = [];
+        this.hostId = this.playerId;
+        this.playerList = {};
         this.socket = io.connect();
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -53,28 +58,30 @@ Hackatron.Game.prototype = {
         // Collision
         this.game.physics.arcade.enable(this.layer);
         this.map.setCollision(18);
-        this.map.setCollision(88);
-        this.map.setCollision(54);
-        this.map.setCollision(89);
-        this.map.setCollision(53);
         this.map.setCollision(52);
+        this.map.setCollision(53);
+        this.map.setCollision(54);
+        this.map.setCollision(88);
+        this.map.setCollision(89);
         
-        if(!player){
-            player = new Tron();
-            player.init(this, 20, 20, 'tron');
-            player.setName(this, this.playerId.substring(0,2));
-            this.setUpSprite({
-                sprite: player.sprite,
-                emitterKey: 'blueball',
-                upKey: Keyboard.UP,
-                downKey: Keyboard.DOWN,
-                leftKey: Keyboard.LEFT,
-                rightKey: Keyboard.RIGHT
-            });
-        }
+        // Create player
+        player = new Tron();
+        player.init(this, 20, 20, 'tron');
+        player.setName(this, this.playerId.substring(0,2));
+        this.setUpSprite({
+            sprite: player.sprite,
+            emitterKey: 'blueball',
+            upKey: Keyboard.UP,
+            downKey: Keyboard.DOWN,
+            leftKey: Keyboard.LEFT,
+            rightKey: Keyboard.RIGHT
+        });
+        this.player = player;
 
-        this.updateClientSideListener();
-        this.sendMessageToBankend();    // tell everyone you started a game
+        // Register to listen to events and inform
+        // other players that you have joined the game
+        this.registerToEvents();
+        this.joinGame();
 
         if (!enemy) {
             enemy = new Ghost();
@@ -87,7 +94,7 @@ Hackatron.Game.prototype = {
                 leftKey: Keyboard.A,
                 rightKey: Keyboard.D
             });
-            this.playerList.ghost = enemy;
+            this.enemy = enemy;
         }
 
         // Add score text
@@ -258,7 +265,10 @@ Hackatron.Game.prototype = {
         }
     },
 
-    updateClientSideListener : function () {
+// ============================================================================
+//                          Socket Event Handlers
+// ============================================================================
+     registerToEvents: function () {
         this.socket.on('playerMove', function(data) {
             data = JSON.parse(data);
 
@@ -288,93 +298,92 @@ Hackatron.Game.prototype = {
                 player.sprite.animations.play(data.spriteDirection, 3, false);
                 
             }
-            if (!this.playerList.ghost) {
+            if (!this.enemy) {
                 enemy = new Ghost();
                 enemy.init(this.game, data.ghost_x, data.ghost_y, 'ghost');
                 addAnimations(enemy.sprite);
                 enemy.sprite.scale.x = 0.8;
                 enemy.sprite.scale.y = 0.8;
                 this.game.physics.arcade.enable([player.sprite, enemy.sprite], Phaser.Physics.ARCADE);
-                this.playerList.ghost = enemy;
+                this.enemy = enemy;
             } else {
                 enemy.sprite.x = data.ghost_x;
                 enemy.sprite.y = data.ghost_y;
             }
             // emitter.x = data.ghost_x;
             // emitter.y = data.ghost_y;
-        }.bind(this));
-
-        this.socket.on('newPlayer', function(data) {
-            data = JSON.parse(data);
-            console.log(data);
-            var addAnimations = function(sprite) {
-                sprite.animations.add('walkUp', [9,10,11], 3, false, true);
-                sprite.animations.add('walkDown', [0,1,2], 3, false, true);
-                sprite.animations.add('walkLeft', [3,4,5], 3, false, true);
-                sprite.animations.add('walkRight', [6,7,8], 3, false, true);
-            };
-
-            if(!this.playerList[data.playerId]){
-                var tron = new Tron();
-                tron.init(this, 20, 20, 'tron');
-                tron.setName(this, this.playerId.substring(0,2));
-                addAnimations(tron.sprite);
-                setKeys(tron.sprite, this, Keyboard.UP, Keyboard.DOWN, Keyboard.LEFT, Keyboard.RIGHT);
-
-                tron.sprite.scale.x = 0.8;
-                tron.sprite.scale.y = 0.8;
-
-                var emitter = this.add.emitter(tron.sprite.x, tron.sprite.y, 50);
-                emitter.width = 5;
-                emitter.makeParticles('blueball');
-                emitter.setXSpeed();
-                emitter.setYSpeed();
-                emitter.setRotation();
-                emitter.setAlpha(1, 0.4, 800);
-                emitter.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
-                emitter.start(false,250, 1);
-                
-                tron.character.emitter = emitter;
-                
-                this.playerList[data.playerId] = data;
-                tron.setName(this, data.playerId.substring(0,2));
-                tron.playerList[data.playerId].tron = tron;
-                tron.physics.enable(tron, Phaser.Physics.ARCADE);
-            }
 
         }.bind(this));
 
         this.socket.on('tronKilled', function(data) {
-            console.log(this.playerList[data.killedTronId] + 'was killed!');
             data = JSON.parse(data);
             var tron = this.playerList[data.killedTronId].tron;
-            if(tron) {
-                enemy.killTron(tron);
+            if(this.enemy && tron) {
+                this.enemy.killTron(tron);
+                console.log(data.killedTronId + 'was killed!');
             }
         }.bind(this));
+
+        // When new player joins, host shall send them data about the 'ghost'
+        this.socket.on('newPlayer', function(playerInfo) {
+            playerInfo = JSON.parse(playerInfo);
+
+            if (this.playerId === this.hostId) {
+                var gameData = {
+                    hostId: this.hostId,
+                    ghost: {
+                        posX: this.enemy.sprite.x,
+                        posY: this.enemy.sprite.y
+                    }
+                };
+                this.socket.emit('welcomeNewPlayer', JSON.stringify(gameData));
+            }
+        }.bind(this));
+
+        // Set up game state as a new player receiving game data from host
+        this.socket.on('welcomePlayer', function(gameData) {
+            gameData = JSON.parse(gameData);
+            this.hostId = gameData.hostId;
+
+            // Create a ghost
+            enemy = new Ghost();
+            enemy.init(this, gameData.ghost.posX, gameData.ghost.posY, 'ghost');
+            this.setUpSprite({
+                sprite: enemy.sprite,
+                emitterKey: 'poop',
+            });
+            this.enemy = enemy;
+        });
     },
-    sendMessageToBankend : function () {
+
+    // Method to broadcast to  other clients (if there are any) that you have
+    // joined the game
+    joinGame: function () {
         this.socket.emit('newPlayer', JSON.stringify({
             playerId: this.playerId,
-            sMessage: this.playerId + " just joined the game"
+            message: this.playerId + " has joined the game!"
         }));
     },
 
+// ============================================================================
+//                              Helper Methods
+// ============================================================================
     // Method for loading all assets/resources at game-level 
     // Resources loaded from gitHub since Heroku does not compile assets
     loadAssets: function() {
-        var baseURL = 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/';
+        var baseURL = 'https://raw.githubusercontent.com/tony-dinh\
+                      /hackatron/master/assets/';
         
         // this === Hackatron.Game
         // load all resources/assets here
-        this.load.image('blueball', baseURL + 'assets/blueball.png');
-        this.load.image('pellet', baseURL + 'assets/pellet.png');
-        this.load.image('poop', baseURL + 'assets/poop.png');
-        this.load.image('tiles', baseURL + 'assets/part2_tileset.png');
-        this.load.json('JSONobj', baseURL + 'assets/tiles1.json');
-        this.load.spritesheet('ghost', baseURL + 'assets/ghost.png', 32, 32, 12);
-        this.load.spritesheet('tron', baseURL + 'assets/tron.png', 32, 32, 12);
-        this.load.tilemap('map', baseURL + 'assets/tiles1.json', null, Phaser.Tilemap.TILED_JSON);
+        this.load.image('blueball', baseURL + 'blueball.png');
+        this.load.image('pellet', baseURL + 'pellet.png');
+        this.load.image('poop', baseURL + 'poop.png');
+        this.load.image('tiles', baseURL + 'part2_tileset.png');
+        this.load.json('JSONobj', baseURL + 'tiles1.json');
+        this.load.spritesheet('ghost', baseURL + 'ghost.png', 32, 32, 12);
+        this.load.spritesheet('tron', baseURL + 'tron.png', 32, 32, 12);
+        this.load.tilemap('map', baseURL + 'tiles1.json', null, Phaser.Tilemap.TILED_JSON);
     },
    
     // Method for assigning animations to a sprite given that a 3x3
