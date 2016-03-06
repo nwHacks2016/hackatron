@@ -300,9 +300,10 @@ Hackatron.Game.prototype = {
         // {playerId, playersPos: {posX, posY, direction}, enemyPos: {posX, posY}}
         self.socket.on('updateClientPosition', function(clientInfo) {
             clientInfo = JSON.parse(clientInfo);
+            
+            var player; 
             var playerId = clientInfo.playerId;
             var playerPos = clientInfo.playerPos;
-            var player; 
             if (!self.playerList[clientInfo.playerId]) {
                 player = new Tron();
                 player.init(self, playerPos.posX, playerPos.posY, 'tron');
@@ -313,6 +314,7 @@ Hackatron.Game.prototype = {
                 player = self.playerList[clientInfo.playerId].player;
             } 
             
+            self.game.physics.arcade.collide(player.sprite, self.layer);
             self.game.physics.arcade.collide(player.sprite, self.player.sprite, null, null, self.game);
             if(player.sprite.body) {
                 player.sprite.body.velocity.x = 0;
