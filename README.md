@@ -36,13 +36,15 @@ Open `localhost:8080` in your browser & enjoy! :)
 
 ## Accomplishments
 Within 24 hours, our team was able to familiarize ourselves with the following web/game development technology to deliver a 2D multiplayer game:
-- `node.js` as a basis for our project
+- `node.js` for dependency management
 - `phaser.io` game engine to do the heavy lifting
-- `express.js` to handle routing
-- `socket.io` to handle multiplayer
+- `express.js` to handle routing/server
+- `socket.io` to enable multiplayer
 
 ## What We Learned
-1. JavaScript & Node.js
-2. Understand basic communication between client-side and server-side networks
-3. How to stay awake for 24+ hours
+1. Javascript syntax
+2. Dependency management using `node.js`
+2. Simple game-networking design allowing communication between multiple clients
+3. How to set up a web application
+4. How to deploy a project to heroku
 
