@@ -9,7 +9,7 @@
 ## Overview
 Hackatron is a multiplayer game developed as a submission for nwHacks 2016. 
 
-This is a forked version of our [original submission](https://github.com/nwHacks2016/hackatron), which was developed alongside:
+This repository is forked from our [original submission](https://github.com/nwHacks2016/hackatron), which was developed alongside:
 
 |[**@mingchia-andy-liu**](https://github.com/mingchia-andy-liu)|[@wesleytsai](https://github.com/wesleytsai)|[@ericmuyser](https://github.com/ericmuyser)|
 |---------------------|---------------------|----------------------|
