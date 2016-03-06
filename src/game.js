@@ -190,7 +190,7 @@ Hackatron.Game.prototype = {
         };
         
         var playerDirection = self.updateCharPos(self.player.sprite);
-        // var ghostDirection = self.updateCharPos(enemy.sprite);
+        var ghostDirection = self.updateCharPos(enemy.sprite);
         self.game.physics.arcade.collide(self.player.sprite, self.layer);
         self.game.physics.arcade.collide(self.enemy.sprite, self.layer);
         self.game.physics.arcade.overlap(self.enemy.sprite, self.player.sprite, collisionHandler, null, self.game);
@@ -451,8 +451,6 @@ Hackatron.Game.prototype = {
         this.addAnimationsToSprite(sprite); 
         sprite.scale.x = 0.8;
         sprite.scale.y = 0.8;
-        sprite.body.immovable = false;
-        sprite.body.moves = true;
         this.setUpKeys(
             sprite,
             params.upKey,
