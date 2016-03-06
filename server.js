@@ -16,17 +16,24 @@ var io = require('socket.io').listen(server);
 io.sockets.on('connection', function(socket) {
   // console.log('New client')
   //recieve client data
-    socket.on('playerMove', function(data) {
+    socket.on('updateClientPosition', function(data) {
         // process.stdout.write(data);
-
-        socket.broadcast.emit('playerMove', data);
+        socket.broadcast.emit('updateClientPosition', data);
     });
 
-    socket.on('gameStarted', function(data) {
+    socket.on('newPlayer', function(data) {
         // process.stdout.write(data);
-
-        socket.broadcast.emit('gameStarted', data);
+        console.log(JSON.parse(data));
+        socket.broadcast.emit('newPlayer', data);
     });
+
+    socket.on('welcomePlayer', function(data) {
+        socket.broadcast.emit('welcomePlayer', data);
+    })
+
+    socket.on('tronKilled', function(data) {
+        socket.broadcast.emit('tronKilled', data);
+    })
 });
 
 console.log('\nOpen localhost:8080 on your browser.')

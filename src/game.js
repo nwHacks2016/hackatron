@@ -77,15 +77,19 @@ Hackatron.Game.prototype = {
             rightKey: Keyboard.RIGHT
         });
         this.player = player;
-
+        
         // Register to listen to events and inform
         // other players that you have joined the game
         this.registerToEvents();
         this.joinGame();
-
-        if (!enemy) {
+        
+        // Create enemy for the host
+        if (!this.enemy) {
+            var spawnPosY = 20;
+            var spawnPosX = 512 - 40;
+            
             enemy = new Ghost();
-            enemy.init(this, 512-20, 20, 'ghost');
+            enemy.init(this, spawnPosX, spawnPosY, 'ghost');
             this.setUpSprite({
                 sprite: enemy.sprite,
                 emitterKey: 'poop',
@@ -126,84 +130,93 @@ Hackatron.Game.prototype = {
         //easystar.disableCornerCutting();
         // easystar.enableCornerCutting();
 
-        var timeStep = 400;
-
-        setInterval(function() { 
-
-               if (!currentPath) {
-                    this.easystar.findPath(this.currentGhostXtile, this.currentGhostYtile, this.currentPlayerXtile, this.currentPlayerYtile, function( path ) {
-
-                        if (!path || path.length < 2) {
-                            console.log("The path to the destination point was not found.");
-                            return;
-                        }
-
-                        currentPath = path;  
-
-                        // Periodically reset
-                        setTimeout(function() {
-                            currentPathIndex = 0;
-                            currentPath = null;
-                        }, 3000);           
-                    }.bind(this));
-
-               }
-             this.easystar.calculate();
-
-
-        if (currentPath && currentPathIndex < currentPath.length) {
-            enemy.sprite.x = Math.floor(currentPath[currentPathIndex].x) * 16;
-            enemy.sprite.y = Math.floor(currentPath[currentPathIndex].y) * 16;
-
-                if (currentPathIndex < currentPath.length-1) {
-                    ++currentPathIndex;
-                } else {
-                    currentPathIndex = 0;
-                    currentPath = null;
-                }
-        }
-
-        }.bind(this), 100);
+        // if (this.playerId === this.hostId) {
+        //     var timeStep = 400;
+        //
+        //     setInterval(function() { 
+        //            if (!currentPath) {
+        //                 this.easystar.findPath(this.currentGhostXtile, this.currentGhostYtile, this.currentPlayerXtile, this.currentPlayerYtile, function( path ) {
+        //
+        //                     if (!path || path.length < 2) {
+        //                         console.log("The path to the destination point was not found.");
+        //                         return;
+        //                     }
+        //
+        //                     currentPath = path;  
+        //
+        //                     // Periodically reset
+        //                     setTimeout(function() {
+        //                         currentPathIndex = 0;
+        //                         currentPath = null;
+        //                     }, 3000);           
+        //                 }.bind(this));
+        //
+        //            }
+        //          this.easystar.calculate();
+        //
+        //     if (currentPath && currentPathIndex < currentPath.length) {
+        //         enemy.sprite.x = Math.floor(currentPath[currentPathIndex].x) * 16;
+        //         enemy.sprite.y = Math.floor(currentPath[currentPathIndex].y) * 16;
+        //
+        //             if (currentPathIndex < currentPath.length-1) {
+        //                 ++currentPathIndex;
+        //             } else {
+        //                 currentPathIndex = 0;
+        //                 currentPath = null;
+        //             }
+        //     }
+        //
+        //     }.bind(this), 100);
+        // }
     }, 
 
     update: function() {
+        // this === Hackatron.Game
         var self = this;
         if (!player || !enemy) return;
+
         var collisionHandler = function() {
+            // this === Phaser.Game
             self.socket.emit('tronKilled', JSON.stringify({
                 killedTronId: self.playerId
             }));
 
             enemy.killTron(player);
-            //enemy.stopPathFinding;
-            var rebootGhost= function() {
-                //enemy.startPathFinding;
-            };
-
-            self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
+            // //enemy.stopPathFinding;
+            // var rebootGhost= function() {
+            //     //enemy.startPathFinding;
+            // };
+            //
+            // self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
 
         var playerDirection = this.updateCharPos(player.sprite, 200);
-        var ghostDirection = this.updateCharPos(enemy.sprite, 200);
+        // var ghostDirection = this.updateCharPos(enemy.sprite, 200);
         this.game.physics.arcade.collide(player.sprite, this.layer);
         this.game.physics.arcade.collide(enemy.sprite, this.layer);
         this.game.physics.arcade.overlap(enemy.sprite, player.sprite, collisionHandler, null, this.game);
     
-        this.socket.emit('playerMove', JSON.stringify({
+        var clientInfo = {
             playerId: this.playerId, 
-            tron_x: player.sprite.x, 
-            tron_y: player.sprite.y,
-            playerDirection: playerDirection,
-            ghost_x: enemy.sprite.x,
-            ghost_y: enemy.sprite.y,
-            ghostDirection: ghostDirection
-        }));
+            playerPos: {
+                posX: this.player.sprite.x,
+                posY: this.player.sprite.y,
+                direction: playerDirection
+            }
+        }
+
+        if (this.playerId === this.hostId) {
+            clientInfo['enemyPos'] = {
+                posX: this.enemy.sprite.x,
+                posY: this.enemy.sprite.y
+            }
+        }
+        this.socket.emit('updateClientPosition', JSON.stringify(clientInfo));
 
         this.currentPlayerXtile = Math.floor(player.sprite.x / 16);
         this.currentPlayerYtile = Math.floor(player.sprite.y / 16); 
         this.currentGhostXtile = Math.floor(enemy.sprite.x / 16);
         this.currentGhostYtile = Math.floor(enemy.sprite.y / 16); 
-
     }, 
 
      updateCharPos: function(sprite, speed) {
@@ -268,92 +281,105 @@ Hackatron.Game.prototype = {
 // ============================================================================
 //                          Socket Event Handlers
 // ============================================================================
-     registerToEvents: function () {
-        this.socket.on('playerMove', function(data) {
-            data = JSON.parse(data);
+    registerToEvents: function () {
+        var self = this;
+        
+        // Method for updating board local client game state using clientInfo
+        // broadcasted to all players. The clientInfo variable contains the
+        // following keys:
+        // {playerId, playersPos: {posX, posY, direction}, enemyPos: {posX, posY}}
+        self.socket.on('updateClientPosition', function(clientInfo) {
+            clientInfo = JSON.parse(clientInfo);
+            var playerId = clientInfo.playerId;
+            var playerPos = clientInfo.playerPos;
+           
+            if (!self.playerList[clientInfo.playerId]) {
+                var player = new Tron();
+                player.init(self, playerPos.posX, playerPos.posY, 'tron');
+                player.setName(self, clientInfo.playerId.substring(0,2));
+                self.setUpSprite({sprite: player.sprite, emitterKey: 'blueball'});
+                self.playerList[clientInfo.playerId] = {'player': player};
+            } 
+            
+            var player = self.playerList[clientInfo.playerId].player;
+            player.sprite.x = playerPos.posX;
+            player.sprite.y = playerPos.posY;
+            player.sprite.animations.play(playerPos.direction, 3, false);
 
-            var addAnimations = function(sprite) {
-                sprite.animations.add('walkUp', [9,10,11], 3, false, true);
-                sprite.animations.add('walkDown', [0,1,2], 3, false, true);
-                sprite.animations.add('walkLeft', [3,4,5], 3, false, true);
-                sprite.animations.add('walkRight', [6,7,8], 3, false, true);
-            };
+            switch(playerPos.direction) {
+                case 'walkUp':
+                    player.sprite.emitter.x = player.sprite.x + 15;
+                    player.sprite.emitter.y = player.sprite.y + 35;
+                    break;
 
-            if (!this.playerList[data.playerId]) {
-                this.playerList[data.playerId] = {};
-                var tron = new Tron();
-                tron.init(this.game, data.tron_x, data.tron_y, 'tron');
-                addAnimations(tron.sprite);
-                tron.sprite.scale.x = 0.8;
-                tron.sprite.scale.y = 0.8;
-                tron.setName(this.game, data.playerId.substring(0,2));
-                this.physics.enable(tron, Phaser.Physics.ARCADE);
-                this.physics.arcade.enable([player.sprite, tron.sprite], Phaser.Physics.ARCADE);
-                this.playerList[data.playerId].tron = tron;
-                tron.sprite.animations.play(data.spriteDirection, 3, false);
-            } else {
-                var player = this.playerList[data.playerId].tron;
-                player.sprite.x = data.tron_x;
-                player.sprite.y = data.tron_y;
-                player.sprite.animations.play(data.spriteDirection, 3, false);
-                
+                case 'walkDown':
+                    player.sprite.emitter.x = player.sprite.x + 15;
+                    player.sprite.emitter.y = player.sprite.y + -5;
+                    break;
+
+                case 'walkLeft':
+                    player.sprite.emitter.x = player.sprite.x + 30;
+                    player.sprite.emitter.y = player.sprite.y + 15;            
+                    break;
+
+                case 'walkRight':
+                    player.sprite.emitter.x = player.sprite.x;
+                    player.sprite.emitter.y = player.sprite.y + 15;
+                    break;
             }
-            if (!this.enemy) {
-                enemy = new Ghost();
-                enemy.init(this.game, data.ghost_x, data.ghost_y, 'ghost');
-                addAnimations(enemy.sprite);
-                enemy.sprite.scale.x = 0.8;
-                enemy.sprite.scale.y = 0.8;
-                this.game.physics.arcade.enable([player.sprite, enemy.sprite], Phaser.Physics.ARCADE);
-                this.enemy = enemy;
-            } else {
-                enemy.sprite.x = data.ghost_x;
-                enemy.sprite.y = data.ghost_y;
+            if (self.playerId !== self.hostId) {
+                var enemyPos = clientInfo.enemyPos;
+                enemy.sprite.x = enemyPos.posX;
+                enemy.sprite.y = enemyPos.posY;
             }
-            // emitter.x = data.ghost_x;
-            // emitter.y = data.ghost_y;
-
-        }.bind(this));
-
-        this.socket.on('tronKilled', function(data) {
-            data = JSON.parse(data);
-            var tron = this.playerList[data.killedTronId].tron;
-            if(this.enemy && tron) {
-                this.enemy.killTron(tron);
-                console.log(data.killedTronId + 'was killed!');
-            }
-        }.bind(this));
-
-        // When new player joins, host shall send them data about the 'ghost'
-        this.socket.on('newPlayer', function(playerInfo) {
+        }.bind(self));
+        // When new player joins, host shall send them data about the 'enemyPos'
+        self.socket.on('newPlayer', function(playerInfo) {
             playerInfo = JSON.parse(playerInfo);
 
-            if (this.playerId === this.hostId) {
+            if (self.playerId === self.hostId) {
                 var gameData = {
-                    hostId: this.hostId,
-                    ghost: {
-                        posX: this.enemy.sprite.x,
-                        posY: this.enemy.sprite.y
+                    playerId: playerInfo.playerId,
+                    hostId: self.hostId,
+                    enemy: {
+                        posX: self.enemy.sprite.x,
+                        posY: self.enemy.sprite.y
                     }
                 };
-                this.socket.emit('welcomeNewPlayer', JSON.stringify(gameData));
+                self.socket.emit('welcomePlayer', JSON.stringify(gameData));
             }
-        }.bind(this));
+        });
 
         // Set up game state as a new player receiving game data from host
-        this.socket.on('welcomePlayer', function(gameData) {
+        self.socket.on('welcomePlayer', function(gameData) {
             gameData = JSON.parse(gameData);
-            this.hostId = gameData.hostId;
 
-            // Create a ghost
-            enemy = new Ghost();
-            enemy.init(this, gameData.ghost.posX, gameData.ghost.posY, 'ghost');
-            this.setUpSprite({
-                sprite: enemy.sprite,
-                emitterKey: 'poop',
-            });
-            this.enemy = enemy;
+            if (self.playerId === gameData.playerId) {
+                self.hostId = gameData.hostId;
+
+                if (self.enemy) {
+                    self.enemy.sprite.destroy();
+                }
+                // Create a ghost
+                var enemy = new Ghost();
+                enemy.init(self, gameData.enemy.posX, gameData.enemy.posY, 'ghost');
+                self.setUpSprite({
+                    sprite: enemy.sprite,
+                    emitterKey: 'poop'
+                });
+                self.enemy = enemy;
+            }
         });
+       
+       // Method for handling received deaths of other clients
+        self.socket.on('tronKilled', function(eventInfo) {
+            eventInfo = JSON.parse(eventInfo);
+            var tron = self.playerList[eventInfo.killedTronId].tron;
+            if(self.enemy && tron) {
+                self.enemy.killTron(tron.sprite);
+                console.log(data.killedTronId + 'was killed!');
+            }
+        }.bind(self));
     },
 
     // Method to broadcast to  other clients (if there are any) that you have
