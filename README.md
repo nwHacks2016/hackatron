@@ -44,7 +44,7 @@ Within 24 hours, our team was able to familiarize ourselves with the following w
 ## What We Learned
 1. Javascript syntax
 2. Dependency management using `node.js`
-2. Simple game-networking design allowing communication between multiple clients
-3. How to set up a web application
-4. How to deploy a project to heroku
-
+3. Simple game-networking design allowing communication between multiple clients
+4. How to set up a web application
+5. How to deploy a project to heroku
+6. **How to stay awake for 24+ hours**
