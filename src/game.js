@@ -310,31 +310,42 @@ Hackatron.Game.prototype = {
                 player = self.playerList[clientInfo.playerId].player;
             } 
             
-            player.sprite.x = playerPos.posX;
-            player.sprite.y = playerPos.posY;
             player.sprite.animations.play(playerPos.direction, 3, false);
 
-            switch(playerPos.direction) {
-                case 'walkUp':
-                    player.sprite.emitter.x = player.sprite.x + 15;
-                    player.sprite.emitter.y = player.sprite.y + 35;
-                    break;
+            if(player.sprite.body) {
+                player.sprite.body.velocity.x = 0;
+                player.sprite.body.velocity.y = 0;
+                
+                switch(playerPos.direction) {
+                    case 'walkUp':
+                        player.sprite.body.velocity.y = -PLAYER_SPEED;
+                        player.sprite.emitter.x = player.sprite.x + 15;
+                        player.sprite.emitter.y = player.sprite.y + 35;
+                        break;
 
-                case 'walkDown':
-                    player.sprite.emitter.x = player.sprite.x + 15;
-                    player.sprite.emitter.y = player.sprite.y + -5;
-                    break;
+                    case 'walkDown':
+                        player.sprite.body.velocity.y = PLAYER_SPEED;
+                        player.sprite.emitter.x = player.sprite.x + 15;
+                        player.sprite.emitter.y = player.sprite.y + -5;
+                        break;
 
-                case 'walkLeft':
-                    player.sprite.emitter.x = player.sprite.x + 30;
-                    player.sprite.emitter.y = player.sprite.y + 15;            
-                    break;
+                    case 'walkLeft':
+                        player.sprite.body.velocity.x = -PLAYER_SPEED;
+                        player.sprite.emitter.x = player.sprite.x + 30;
+                        player.sprite.emitter.y = player.sprite.y + 15;            
+                        break;
 
-                case 'walkRight':
-                    player.sprite.emitter.x = player.sprite.x;
-                    player.sprite.emitter.y = player.sprite.y + 15;
-                    break;
+                    case 'walkRight':
+                        player.sprite.body.velocity.x = PLAYER_SPEED;
+                        player.sprite.emitter.x = player.sprite.x;
+                        player.sprite.emitter.y = player.sprite.y + 15;
+                        break;
+                }
+
+                // player.sprite.x = playerPos.posX;
+                // player.sprite.y = playerPos.posY;
             }
+
             if (self.playerId !== self.hostId) {
                 var enemyPos = clientInfo.enemyPos;
                 self.enemy.sprite.x = enemyPos.posX;
