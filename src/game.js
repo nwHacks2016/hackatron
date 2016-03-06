@@ -314,8 +314,9 @@ Hackatron.Game.prototype = {
                 player = self.playerList[clientInfo.playerId].player;
             } 
             
-            self.game.physics.arcade.collide(player.sprite, self.layer);
-            self.game.physics.arcade.collide(player.sprite, self.player.sprite, null, null, self.game);
+            // self.game.physics.arcade.collide(player.sprite, self.layer);
+            // self.game.physics.arcade.collide(player.sprite, self.player.sprite, null, null, self.game);
+
             if(player.sprite.body) {
                 player.sprite.body.velocity.x = 0;
                 player.sprite.body.velocity.y = 0;
@@ -358,8 +359,8 @@ Hackatron.Game.prototype = {
             }
             
 
-            // player.sprite.x = playerPos.posX;
-            // player.sprite.y = playerPos.posY;
+            player.sprite.x = playerPos.posX;
+            player.sprite.y = playerPos.posY;
 
         });
         // When new player joins, host shall send them data about the 'enemyPos'
