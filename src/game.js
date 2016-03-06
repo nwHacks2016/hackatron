@@ -172,7 +172,7 @@ Hackatron.Game.prototype = {
     update: function() {
         // this === Hackatron.Game
         var self = this;
-        if (!this.player || !this.enemy) return;
+        if (!self.player || !self.enemy) return;
 
         var collisionHandler = function() {
             // this === Phaser.Game
@@ -188,34 +188,34 @@ Hackatron.Game.prototype = {
             //
             // self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
-
-        var playerDirection = this.updateCharPos(this.player.sprite);
-        // var ghostDirection = this.updateCharPos(enemy.sprite);
-        this.game.physics.arcade.collide(this.player.sprite, this.layer);
-        this.game.physics.arcade.collide(this.enemy.sprite, this.layer);
-        this.game.physics.arcade.overlap(this.enemy.sprite, this.player.sprite, collisionHandler, null, this.game);
+        
+        var playerDirection = self.updateCharPos(self.player.sprite);
+        // var ghostDirection = self.updateCharPos(enemy.sprite);
+        self.game.physics.arcade.collide(self.player.sprite, self.layer);
+        self.game.physics.arcade.collide(self.enemy.sprite, self.layer);
+        self.game.physics.arcade.overlap(self.enemy.sprite, self.player.sprite, collisionHandler, null, self.game);
     
         var clientInfo = {
-            playerId: this.playerId, 
+            playerId: self.playerId, 
             playerPos: {
-                posX: this.player.sprite.x,
-                posY: this.player.sprite.y,
+                posX: self.player.sprite.x,
+                posY: self.player.sprite.y,
                 direction: playerDirection
             }
         }
 
-        if (this.playerId === this.hostId) {
+        if (self.playerId === self.hostId) {
             clientInfo['enemyPos'] = {
-                posX: this.enemy.sprite.x,
-                posY: this.enemy.sprite.y
+                posX: self.enemy.sprite.x,
+                posY: self.enemy.sprite.y
             }
         }
-        this.socket.emit('updateClientPosition', JSON.stringify(clientInfo));
+        self.socket.emit('updateClientPosition', JSON.stringify(clientInfo));
 
-        this.currentPlayerXtile = Math.floor(this.player.sprite.x / 16);
-        this.currentPlayerYtile = Math.floor(this.player.sprite.y / 16); 
-        this.currentGhostXtile = Math.floor(this.enemy.sprite.x / 16);
-        this.currentGhostYtile = Math.floor(this.enemy.sprite.y / 16); 
+        self.currentPlayerXtile = Math.floor(self.player.sprite.x / 16);
+        self.currentPlayerYtile = Math.floor(self.player.sprite.y / 16); 
+        self.currentGhostXtile = Math.floor(self.enemy.sprite.x / 16);
+        self.currentGhostYtile = Math.floor(self.enemy.sprite.y / 16); 
     }, 
 
      updateCharPos: function(sprite) {
@@ -335,6 +335,8 @@ Hackatron.Game.prototype = {
             
             var collisionHandler = function() {
                 //no op
+                console.log('collided with ' + playerId);
+                return true;
             }
 
             self.game.physics.arcade.collide(player.sprite, self.player.sprite, null, collisionHandler);
@@ -365,8 +367,10 @@ Hackatron.Game.prototype = {
                 self.hostId = gameData.hostId;
 
                 if (self.enemy) {
+                    self.enemy.sprite.emitter.destroy();
                     self.enemy.sprite.destroy();
                 }
+
                 // Create a ghost
                 var enemy = new Ghost();
                 enemy.init(self, gameData.enemy.posX, gameData.enemy.posY, 'ghost');
@@ -394,7 +398,7 @@ Hackatron.Game.prototype = {
     joinGame: function () {
         this.socket.emit('newPlayer', JSON.stringify({
             playerId: this.playerId,
-            message: this.playerId + " has joined the game!"
+            message: this.playerId + ' has joined the game!'
         }));
     },
 
@@ -443,11 +447,12 @@ Hackatron.Game.prototype = {
     //     {sprite, emitterKey, upKey, downKey, leftKey, rightKey}
     setUpSprite: function(params) {
         var sprite = params.sprite;
-        sprite.scale.x = 0.8;
-        sprite.scale.y = 0.8;
-
         this.game.physics.arcade.enable(sprite, Phaser.Physics.ARCADE);
         this.addAnimationsToSprite(sprite); 
+        sprite.scale.x = 0.8;
+        sprite.scale.y = 0.8;
+        sprite.body.immovable = false;
+        sprite.body.moves = true;
         this.setUpKeys(
             sprite,
             params.upKey,
