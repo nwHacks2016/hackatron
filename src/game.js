@@ -194,7 +194,7 @@ Hackatron.Game.prototype = {
         self.game.physics.arcade.collide(self.player.sprite, self.layer);
         self.game.physics.arcade.collide(self.enemy.sprite, self.layer);
         self.game.physics.arcade.overlap(self.enemy.sprite, self.player.sprite, collisionHandler, null, self.game);
-    
+ 
         var clientInfo = {
             playerId: self.playerId, 
             playerPos: {
@@ -227,9 +227,10 @@ Hackatron.Game.prototype = {
            && sprite.rightKey)) {
             return;
         }
-        
         sprite.body.velocity.x = 0;
         sprite.body.velocity.y = 0;
+        sprite.emitter.on = true;
+        
         if (sprite.upKey.isDown) {
             sprite.animations.play('walkUp', 3, false);
             sprite.body.velocity.y = -PLAYER_SPEED;
@@ -260,6 +261,8 @@ Hackatron.Game.prototype = {
             sprite.emitter.x = sprite.x;
             sprite.emitter.y = sprite.y + 15;    
             return 'walkRight';
+        } else {
+            sprite.emitter.on = false;
         }
 
     }, 
@@ -310,12 +313,12 @@ Hackatron.Game.prototype = {
                 player = self.playerList[clientInfo.playerId].player;
             } 
             
-            player.sprite.animations.play(playerPos.direction, 3, false);
-
+            self.game.physics.arcade.collide(player.sprite, self.player.sprite, null, null, self.game);
             if(player.sprite.body) {
                 player.sprite.body.velocity.x = 0;
                 player.sprite.body.velocity.y = 0;
-                
+                player.sprite.animations.play(playerPos.direction, 3, false);
+                player.sprite.emitter.on = true;
                 switch(playerPos.direction) {
                     case 'walkUp':
                         player.sprite.body.velocity.y = -PLAYER_SPEED;
@@ -340,10 +343,10 @@ Hackatron.Game.prototype = {
                         player.sprite.emitter.x = player.sprite.x;
                         player.sprite.emitter.y = player.sprite.y + 15;
                         break;
+                   default:
+                        player.sprite.emitter.on = false;
+                        break;
                 }
-
-                // player.sprite.x = playerPos.posX;
-                // player.sprite.y = playerPos.posY;
             }
 
             if (self.playerId !== self.hostId) {
@@ -352,14 +355,9 @@ Hackatron.Game.prototype = {
                 self.enemy.sprite.y = enemyPos.posY;
             }
             
-            var collisionHandler = function() {
-                //no op
-                console.log('collided with ' + playerId);
-                return true;
-            }
 
-            self.game.physics.arcade.collide(player.sprite, self.layer);
-            self.game.physics.arcade.collide(player.sprite, self.player.sprite, null, collisionHandler);
+            // player.sprite.x = playerPos.posX;
+            // player.sprite.y = playerPos.posY;
 
         });
         // When new player joins, host shall send them data about the 'enemyPos'
