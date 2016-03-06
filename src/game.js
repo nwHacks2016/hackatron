@@ -219,7 +219,15 @@ Hackatron.Game.prototype = {
     }, 
 
      updateCharPos: function(sprite) {
-        if(!sprite || !sprite.body) return;
+        if (!(sprite
+           && sprite.body
+           && sprite.upKey 
+           && sprite.downKey
+           && sprite.leftKey
+           && sprite.rightKey)) {
+            return;
+        }
+        
         sprite.body.velocity.x = 0;
         sprite.body.velocity.y = 0;
         if (sprite.upKey.isDown) {
