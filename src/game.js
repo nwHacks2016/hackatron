@@ -190,7 +190,7 @@ Hackatron.Game.prototype = {
         };
         
         var playerDirection = self.updateCharPos(self.player.sprite);
-        var ghostDirection = self.updateCharPos(enemy.sprite);
+        var ghostDirection = self.updateCharPos(self.enemy.sprite);
         self.game.physics.arcade.collide(self.player.sprite, self.layer);
         self.game.physics.arcade.collide(self.enemy.sprite, self.layer);
         self.game.physics.arcade.overlap(self.enemy.sprite, self.player.sprite, collisionHandler, null, self.game);
