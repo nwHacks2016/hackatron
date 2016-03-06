@@ -342,6 +342,7 @@ Hackatron.Game.prototype = {
                         break;
                 }
 
+                self.game.physics.arcade.collide(player.sprite, self.layer);
                 // player.sprite.x = playerPos.posX;
                 // player.sprite.y = playerPos.posY;
             }
