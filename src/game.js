@@ -324,25 +324,25 @@ Hackatron.Game.prototype = {
                 player.sprite.emitter.on = true;
                 switch(playerPos.direction) {
                     case 'walkUp':
-                        player.sprite.body.velocity.y = -PLAYER_SPEED;
+                        // player.sprite.body.velocity.y = -PLAYER_SPEED;
                         player.sprite.emitter.x = player.sprite.x + 15;
                         player.sprite.emitter.y = player.sprite.y + 35;
                         break;
 
                     case 'walkDown':
-                        player.sprite.body.velocity.y = PLAYER_SPEED;
+                        // player.sprite.body.velocity.y = PLAYER_SPEED;
                         player.sprite.emitter.x = player.sprite.x + 15;
                         player.sprite.emitter.y = player.sprite.y + -5;
                         break;
 
                     case 'walkLeft':
-                        player.sprite.body.velocity.x = -PLAYER_SPEED;
+                        // player.sprite.body.velocity.x = -PLAYER_SPEED;
                         player.sprite.emitter.x = player.sprite.x + 30;
                         player.sprite.emitter.y = player.sprite.y + 15;            
                         break;
 
                     case 'walkRight':
-                        player.sprite.body.velocity.x = PLAYER_SPEED;
+                        // player.sprite.body.velocity.x = PLAYER_SPEED;
                         player.sprite.emitter.x = player.sprite.x;
                         player.sprite.emitter.y = player.sprite.y + 15;
                         break;
@@ -487,7 +487,7 @@ Hackatron.Game.prototype = {
         emitter.setYSpeed();
         emitter.setRotation();
         emitter.setAlpha(1, 0.4, 800);
-        emitter.setScale(0.05, 0.2, 0.05, 0.2, 2000, Phaser.Easing.Quintic.Out);
+        emitter.setScale(0.2, 0.05, 0.2, 0.05, 2000, Phaser.Easing.Quintic.Out);
         emitter.start(false,250, 1);
 
         sprite.emitter = emitter;
