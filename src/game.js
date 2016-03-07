@@ -11,13 +11,6 @@ Hackatron.Game = function(game) {
 };
 
 var PLAYER_SPEED = 200;
-var pellet;
-
-var tilemapData;
-var enemyDirection;
-var posX = 0;
-var posY = 0;
-var moves = [];
 var currentPath;
 var currentPathIndex = 0;
 
@@ -56,13 +49,8 @@ Hackatron.Game.prototype = {
         
         // Collision
         this.game.physics.arcade.enable(this.layer);
-        this.map.setCollision(18);
-        this.map.setCollision(52);
-        this.map.setCollision(53);
-        this.map.setCollision(54);
-        this.map.setCollision(88);
-        this.map.setCollision(89);
-        
+        this.map.setCollision([18, 52, 53, 54, 88, 89]);
+
         // Create player
         var player = new Tron();
         player.init(this, 20, 20, 'tron');
