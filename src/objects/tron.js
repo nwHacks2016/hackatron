@@ -60,8 +60,8 @@ Tron.prototype.triggerAttack = function(blockList) {
         block.scale.y = 0.8;
         blockList.push(block);
 
-        // makes block fade away within a 1.5 seconds
-        this.game.add.tween(block).to( { alpha: 0 }, 1500, "Linear", true, 0, -1);
+        // makes block fade away within a 2.0 seconds
+        this.game.add.tween(block).to( { alpha: 0 }, 2000, "Linear", true, 0, -1);
         setTimeout(function() {
             block.destroy();
             self.blocks++;

@@ -401,8 +401,8 @@ Hackatron.Game.prototype = {
             block.scale.y = 0.8;
             block.body.immovable = true;
 
-            // Make block fade in 1.5 seconds
-            this.game.add.tween(block).to( { alpha: 0 }, 1500, "Linear", true, 0, -1);
+            // Make block fade in 2.0 seconds
+            this.game.add.tween(block).to( { alpha: 0 }, 2000, "Linear", true, 0, -1);
 
             self.blockList.push(block);
             setTimeout(function() {
