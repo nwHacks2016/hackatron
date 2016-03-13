@@ -49,7 +49,7 @@ Hackatron.Game.prototype = {
 
             //console.log(cell);
 
-            if (cell === -1) {
+            if (cell === Hackatron.mapConfig.floorTile) {
                 coord = {x: x, y: y};
             }
         }
@@ -60,56 +60,42 @@ Hackatron.Game.prototype = {
     },
 
     create: function() {
-        // Client set-up
         this.playerId = generateId();
         this.hostId = this.playerId;
         this.playerList = {};
         this.socket = io.connect();
-        this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
-        // Create the map
-        // this.pelletHelper(data);
-        this.map = this.add.tilemap('tilesetMap');
-        this.map.addTilesetImage('tileset', 'tilesetImage');
-
-        this.mapData = this.map.layers[0].data;
-
-        this.layer = this.map.createLayer('Base');
-        this.layer.resizeWorld();
-        var Keyboard = Phaser.Keyboard;
-
-        // Collision
-        this.game.physics.arcade.enable(this.layer);
-        this.map.setCollision([18, 52, 53, 54, 88, 89]);
-
-        // Create player
-        var player = new Tron();
-        var spawnPosX = 20;
-        var spawnPosY = 20;
-        var playerParams = {
-            game: this.game,
-            characterKey: 'tron',
-            emitterKey: 'blueball',
-            speed: PLAYER_SPEED,
-            x: spawnPosX,
-            y: spawnPosY,
-            keys: {
-                up: Keyboard.UP,
-                down: Keyboard.DOWN,
-                left: Keyboard.LEFT,
-                right: Keyboard.RIGHT,
-                att: Keyboard.SPACEBAR
-            }
-        };
-        player.init(playerParams);
-        player.setName(this, Hackatron.playerName);
-        this.player = player;
+        this.initPhysics();
+        this.initMap();
+        this.initPlayer();
+        this.initEnemy();
+        this.initAI();
+        this.initPowerUps();
+        this.initCountdown();
+        this.initSFX();
+        this.initHotkeys();
 
         // Register to listen to events and inform
         // other players that you have joined the game
         this.registerToEvents();
         this.joinGame();
+    },
 
+    initPhysics: function() {
+        this.game.physics.startSystem(Phaser.Physics.ARCADE);
+    },
+
+    initHotkeys: function() {
+        this.fullscreenKey = this.game.input.keyboard.addKey(Phaser.Keyboard.F);
+        this.fullscreenKey.onDown.add(this.toggleFullscreen, this);
+    },
+
+    initAI: function() {
+        this.ai = new AI();
+        this.ai.init(this.mapData);
+    },
+
+    initEnemy: function() {
         // Create enemy for the host
         if (!this.enemy) {
             spawnPosY = 20;
@@ -122,23 +108,88 @@ Hackatron.Game.prototype = {
                 x: spawnPosX,
                 y: spawnPosY,
                 keys: {
-                    up: Keyboard.W,
-                    down: Keyboard.S,
-                    left: Keyboard.A,
-                    right: Keyboard.D
+                    up: Phaser.Keyboard.W,
+                    down: Phaser.Keyboard.S,
+                    left: Phaser.Keyboard.A,
+                    right: Phaser.Keyboard.D
                 }
             };
             var enemy = new Ghost();
             enemy.init(enemyParams);
             this.enemy = enemy;
         }
+    },
 
-        this.ai = new AI();
-        this.ai.init(this.mapData);
+    initPlayer: function() {
+        // Create player
+        var player = new Tron();
+        var spawnPosX = 20;
+        var spawnPosY = 20;
+        var playerParams = {
+            game: this.game,
+            characterKey: 'tron',
+            emitterKey: 'blueball',
+            speed: PLAYER_SPEED,
+            x: spawnPosX,
+            y: spawnPosY,
+            keys: {
+                up: Phaser.Keyboard.UP,
+                down: Phaser.Keyboard.DOWN,
+                left: Phaser.Keyboard.LEFT,
+                right: Phaser.Keyboard.RIGHT,
+                att: Phaser.Keyboard.SPACEBAR
+            }
+        };
+        player.init(playerParams);
+        player.setName(this, Hackatron.playerName);
+        this.player = player;
+    },
 
-        this.fullscreenKey = this.game.input.keyboard.addKey(Phaser.Keyboard.F);
-        this.fullscreenKey.onDown.add(this.toggleFullscreen, this);
+    initMap: function() {
+        this.map = this.add.tilemap('tilesetMap');
+        this.map.addTilesetImage(Hackatron.mapConfig.tilesetKey, 'tilesetImage');
 
+        this.mapData = this.map.layers[0].data;
+
+        this.layer = this.map.createLayer('Base');
+        this.layer.resizeWorld();
+
+        // Collision
+        this.game.physics.arcade.enable(this.layer);
+
+        var nonGroundTilesMap = {};
+        var nonGroundTiles = [];
+
+        this.mapData.forEach(function(column) {
+            column.forEach(function(cell) {
+                if (cell.index !== Hackatron.mapConfig.floorTile) {
+                    nonGroundTilesMap[cell.index] = true;
+                }
+            });
+        });
+
+        for (index in nonGroundTilesMap) {
+            nonGroundTiles.push(parseInt(index));
+        }
+
+        this.map.setCollision(nonGroundTiles);
+    },
+
+    initCountdown: function() {
+        var countdown = new Countdown();
+        countdown.init(this.game);
+        countdown.start();
+    },
+
+    initSFX: function() {
+        // var fx = this.game.add.audio('sfx');
+        // fx.addMarker('monsterRoar', 2, 1.2);
+        // fx.addMarker('playerEaten', 5, 0.5);
+        // fx.addMarker('playerInWater', 7, 0.5);
+        // fx.addMarker('jump', 0, 0.24);
+    },
+
+    initPowerUps: function() {
         this.powerups = [];
         this.powerupPlugins = ['speedBoost', 'portal', 'reverseMode', 'invincibleMode', 'rageMode']; // 'ghostMode', 'saiyanMode'];
 
@@ -155,17 +206,6 @@ Hackatron.Game.prototype = {
 
             this.powerups.push(powerup);
         }.bind(this), 1000);
-
-        var countdown = new Countdown();
-        countdown.init(this.game);
-        countdown.start();
-
-
-        // var fx = this.game.add.audio('sfx');
-        // fx.addMarker('monsterRoar', 2, 1.2);
-        // fx.addMarker('playerEaten', 5, 0.5);
-        // fx.addMarker('playerInWater', 7, 0.5);
-        // fx.addMarker('jump', 0, 0.24);
     },
 
     // TODO: causing some errors, not sure why
