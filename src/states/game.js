@@ -234,14 +234,22 @@ Hackatron.Game.prototype = {
     },
 
     initPowerUps: function() {
+        var self = this;
+
         this.powerups = [];
+        for (var i = 0; i < 32; i++) {
+            this.powerups.push([]);
+        }
+
         this.powerupPlugins = ['speedBoost', 'portal', 'reverseMode', 'invincibleMode', 'rageMode']; // 'ghostMode', 'saiyanMode'];
 
         setInterval(function() {
-            this.powerups = this.powerups.filter(function(powerup) {
-                if (!powerup.ended) {
-                    return powerup;
-                }
+            this.powerups.forEach(function(row) {
+                row.forEach(function(powerup) {
+                    if (powerup && powerup.ended) {
+                        self.powerups[row][powerup] = null;
+                    }
+                });
             });
         }.bind(this), 1000);
     },
@@ -252,15 +260,13 @@ Hackatron.Game.prototype = {
             var randomPlugin = this.powerupPlugins[this.game.rnd.integerInRange(0, this.powerupPlugins.length-1)];
             var powerup = new Powerup();
             var onStarted = function() {
-                var id = self.powerups.indexOf(powerup);
-
-                self.addEvent({key: 'foundPowerup', info: {id: id, playerId: self.playerId}});
+                self.addEvent({key: 'foundPowerup', info: {state: powerup.state, playerId: self.playerId}});
             };
-            var state = powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.mapData, player: this.player, onStarted: onStarted});
+            powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.mapData, player: this.player, onStarted: onStarted});
 
-            this.powerups.push(powerup);
+            this.powerups[powerup.state.coord.x][powerup.state.coord.y] = powerup;
 
-            this.addEvent({key: 'powerupSpawned', info: {plugin: randomPlugin, state: state}});
+            this.addEvent({key: 'powerupSpawned', info: {plugin: randomPlugin, state: powerup.state}});
         }.bind(this), 1000);
     },
 
@@ -326,7 +332,7 @@ Hackatron.Game.prototype = {
 
             //self.game.fx.play('monsterRoar');
             
-            self.createExplodingParticles(self.player.sprite, function() {
+            //self.createExplodingParticles(self.player.sprite, function() {
                 self.addEvent({key: 'tronKilled', info: {
                     killedTronId: self.playerId
                 }});
@@ -335,7 +341,7 @@ Hackatron.Game.prototype = {
                 self.player.sprite.emitter.destroy();
                 self.player.nameText.destroy();
                 self.player.sprite.destroy();
-            });
+            //});
 
             if (self.ai) {
                 self.ai.stopPathFinding();
@@ -358,8 +364,12 @@ Hackatron.Game.prototype = {
         self.game.physics.arcade.collide(self.enemy.sprite, self.layer);
         self.game.physics.arcade.overlap(self.enemy.sprite, self.player.sprite, collisionHandler, null, self.game);
 
-        self.powerups.forEach(function(powerup) {
-            powerup.update();
+        self.powerups.forEach(function(row) {
+            row.forEach(function(powerup) {
+                if (powerup) {
+                    powerup.update();
+                }
+            });
         });
 
         self.blockList.forEach(function(block) {
@@ -405,6 +415,30 @@ Hackatron.Game.prototype = {
             }
         }
     },
+    getPlayerById: function(playerId) {
+        var self = this;
+        if (self.playerList[playerId]) {
+            return self.playerList[playerId].player;
+        }
+
+        var player = new Tron();
+
+        player.init({
+            game: self.game,
+            characterKey: 'tron',
+            emitterKey: 'blueball',
+            speed: PLAYER_SPEED
+        });
+
+        player.setName(self, playerId.substring(0, 2));
+
+        self.playerList[playerId] = {'player': player};
+
+        self.game.physics.arcade.collide(player.sprite, self.layer);
+        self.game.physics.arcade.collide(player.sprite, self.player.sprite, null, null, self.game);
+
+        return self.playerList[playerId];
+    },
 
 // ============================================================================
 //                          Socket Event Handlers
@@ -425,62 +459,48 @@ Hackatron.Game.prototype = {
             // Don't update ourself (bug?)
             if (event.info.playerId === self.playerId) { return; }
 
-            if (!self.playerList[event.info.playerId]) {
-                player = new Tron();
-                var playerParams = {
-                    game: self.game,
-                    characterKey: 'tron',
-                    emitterKey: 'blueball',
-                    speed: PLAYER_SPEED,
-                    x: playerPos.posX,
-                    y: playerPos.posY
-                };
-                var playerName = !event.info.playerName ? playerId.substring(0, 2) : event.info.playerName;
-                player.init(playerParams);
-                player.setName(self, playerName);
-                self.playerList[event.info.playerId] = {'player': player};
-            } else {
-                player = self.playerList[event.info.playerId].player;
+            var player = self.getPlayerById(playerId);
+
+            if (event.info.playerName) {
+                player.setName(self, event.info.playerName);
             }
 
-            // self.game.physics.arcade.collide(player.sprite, self.layer);
-            // self.game.physics.arcade.collide(player.sprite, self.player.sprite, null, null, self.game);
+            // disable animations for now - lag?
+            // if (player.sprite.body) {
+            //     player.sprite.body.velocity.x = 0;
+            //     player.sprite.body.velocity.y = 0;
+            //     player.sprite.animations.play(playerPos.direction, 3, false);
+            //     player.sprite.emitter.on = true;
 
-            if (player.sprite.body) {
-                player.sprite.body.velocity.x = 0;
-                player.sprite.body.velocity.y = 0;
-                player.sprite.animations.play(playerPos.direction, 3, false);
-                player.sprite.emitter.on = true;
+            //     switch(playerPos.direction) {
+            //         case 'walkUp':
+            //             // player.sprite.body.velocity.y = -PLAYER_SPEED;
+            //             player.sprite.emitter.x = player.sprite.x + 15;
+            //             player.sprite.emitter.y = player.sprite.y + 35;
+            //             break;
 
-                switch(playerPos.direction) {
-                    case 'walkUp':
-                        // player.sprite.body.velocity.y = -PLAYER_SPEED;
-                        player.sprite.emitter.x = player.sprite.x + 15;
-                        player.sprite.emitter.y = player.sprite.y + 35;
-                        break;
+            //         case 'walkDown':
+            //             // player.sprite.body.velocity.y = PLAYER_SPEED;
+            //             player.sprite.emitter.x = player.sprite.x + 15;
+            //             player.sprite.emitter.y = player.sprite.y + -5;
+            //             break;
 
-                    case 'walkDown':
-                        // player.sprite.body.velocity.y = PLAYER_SPEED;
-                        player.sprite.emitter.x = player.sprite.x + 15;
-                        player.sprite.emitter.y = player.sprite.y + -5;
-                        break;
+            //         case 'walkLeft':
+            //             // player.sprite.body.velocity.x = -PLAYER_SPEED;
+            //             player.sprite.emitter.x = player.sprite.x + 30;
+            //             player.sprite.emitter.y = player.sprite.y + 15;
+            //             break;
 
-                    case 'walkLeft':
-                        // player.sprite.body.velocity.x = -PLAYER_SPEED;
-                        player.sprite.emitter.x = player.sprite.x + 30;
-                        player.sprite.emitter.y = player.sprite.y + 15;
-                        break;
-
-                    case 'walkRight':
-                        // player.sprite.body.velocity.x = PLAYER_SPEED;
-                        player.sprite.emitter.x = player.sprite.x;
-                        player.sprite.emitter.y = player.sprite.y + 15;
-                        break;
-                   default:
-                        player.sprite.emitter.on = false;
-                        break;
-                }
-            }
+            //         case 'walkRight':
+            //             // player.sprite.body.velocity.x = PLAYER_SPEED;
+            //             player.sprite.emitter.x = player.sprite.x;
+            //             player.sprite.emitter.y = player.sprite.y + 15;
+            //             break;
+            //        default:
+            //             player.sprite.emitter.on = false;
+            //             break;
+            //     }
+            // }
 
             player.sprite.x = playerPos.posX;
             player.sprite.y = playerPos.posY;
@@ -531,18 +551,21 @@ Hackatron.Game.prototype = {
             // TODO: we already do this above, refactor it out
             var powerup = new Powerup();
             var onStarted = function() {
-                var id = self.powerups.indexOf(powerup);
-
-                self.addEvent({key: 'foundPowerup', info: {id: id, playerId: self.playerId}});
+                self.addEvent({key: 'foundPowerup', info: {playerId: self.playerId, state: powerup.state}});
             };
             powerup.init({handler: Powerup.plugins[event.info.plugin], game: self.game, map: self.mapData, player: self.player, state: event.info.state, onStarted: onStarted});
 
-            self.powerups.push(powerup);
+            self.powerups[powerup.state.coord.x][powerup.state.coord.y] = powerup;
         // Method for handling spawned blocks by other players
         } else if (event.key === 'foundPowerup') {
             // TODO: we already do this above, refactor it out
-            self.powerups[event.info.id].player = self.playerList[event.info.playerId].player;
-            self.powerups[event.info.id].start();
+            var powerup = self.powerups[event.info.state.coord.x][event.info.state.coord.y];
+
+            if (powerup) {
+                self.powerups[event.info.state.coord.x][event.info.state.coord.y] = null;
+                powerup.player = self.getPlayerById(event.info.playerId);
+                powerup.start();
+            }
         // Method for handling spawned blocks by other players
         } else if (event.key === 'blockSpawned') {
             var block = self.game.add.sprite(event.info.x, event.info.y, self.game.add.bitmapData(16, 16));
@@ -581,7 +604,7 @@ Hackatron.Game.prototype = {
         // Method for receiving multiple events at once
         // {events: [{key: 'eventName', info: {...data here...}]}
         self.socket.on('events', function(data) {
-            JSON.parse(data).events.forEach(function(event) { self.parseEvent(event); });
+            data.events.forEach(function(event) { self.parseEvent(event); });
         });
 
         // Route all the events to the event parser
