@@ -120,6 +120,9 @@ Hackatron.Game.prototype = {
 
         this.fullscreenKey = this.game.input.keyboard.addKey(Phaser.Keyboard.F);
         this.fullscreenKey.onDown.add(this.toggleFullscreen, this);
+
+        // this.startCountdown();
+
     },
 
     update: function() {
