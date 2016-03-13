@@ -30,8 +30,8 @@ Powerup.plugins.saiyanMode = function() {
             var coord = Hackatron.game.state.states.Game.getValidCoord(0, 0);
             this.sprite = this.game.add.sprite(coord.x * 16, coord.y * 16, this.game.add.bitmapData(16, 16));
             this.sprite.key.copyRect('powerups', getRect(1, 1), 0, 0);
-            this.sprite.scale.x = 1;
-            this.sprite.scale.y = 1;
+            this.sprite.scale.x = 1.2;
+            this.sprite.scale.y = 1.2;
             this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
 
             setTimeout(this.destroy, 15000);
@@ -65,8 +65,8 @@ Powerup.plugins.ghostMode = function() {
             var coord = Hackatron.game.state.states.Game.getValidCoord(0, 0);
             this.sprite = this.game.add.sprite(coord.x * 16, coord.y * 16, this.game.add.bitmapData(16, 16));
             this.sprite.key.copyRect('powerups', getRect(1, 1), 0, 0);
-            this.sprite.scale.x = 1;
-            this.sprite.scale.y = 1;
+            this.sprite.scale.x = 1.2;
+            this.sprite.scale.y = 1.2;
             this.game.add.tween(this.sprite).to({alpha: 0}, 15000, "Linear", true, 0, -1);
             this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
 
@@ -104,8 +104,8 @@ Powerup.plugins.invincibleMode = function() {
             var coord = Hackatron.game.state.states.Game.getValidCoord(0, 0);
             this.sprite = this.game.add.sprite(coord.x * 16, coord.y * 16, this.game.add.bitmapData(16, 16));
             this.sprite.key.copyRect('powerups', getRect(1, 2), 0, 0);
-            this.sprite.scale.x = 1;
-            this.sprite.scale.y = 1;
+            this.sprite.scale.x = 1.2;
+            this.sprite.scale.y = 1.2;
             this.game.add.tween(this.sprite).to({alpha: 0}, 15000, "Linear", true, 0, -1);
             this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
 
@@ -148,8 +148,8 @@ Powerup.plugins.rageMode = function() {
             var coord = Hackatron.game.state.states.Game.getValidCoord(0, 0);
             this.sprite = this.game.add.sprite(coord.x * 16, coord.y * 16, this.game.add.bitmapData(16, 16));
             this.sprite.key.copyRect('powerups', getRect(1, 1), 0, 0);
-            this.sprite.scale.x = 1;
-            this.sprite.scale.y = 1;
+            this.sprite.scale.x = 1.2;
+            this.sprite.scale.y = 1.2;
             this.game.add.tween(this.sprite).to({alpha: 0}, 15000, "Linear", true, 0, -1);
             this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
 
@@ -205,8 +205,8 @@ Powerup.plugins.speedBoost = function() {
             var coord = Hackatron.game.state.states.Game.getValidCoord(0, 0);
             this.sprite = this.game.add.sprite(coord.x * 16, coord.y * 16, this.game.add.bitmapData(16, 16));
             this.sprite.key.copyRect('powerups', getRect(6, 2), 0, 0);
-            this.sprite.scale.x = 1;
-            this.sprite.scale.y = 1;
+            this.sprite.scale.x = 1.2;
+            this.sprite.scale.y = 1.2;
             this.game.add.tween(this.sprite).to({alpha: 0}, 15000, "Linear", true, 0, -1);
             this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
 
@@ -246,8 +246,8 @@ Powerup.plugins.reverseMode = function() {
             var coord = Hackatron.game.state.states.Game.getValidCoord(0, 0);
             this.sprite = this.game.add.sprite(coord.x * 16, coord.y * 16, this.game.add.bitmapData(16, 16));
             this.sprite.key.copyRect('powerups', getRect(2, 2), 0, 0);
-            this.sprite.scale.x = 1;
-            this.sprite.scale.y = 1;
+            this.sprite.scale.x = 1.2;
+            this.sprite.scale.y = 1.2;
             this.game.add.tween(this.sprite).to({alpha: 0}, 15000, "Linear", true, 0, -1);
             this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
 
@@ -292,14 +292,14 @@ Powerup.plugins.portal = function() {
 
             this.entryPortal = this.game.add.sprite(entryPortalCoord.x * 16, entryPortalCoord.y * 16, this.game.add.bitmapData(16, 16));
             this.entryPortal.key.copyRect('powerups', getRect(1, 7), 0, 0);
-            this.entryPortal.scale.x = 1;
-            this.entryPortal.scale.y = 1;
+            this.entryPortal.scale.x = 1.2;
+            this.entryPortal.scale.y = 1.2;
             this.game.add.tween(this.entryPortal).to({alpha: 0}, 15000, "Linear", true, 0, -1);
 
             this.exitPortal = this.game.add.sprite(exitPortalCoord.x * 16, exitPortalCoord.y * 16, this.game.add.bitmapData(16, 16));
             this.exitPortal.key.copyRect('powerups', getRect(17, 7), 0, 0);
-            this.exitPortal.scale.x = 1;
-            this.exitPortal.scale.y = 1;
+            this.exitPortal.scale.x = 1.2;
+            this.exitPortal.scale.y = 1.2;
             this.game.add.tween(this.exitPortal).to({alpha: 0}, 15000, "Linear", true, 0, -1);
 
             this.game.physics.arcade.enable(this.entryPortal, Phaser.Physics.ARCADE);

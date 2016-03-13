@@ -49,11 +49,12 @@ Tron.prototype.triggerAttack = function(blockList) {
     if (this.sprite.attKey.isDown && this.blocks > 0) {
         self.blocks--;
         if (self.blocks < 0) self.blocks = 0;
-        var block = this.game.add.sprite(this.sprite.x, this.sprite.y, 'block');
+        var block = this.game.add.sprite(this.sprite.x, this.sprite.y, this.game.add.bitmapData(16, 16));
+        block.key.copyRect('powerups', getRect(5, 4), 0, 0);
         this.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
         block.body.immovable = true;
-        block.scale.x = 0.8;
-        block.scale.y = 0.8;
+        block.scale.x = 2;
+        block.scale.y = 2;
         blockList.push(block);
 
         // makes block fade away within a 2.0 seconds
