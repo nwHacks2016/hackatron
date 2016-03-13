@@ -5,12 +5,18 @@ Powerup.prototype.init = function(params) {
     this.finished = false;
     this.claimed = false;
 
-    this.character = params.character;
+    // Deps
+    // TODO: clean up
     this.game = params.game;
     this.player = params.player;
     this.mapData = params.mapData;
     this.handler = params.handler();
 
+    // Events
+    this.onStarted = params.onStarted;
+
+    // Plugin methods
+    this.key = this.handler.key;
     this.update = this.handler.update.bind(this);
     this.setup = this.handler.setup.bind(this);
     this.start = this.handler.start.bind(this);
@@ -27,6 +33,7 @@ Powerup.plugins = {};
 
 Powerup.plugins.saiyanMode = function() {
     return {
+        key: 'saiyanMode',
         setup: function(state) {
             if (!state) {
                 state = {
@@ -56,6 +63,8 @@ Powerup.plugins.saiyanMode = function() {
             this.sprite.destroy();
             setTimeout(this.stop, 4000);
 
+            this.onStarted && this.onStarted();
+
             console.log('Powerup START: Phase mode');
         },
 
@@ -69,6 +78,7 @@ Powerup.plugins.saiyanMode = function() {
 
 Powerup.plugins.ghostMode = function() {
     return {
+        key: 'ghostMode',
         setup: function(state) {
             if (!state) {
                 state = {
@@ -99,6 +109,8 @@ Powerup.plugins.ghostMode = function() {
             this.sprite.destroy();
             setTimeout(this.stop, 4000);
 
+            this.onStarted && this.onStarted();
+
             console.log('Powerup START: Ghost mode');
         },
 
@@ -115,6 +127,7 @@ Powerup.plugins.ghostMode = function() {
 
 Powerup.plugins.invincibleMode = function() {
     return {
+        key: 'invincibleMode',
         setup: function(state) {
             if (!state) {
                 state = {
@@ -147,6 +160,8 @@ Powerup.plugins.invincibleMode = function() {
             this.sprite.destroy();
             setTimeout(this.stop, 4000);
 
+            this.onStarted && this.onStarted();
+
             console.log('Powerup START: Invincible mode');
         },
 
@@ -166,6 +181,7 @@ Powerup.plugins.invincibleMode = function() {
 
 Powerup.plugins.rageMode = function() {
     return {
+        key: 'rageMode',
         setup: function(state) {
             if (!state) {
                 state = {
@@ -202,6 +218,8 @@ Powerup.plugins.rageMode = function() {
             this.sprite.destroy();
             setTimeout(this.stop, 4000);
 
+            this.onStarted && this.onStarted();
+
             console.log('Powerup START: Rage mode');
         },
 
@@ -230,6 +248,7 @@ var getRect = function(x, y) {
 
 Powerup.plugins.speedBoost = function() {
     return {
+        key: 'speedBoost',
         setup: function(state) {
             if (!state) {
                 state = {
@@ -261,6 +280,8 @@ Powerup.plugins.speedBoost = function() {
             this.destroy();
             setTimeout(this.stop, 4000);
 
+            this.onStarted && this.onStarted();
+
             console.log('Powerup START: Speed boost');
         },
 
@@ -278,6 +299,7 @@ Powerup.plugins.speedBoost = function() {
 
 Powerup.plugins.reverseMode = function() {
     return {
+        key: 'reverseMode',
         setup: function(state) {
             if (!state) {
                 state = {
@@ -326,6 +348,7 @@ Powerup.plugins.reverseMode = function() {
 
 Powerup.plugins.portal = function() {
     return {
+        key: 'portal',
         setup: function(state) {
             if (!state) {
                 state = {

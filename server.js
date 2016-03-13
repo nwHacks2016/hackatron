@@ -37,6 +37,8 @@ setTimeout(function() {
     if (!clients[hostClientId]) {
         hostClientId = null;
         findNewHost();
+    } else {
+        console.log(clients[hostClientId].playerId);
     }
 }, 40);
 

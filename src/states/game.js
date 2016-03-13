@@ -124,7 +124,7 @@ Hackatron.Game.prototype = {
 
                 self.addEvent({key: 'updateEnemy', info: info});
             }
-        }, 50);
+        }, 200);
     },
 
     initPhysics: function() {
@@ -138,7 +138,7 @@ Hackatron.Game.prototype = {
 
     runAiSystem: function() {
         this.ai = new AI();
-        this.ai.init(this.game, this.player, this.enemy, this.playerId, this.hostId, this.mapData);
+        this.ai.init(this.game, this.player, this.enemy, this.mapData);
     },
 
     runEnemySystem: function() {
@@ -146,7 +146,8 @@ Hackatron.Game.prototype = {
         if (!this.enemy) {
             var coord = this.getValidCoord();
 
-            var enemyParams = {
+            this.enemy = new Ghost();
+            this.enemy.init({
                 game: this.game,
                 speed: PLAYER_SPEED,
                 characterKey: 'ghost',
@@ -159,10 +160,7 @@ Hackatron.Game.prototype = {
                     left: Phaser.Keyboard.A,
                     right: Phaser.Keyboard.D
                 }
-            };
-
-            this.enemy = new Ghost();
-            this.enemy.init(enemyParams);
+            });
         }
     },
 
@@ -249,10 +247,16 @@ Hackatron.Game.prototype = {
     },
 
     runPowerUpSystem: function() {
+        var self = this;
         setInterval(function() {
             var randomPlugin = this.powerupPlugins[this.game.rnd.integerInRange(0, this.powerupPlugins.length-1)];
             var powerup = new Powerup();
-            var state = powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.mapData, player: this.player});
+            var onStarted = function() {
+                var id = self.powerups.indexOf(powerup);
+
+                self.addEvent({key: 'foundPowerup', info: {id: id, playerId: self.playerId}});
+            };
+            var state = powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.mapData, player: this.player, onStarted: onStarted});
 
             this.powerups.push(powerup);
 
@@ -332,7 +336,10 @@ Hackatron.Game.prototype = {
                 self.player.nameText.destroy();
                 self.player.sprite.destroy();
             });
-            self.ai.stopPathFinding();
+
+            if (self.ai) {
+                self.ai.stopPathFinding();
+            }
         };
 
         var block = self.player.triggerAttack(self.blockList);
@@ -500,7 +507,6 @@ Hackatron.Game.prototype = {
             if (self.playerId === self.hostId) {
                 var gameData = {
                     playerId: event.info.playerId,
-                    hostId: self.hostId,
                     enemy: {
                         posX: self.enemy.sprite.x,
                         posY: self.enemy.sprite.y
@@ -512,7 +518,6 @@ Hackatron.Game.prototype = {
         // Set up game state as a new player receiving game data from host
         } else if (event.key === 'welcomePlayer') {
             if (self.playerId === event.info.playerId) {
-                self.hostId = event.info.hostId;
             }
         // Method for handling received deaths of other clients
         } else if (event.key === 'tronKilled') {
@@ -525,9 +530,19 @@ Hackatron.Game.prototype = {
         } else if (event.key === 'powerupSpawned') {
             // TODO: we already do this above, refactor it out
             var powerup = new Powerup();
-            powerup.init({handler: Powerup.plugins[event.info.plugin], game: self.game, map: self.mapData, player: self.player, state: event.info.state});
+            var onStarted = function() {
+                var id = self.powerups.indexOf(powerup);
+
+                self.addEvent({key: 'foundPowerup', info: {id: id, playerId: self.playerId}});
+            };
+            powerup.init({handler: Powerup.plugins[event.info.plugin], game: self.game, map: self.mapData, player: self.player, state: event.info.state, onStarted: onStarted});
 
             self.powerups.push(powerup);
+        // Method for handling spawned blocks by other players
+        } else if (event.key === 'foundPowerup') {
+            // TODO: we already do this above, refactor it out
+            self.powerups[event.info.id].player = self.playerList[event.info.playerId].player;
+            self.powerups[event.info.id].start();
         // Method for handling spawned blocks by other players
         } else if (event.key === 'blockSpawned') {
             var block = self.game.add.sprite(event.info.x, event.info.y, self.game.add.bitmapData(16, 16));
@@ -553,6 +568,7 @@ Hackatron.Game.prototype = {
 
             // If this player is the new host, lets set them up
             if (self.hostId === self.playerId) {
+                console.log('Hey now the host, lets do this!');
                 self.runEnemySystem();
                 self.runAiSystem();
                 self.runPowerUpSystem();
@@ -576,6 +592,7 @@ Hackatron.Game.prototype = {
          'tronKilled',
          'powerupSpawned',
          'blockSpawned',
+         'foundPowerup',
          'setHost'].forEach(function(key) {
             self.socket.on(key, function(info) { self.parseEvent({key: key, info: info}); });
         });
