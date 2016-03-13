@@ -121,6 +121,7 @@ Powerup.plugins.invincibleMode = function() {
 
             this.claimed = true;
             this.player.invincible = true;
+            this.tween = this.game.add.tween(this.player.sprite).to({alpha: 0}, 400, "Linear", true, 0, -1);
             this.sprite.destroy();
             setTimeout(this.stop, 4000);
 
@@ -130,6 +131,7 @@ Powerup.plugins.invincibleMode = function() {
         stop: function() {
             this.finished = true;
             this.player.invincible = false;
+            this.tween.stop();
             console.log('Powerup STOP: Invincible mode');
         },
 
