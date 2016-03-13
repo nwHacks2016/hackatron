@@ -1,5 +1,4 @@
 Hackatron = {
-    score: 0
 };
 
 Hackatron.Game = function(game) {
@@ -27,6 +26,15 @@ function generateId() {
 
 Hackatron.Game.prototype = {
     preload: function() {
+    },
+
+    toggleFullscreen: function() {
+        this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
+        if (this.game.scale.isFullScreen) {
+            this.game.scale.stopFullScreen();
+        } else {
+            this.game.scale.startFullScreen();
+        }
     },
 
     create: function() {
@@ -102,10 +110,6 @@ Hackatron.Game.prototype = {
             this.enemy = enemy;
         }
 
-        // Add score text
-        this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
-        this.scoreText.addColor('White', 0);
-
         this.currentPlayerXtile = 0;
         this.currentPlayerYtile = 0;
         this.currentGhostXtile = 0;
@@ -113,6 +117,9 @@ Hackatron.Game.prototype = {
 
         this.ai = new AI();
         this.ai.init(jsonfile);
+
+        this.fullscreenKey = this.game.input.keyboard.addKey(Phaser.Keyboard.F);
+        this.fullscreenKey.onDown.add(this.toggleFullscreen, this);
     },
 
     update: function() {
