@@ -7,6 +7,7 @@ Powerup.prototype.init = function(params) {
 
     // Deps
     // TODO: clean up
+    this.state = params.state;
     this.game = params.game;
     this.player = params.player;
     this.mapData = params.mapData;
@@ -24,7 +25,7 @@ Powerup.prototype.init = function(params) {
     this.destroy = this.handler.destroy.bind(this);
 
     // should return the JSON necessary for networking
-    return this.setup(params.state);
+    return this.setup();
 };
 
 // Plugins
@@ -34,14 +35,14 @@ Powerup.plugins = {};
 Powerup.plugins.saiyanMode = function() {
     return {
         key: 'saiyanMode',
-        setup: function(state) {
-            if (!state) {
-                state = {
+        setup: function() {
+            if (!this.state) {
+                this.state = {
                     coord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
                 };
             }
 
-            this.sprite = this.game.add.sprite(state.coord.x * 16, state.coord.y * 16, this.game.add.bitmapData(16, 16));
+            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, this.game.add.bitmapData(16, 16));
             this.sprite.key.copyRect('powerups', getRect(1, 1), 0, 0);
             this.sprite.scale.x = 1.2;
             this.sprite.scale.y = 1.2;
@@ -49,7 +50,7 @@ Powerup.plugins.saiyanMode = function() {
 
             setTimeout(this.destroy, 15000);
 
-            return state;
+            return this.state;
         },
 
         update: function() {
@@ -80,13 +81,13 @@ Powerup.plugins.ghostMode = function() {
     return {
         key: 'ghostMode',
         setup: function(state) {
-            if (!state) {
-                state = {
+            if (!this.state) {
+                this.state = {
                     coord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
                 };
             }
 
-            this.sprite = this.game.add.sprite(state.coord.x * 16, state.coord.y * 16, this.game.add.bitmapData(16, 16));
+            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, this.game.add.bitmapData(16, 16));
             this.sprite.key.copyRect('powerups', getRect(1, 1), 0, 0);
             this.sprite.scale.x = 1.2;
             this.sprite.scale.y = 1.2;
@@ -95,7 +96,7 @@ Powerup.plugins.ghostMode = function() {
 
             setTimeout(this.destroy, 15000);
 
-            return state;
+            return this.state;
         },
 
         update: function() {
@@ -129,13 +130,13 @@ Powerup.plugins.invincibleMode = function() {
     return {
         key: 'invincibleMode',
         setup: function(state) {
-            if (!state) {
-                state = {
+            if (!this.state) {
+                this.state = {
                     coord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
                 };
             }
 
-            this.sprite = this.game.add.sprite(state.coord.x * 16, state.coord.y * 16, this.game.add.bitmapData(16, 16));
+            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, this.game.add.bitmapData(16, 16));
             this.sprite.key.copyRect('powerups', getRect(1, 2), 0, 0);
             this.sprite.scale.x = 1.2;
             this.sprite.scale.y = 1.2;
@@ -144,7 +145,7 @@ Powerup.plugins.invincibleMode = function() {
 
             setTimeout(this.destroy, 15000);
 
-            return state;
+            return this.state;
         },
 
         update: function() {
@@ -183,13 +184,13 @@ Powerup.plugins.rageMode = function() {
     return {
         key: 'rageMode',
         setup: function(state) {
-            if (!state) {
-                state = {
+            if (!this.state) {
+                this.state = {
                     coord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
                 };
             }
 
-            this.sprite = this.game.add.sprite(state.coord.x * 16, state.coord.y * 16, this.game.add.bitmapData(16, 16));
+            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, this.game.add.bitmapData(16, 16));
             this.sprite.key.copyRect('powerups', getRect(1, 1), 0, 0);
             this.sprite.scale.x = 1.2;
             this.sprite.scale.y = 1.2;
@@ -198,7 +199,7 @@ Powerup.plugins.rageMode = function() {
 
             setTimeout(this.destroy, 15000);
 
-            return state;
+            return this.state;
         },
 
         update: function() {
@@ -250,13 +251,13 @@ Powerup.plugins.speedBoost = function() {
     return {
         key: 'speedBoost',
         setup: function(state) {
-            if (!state) {
-                state = {
+            if (!this.state) {
+                this.state = {
                     coord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
                 };
             }
 
-            this.sprite = this.game.add.sprite(state.coord.x * 16, state.coord.y * 16, this.game.add.bitmapData(16, 16));
+            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, this.game.add.bitmapData(16, 16));
             this.sprite.key.copyRect('powerups', getRect(6, 2), 0, 0);
             this.sprite.scale.x = 1.2;
             this.sprite.scale.y = 1.2;
@@ -265,7 +266,7 @@ Powerup.plugins.speedBoost = function() {
 
             setTimeout(this.destroy, 15000);
 
-            return state;
+            return this.state;
         },
 
         update: function() {
@@ -301,13 +302,13 @@ Powerup.plugins.reverseMode = function() {
     return {
         key: 'reverseMode',
         setup: function(state) {
-            if (!state) {
-                state = {
+            if (!this.state) {
+                this.state = {
                     coord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
                 };
             }
 
-            this.sprite = this.game.add.sprite(state.coord.x * 16, state.coord.y * 16, this.game.add.bitmapData(16, 16));
+            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, this.game.add.bitmapData(16, 16));
             this.sprite.key.copyRect('powerups', getRect(2, 2), 0, 0);
             this.sprite.scale.x = 1.2;
             this.sprite.scale.y = 1.2;
@@ -316,7 +317,7 @@ Powerup.plugins.reverseMode = function() {
 
             setTimeout(this.destroy, 15000);
 
-            return state;
+            return this.state;
         },
 
         update: function() {
@@ -350,23 +351,25 @@ Powerup.plugins.portal = function() {
     return {
         key: 'portal',
         setup: function(state) {
-            if (!state) {
-                state = {
+            if (!this.state) {
+                this.state = {
                     entryPortalCoord: Hackatron.game.state.states.Game.getValidCoord(0, 0),
                     exitPortalCoord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
                 };
+
+                this.state.coord = this.state.entryPortalCoord;
             }
 
             //console.log('entry x: ' + entryPortalCoord.x * 16 + '\ny: ' + entryPortalCoord.y * 16);
             //console.log('exit x: ' + exitPortalCoord.x * 16 + '\ny: ' + exitPortalCoord.y * 16);
 
-            this.entryPortal = this.game.add.sprite(state.entryPortalCoord.x * 16, state.entryPortalCoord.y * 16, this.game.add.bitmapData(16, 16));
+            this.entryPortal = this.game.add.sprite(this.state.entryPortalCoord.x * 16, this.state.entryPortalCoord.y * 16, this.game.add.bitmapData(16, 16));
             this.entryPortal.key.copyRect('powerups', getRect(1, 7), 0, 0);
             this.entryPortal.scale.x = 1.2;
             this.entryPortal.scale.y = 1.2;
             this.game.add.tween(this.entryPortal).to({alpha: 0}, 15000, 'Linear', true, 0, -1);
 
-            this.exitPortal = this.game.add.sprite(state.exitPortalCoord.x * 16, state.exitPortalCoord.y * 16, this.game.add.bitmapData(16, 16));
+            this.exitPortal = this.game.add.sprite(this.state.exitPortalCoord.x * 16, this.state.exitPortalCoord.y * 16, this.game.add.bitmapData(16, 16));
             this.exitPortal.key.copyRect('powerups', getRect(17, 7), 0, 0);
             this.exitPortal.scale.x = 1.2;
             this.exitPortal.scale.y = 1.2;
@@ -377,7 +380,7 @@ Powerup.plugins.portal = function() {
 
             setTimeout(this.destroy, 15000);
 
-            return state;
+            return this.state;
         },
 
         update: function() {

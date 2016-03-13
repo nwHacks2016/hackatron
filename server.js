@@ -61,9 +61,9 @@ var parseEvent = function(socket, event) {
         }
 
         socket.emit('setHost', {playerId: clients[hostClientId].playerId});
-        socket.broadcast.emit('newPlayer', event.info);
+        //socket.broadcast.emit('newPlayer', event.info);
     } else {
-        socket.broadcast.emit(event.key, event.info);
+        //socket.broadcast.emit(event.key, event.info);
     }
 };
 
@@ -75,6 +75,8 @@ io.sockets.on('connection', function(socket) {
         data = JSON.parse(data);
 
         data.events.forEach(function(event) { parseEvent(socket, event); });
+
+        socket.broadcast.emit('events', data);
     });
 
     socket.on('disconnect', function() {

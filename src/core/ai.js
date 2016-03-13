@@ -53,6 +53,7 @@ AI.prototype.init = function(game, player, enemy, mapData) {
     var currentPathIndex = 0;
     var currentPath = null;
     var timeStep = 600;
+    var speed = 1000; // usually 100
 
     // Delayed start to give players a chance
     setTimeout(function() {
@@ -94,7 +95,7 @@ AI.prototype.init = function(game, player, enemy, mapData) {
                     currentPath = null;
                 }
             }
-        }.bind(this), 100);
+        }.bind(this), speed);
     }.bind(this), 5000);
 };
 
