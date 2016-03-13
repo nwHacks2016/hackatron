@@ -10,6 +10,11 @@ Character.prototype.init = function(params) {
     this._initSprite(params);
 };
 
+Character.prototype.kill = function() {
+    this.isAlive = false;
+    this.points = 0;
+};
+
 // Method for registering hardware keys to a given sprite
 Character.prototype.setUpKeys = function(keys) {
     if (!keys) return;
@@ -56,6 +61,8 @@ Character.prototype._addAnimationsToSprite = function() {
 };
 
 Character.prototype.updatePos = function() {
+    if (!this.isAlive) { return; }
+
     if (!(this.sprite &&
         this.sprite.body &&
         this.sprite.upKey &&

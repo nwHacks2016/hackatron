@@ -14,11 +14,6 @@ Tron.prototype.init = function() {
     Character.prototype.init.apply(this, arguments);
 };
 
-Tron.prototype.kill = function() {
-    this.isAlive = false;
-    this.points = 0;
-};
-
 Tron.prototype.updatePoints = function(points) {
     this.points = this.points + points;
     if(this.points < 0) {
@@ -49,7 +44,8 @@ Tron.prototype.setName = function(game, name) {
 
 Tron.prototype.triggerAttack = function(blockList) {
     var self = this;
-    if (!self.isAlive) return null;
+    if (!self.isAlive) { return null; }
+
     if (this.sprite.attKey.isDown && this.blocks > 0) {
         self.blocks--;
         if (self.blocks < 0) self.blocks = 0;
