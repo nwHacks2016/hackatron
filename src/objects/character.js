@@ -3,6 +3,7 @@ var Character = function() {
 
 Character.prototype.init = function(params) {
     this.name = 'Character';
+    this.isAlive = true;
     this.game = params.game;
     this.speed = params.speed;
     this.sprite = this.game.add.sprite(params.x, params.y, params.characterKey);

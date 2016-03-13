@@ -183,6 +183,10 @@ Hackatron.Game.prototype = {
             // self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
 
+        var portalTransition = function() {
+            self.player.teleport(self.portal.exitPortal);
+        };
+
         var ghostDirection = self.enemy.updatePos();
         var playerDirection = self.player.updatePos();
         var block = self.player.triggerAttack(self.blockList);
@@ -396,6 +400,9 @@ Hackatron.Game.prototype = {
             block.scale.x = 0.8;
             block.scale.y = 0.8;
             block.body.immovable = true;
+
+            // Make block fade in 1.5 seconds
+            this.game.add.tween(block).to( { alpha: 0 }, 1500, "Linear", true, 0, -1);
 
             self.blockList.push(block);
             setTimeout(function() {

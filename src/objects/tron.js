@@ -1,7 +1,6 @@
 var Tron = function() {
     Character.call(this);
     this.name = 'Tron';
-    this.isAlive = true;
     this.speedBoost = 1;
     this.points = 0;
     this.blocks = 1;
@@ -50,6 +49,7 @@ Tron.prototype.setName = function(game, name) {
 
 Tron.prototype.triggerAttack = function(blockList) {
     var self = this;
+    if (!self.isAlive) return null;
     if (this.sprite.attKey.isDown && this.blocks > 0) {
         self.blocks--;
         if (self.blocks < 0) self.blocks = 0;
@@ -60,6 +60,8 @@ Tron.prototype.triggerAttack = function(blockList) {
         block.scale.y = 0.8;
         blockList.push(block);
 
+        // makes block fade away within a 1.5 seconds
+        this.game.add.tween(block).to( { alpha: 0 }, 1500, "Linear", true, 0, -1);
         setTimeout(function() {
             block.destroy();
             self.blocks++;
