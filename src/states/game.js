@@ -132,11 +132,6 @@ Hackatron.Game.prototype = {
             this.enemy = enemy;
         }
 
-        this.currentPlayerXtile = 0;
-        this.currentPlayerYtile = 0;
-        this.currentGhostXtile = 0;
-        this.currentGhostYtile = 0;
-
         this.ai = new AI();
         this.ai.init(this.mapData);
 
@@ -144,7 +139,7 @@ Hackatron.Game.prototype = {
         this.fullscreenKey.onDown.add(this.toggleFullscreen, this);
 
         this.powerups = [];
-        this.powerupPlugins = ['speedBoost', 'portal', 'reverseMode']; // 'ghostMode', 'saiyanMode'];
+        this.powerupPlugins = ['speedBoost', 'portal', 'reverseMode', 'invincibleMode']; // 'ghostMode', 'saiyanMode'];
 
         setInterval(function() {
             this.powerups = this.powerups.filter(function(powerup) {
@@ -158,7 +153,8 @@ Hackatron.Game.prototype = {
             powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.mapData, player: this.player});
 
             this.powerups.push(powerup);
-        }.bind(this), 3000);
+        }.bind(this), 1000);
+
         var countdown = new Countdown();
         countdown.init(this.game);
         countdown.start();
@@ -171,6 +167,8 @@ Hackatron.Game.prototype = {
 
         var collisionHandler = function() {
             // this === Phaser.Game
+            if (self.player.invincible) { return; }
+
             self.socket.emit('tronKilled', JSON.stringify({
                 killedTronId: self.playerId
             }));
@@ -231,11 +229,6 @@ Hackatron.Game.prototype = {
             };
         }
         self.socket.emit('updateClientPosition', JSON.stringify(clientInfo));
-
-        self.currentPlayerXtile = Math.floor(self.player.sprite.x / 16);
-        self.currentPlayerYtile = Math.floor(self.player.sprite.y / 16);
-        self.currentGhostXtile = Math.floor(self.enemy.sprite.x / 16);
-        self.currentGhostYtile = Math.floor(self.enemy.sprite.y / 16);
     },
 
     pelletHelper: function(mapArray){
