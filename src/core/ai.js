@@ -2,67 +2,99 @@ function AI() {
         
 }
 
-AI.prototype.init = function(mapData) {
-        var mazeWidth = 32;
-        var mazeHeight = 32;
+var transpose = function(a) {
+  // Calculate the width and height of the Array
+  var w = a.length ? a.length : 0,
+    h = a[0] instanceof Array ? a[0].length : 0;
 
-        var convertedLevel = [];
-        var originalLevel = mapData;
+  // In case it is a zero matrix, no transpose routine needed.
+  if(h === 0 || w === 0) { return []; }
 
-        for (var i = 0, l = Math.floor(originalLevel.length / 32); i < l; ++i) {
-            var row = originalLevel.slice(i * 32, i * 32 + 32);
+  /**
+   * @var {Number} i Counter
+   * @var {Number} j Counter
+   * @var {Array} t Transposed data is stored in this array.
+   */
+  var i, j, t = [];
 
-            convertedLevel.push(row);
-        }
+  // Loop through every item in the outer array (height)
+  for(i=0; i<h; i++) {
 
-        this.easystar = new EasyStar.js();
-        this.easystar.setGrid(convertedLevel);
-        this.easystar.setAcceptableTiles([0]);
-        // easystar.enableDiagonals();
-        //easystar.disableCornerCutting();
-        // easystar.enableCornerCutting();
+    // Insert a new row (array)
+    t[i] = [];
 
+    // Loop through every item per item in outer array (width)
+    for(j=0; j<w; j++) {
 
-        // self.currentPlayerXtile = Math.floor(self.player.sprite.x / 16);
-        // self.currentPlayerYtile = Math.floor(self.player.sprite.y / 16);
-        // self.currentGhostXtile = Math.floor(self.enemy.sprite.x / 16);
-        // self.currentGhostYtile = Math.floor(self.enemy.sprite.y / 16);
-        // if (this.playerId === this.hostId) {
-        //     var timeStep = 400;
-        //
-        //     setInterval(function() { 
-        //            if (!currentPath) {
-        //                 this.easystar.findPath(this.currentGhostXtile, this.currentGhostYtile, this.currentPlayerXtile, this.currentPlayerYtile, function( path ) {
-        //
-        //                     if (!path || path.length < 2) {
-        //                         console.log("The path to the destination point was not found.");
-        //                         return;
-        //                     }
-        //
-        //                     currentPath = path;  
-        //
-        //                     // Periodically reset
-        //                     setTimeout(function() {
-        //                         currentPathIndex = 0;
-        //                         currentPath = null;
-        //                     }, 3000);           
-        //                 }.bind(this));
-        //
-        //            }
-        //          this.easystar.calculate();
-        //
-        //     if (currentPath && currentPathIndex < currentPath.length) {
-        //         enemy.sprite.x = Math.floor(currentPath[currentPathIndex].x) * 16;
-        //         enemy.sprite.y = Math.floor(currentPath[currentPathIndex].y) * 16;
-        //
-        //             if (currentPathIndex < currentPath.length-1) {
-        //                 ++currentPathIndex;
-        //             } else {
-        //                 currentPathIndex = 0;
-        //                 currentPath = null;
-        //             }
-        //     }
-        //
-        //     }.bind(this), 100);
-        // }
+      // Save transposed data.
+      t[i][j] = a[j][i];
+    }
+  }
+
+  return t;
+};
+
+AI.prototype.init = function(game, player, enemy, playerId, hostId, mapData) {
+    var originalLevel = transpose(mapData);
+    var convertedLevel = [];
+
+    // EasyStar expects a multidimensional array of the rows and columns
+    mapData.forEach(function(row) {
+        convertedLevel.push(row.map(function(cell) { return cell.index; }));
+    });
+
+    this.easystar = new EasyStar.js();
+    this.easystar.setGrid(convertedLevel);
+    this.easystar.setAcceptableTiles([Hackatron.mapConfig.floorTile]);
+    // easystar.enableDiagonals();
+    // easystar.disableCornerCutting();
+    // easystar.enableCornerCutting();
+
+    var currentPathIndex = 0;
+    var currentPath = null;
+
+    if (playerId === hostId) {
+        var timeStep = 600;
+
+        // Delayed start to give players a chance
+        setTimeout(function() {
+            setInterval(function() {
+                var currentPlayerXtile = Math.floor(player.sprite.x / 16);
+                var currentPlayerYtile = Math.floor(player.sprite.y / 16);
+                var currentGhostXtile = Math.floor(enemy.sprite.x / 16);
+                var currentGhostYtile = Math.floor(enemy.sprite.y / 16);
+
+                 if (!currentPath) {
+                    this.easystar.findPath(currentGhostXtile, currentGhostYtile, currentPlayerXtile, currentPlayerYtile, function(path) {
+                        if (!path || path.length < 2) {
+                            console.log("The path to the destination point was not found.");
+                            return;
+                        }
+
+                        currentPath = path;    
+
+                        // Periodically reset
+                        setTimeout(function() {
+                            currentPathIndex = 0;
+                            currentPath = null;
+                        }, 3000);                     
+                    }.bind(this));
+                }
+
+                this.easystar.calculate();
+
+                if (currentPath && currentPathIndex < currentPath.length) {
+                    enemy.sprite.x = Math.floor(currentPath[currentPathIndex].x) * 16;
+                    enemy.sprite.y = Math.floor(currentPath[currentPathIndex].y) * 16;
+
+                    if (currentPathIndex < currentPath.length-1) {
+                        ++currentPathIndex;
+                    } else {
+                        currentPathIndex = 0;
+                        currentPath = null;
+                    }
+                }
+            }.bind(this), 100);
+        }.bind(this), 5000);
+    }
 };

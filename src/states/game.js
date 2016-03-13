@@ -11,8 +11,6 @@ Hackatron.Game = function(game) {
 };
 
 var PLAYER_SPEED = 200;
-var currentPath;
-var currentPathIndex = 0;
 
 function generateId() {
   function s4() {
@@ -92,21 +90,21 @@ Hackatron.Game.prototype = {
 
     initAI: function() {
         this.ai = new AI();
-        this.ai.init(this.mapData);
+        this.ai.init(this.game, this.player, this.enemy, this.playerId, this.hostId, this.mapData);
     },
 
     initEnemy: function() {
         // Create enemy for the host
         if (!this.enemy) {
-            spawnPosY = 20;
-            spawnPosX = 512 - 40;
+            var coord = this.getValidCoord();
+
             var enemyParams = {
                 game: this.game,
                 speed: PLAYER_SPEED,
                 characterKey: 'ghost',
                 emitterKey: 'poop',
-                x: spawnPosX,
-                y: spawnPosY,
+                x: coord.x * 16,
+                y: coord.y * 16,
                 keys: {
                     up: Phaser.Keyboard.W,
                     down: Phaser.Keyboard.S,
@@ -114,24 +112,24 @@ Hackatron.Game.prototype = {
                     right: Phaser.Keyboard.D
                 }
             };
-            var enemy = new Ghost();
-            enemy.init(enemyParams);
-            this.enemy = enemy;
+
+            this.enemy = new Ghost();
+            this.enemy.init(enemyParams);
         }
     },
 
     initPlayer: function() {
-        // Create player
-        var player = new Tron();
-        var spawnPosX = 20;
-        var spawnPosY = 20;
+        this.player = new Tron();
+
+        var coord = this.getValidCoord();
+
         var playerParams = {
             game: this.game,
             characterKey: 'tron',
             emitterKey: 'blueball',
             speed: PLAYER_SPEED,
-            x: spawnPosX,
-            y: spawnPosY,
+            x: coord.x * 16,
+            y: coord.y * 16,
             keys: {
                 up: Phaser.Keyboard.UP,
                 down: Phaser.Keyboard.DOWN,
@@ -140,9 +138,9 @@ Hackatron.Game.prototype = {
                 att: Phaser.Keyboard.SPACEBAR
             }
         };
-        player.init(playerParams);
-        player.setName(this, Hackatron.playerName);
-        this.player = player;
+
+        this.player.init(playerParams);
+        this.player.setName(this, Hackatron.playerName);
     },
 
     initMap: function() {
