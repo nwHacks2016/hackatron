@@ -65,7 +65,8 @@ Hackatron.Game.prototype = {
                 up: Keyboard.UP,
                 down: Keyboard.DOWN,
                 left: Keyboard.LEFT,
-                right: Keyboard.RIGHT
+                right: Keyboard.RIGHT,
+                att: Keyboard.SPACEBAR
             }
         };
         player.init(playerParams);
@@ -79,10 +80,11 @@ Hackatron.Game.prototype = {
 
         // Create enemy for the host
         if (!this.enemy) {
-            var spawnPosY = 20;
-            var spawnPosX = 512 - 40;
-            var enemyParams = {
+            spawnPosY = 20;
+            spawnPosX = 512 - 40;
+            enemyParams = {
                 game: this.game,
+                speed:PLAYER_SPEED,
                 characterKey: 'ghost',
                 emitterKey: 'poop',
                 x: spawnPosX,
@@ -188,8 +190,11 @@ Hackatron.Game.prototype = {
             // self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
 
-        var playerDirection = self.updateCharPos(self.player.sprite);
-        var ghostDirection = self.updateCharPos(self.enemy.sprite);
+        var ghostDirection = self.enemy.updatePos();
+        var playerDirection = self.player.updatePos();
+        self.player.triggerAttack(playerDirection);
+
+        // Check for collisions
         self.game.physics.arcade.collide(self.player.sprite, self.layer);
         self.game.physics.arcade.collide(self.enemy.sprite, self.layer);
         self.game.physics.arcade.overlap(self.enemy.sprite, self.player.sprite, collisionHandler, null, self.game);
@@ -217,68 +222,20 @@ Hackatron.Game.prototype = {
         self.currentGhostYtile = Math.floor(self.enemy.sprite.y / 16);
     },
 
-     updateCharPos: function(sprite) {
-        if (!(sprite &&
-            sprite.body &&
-            sprite.upKey &&
-            sprite.downKey &&
-            sprite.leftKey &&
-            sprite.rightKey)) {
-            return;
-        }
-        sprite.body.velocity.x = 0;
-        sprite.body.velocity.y = 0;
-        sprite.emitter.on = true;
-
-        if (sprite.upKey.isDown) {
-            sprite.animations.play('walkUp', 3, false);
-            sprite.body.velocity.y = -PLAYER_SPEED;
-            sprite.emitter.x = sprite.x + 15;
-            sprite.emitter.y = sprite.y + 35;
-            return 'walkUp';
-        } else if (sprite.downKey.isDown) {
-            sprite.animations.play('walkDown', 3, false);
-            sprite.body.velocity.y = PLAYER_SPEED;
-            sprite.emitter.x = sprite.x + 15;
-            sprite.emitter.y = sprite.y + -5;
-            return 'walkDown';
-        } else if (sprite.leftKey.isDown) {
-            sprite.animations.play('walkLeft', 3, false);
-            sprite.body.velocity.x = -PLAYER_SPEED;
-            sprite.emitter.x = sprite.x + 30;
-            sprite.emitter.y = sprite.y + 15;
-            if (sprite.x < 0) {
-                sprite.x = this.world.width;
-            }
-            return 'walkLeft';
-        } else if (sprite.rightKey.isDown) {
-            sprite.animations.play('walkRight', 3, false);
-            sprite.body.velocity.x = PLAYER_SPEED;
-            if (sprite.x > this.world.width) {
-                sprite.x = 0;
-            }
-            sprite.emitter.x = sprite.x;
-            sprite.emitter.y = sprite.y + 15;
-            return 'walkRight';
-        } else {
-            sprite.emitter.on = false;
-        }
-    },
-
     pelletHelper: function(mapArray){
 //        var pelletArr = [];
         var x = 0;
         var y = 0;
         var pos = 1;
-        for(pos = 1; pos < mapArray.length ; pos++){
-            if(pos % 32 === 0){
+        for (pos = 1; pos < mapArray.length ; pos++) {
+            if (pos % 32 === 0) {
                 x = 0;
                 y++;
             }
-            else
+            else {
                 x++;
-
-            if(mapArray[pos] === 0){
+            }
+            if (mapArray[pos] === 0) {
                 var pellet = this.add.sprite(x*16+2, y*16+2, 'pellet');
                 pellet.scale.x = 0.005;
                 pellet.scale.y = 0.005;
@@ -406,7 +363,6 @@ Hackatron.Game.prototype = {
             var player = self.playerList[eventInfo.killedTronId].player;
             if(self.enemy && player) {
                 self.enemy.killTron(player);
-                console.log(eventInfo.killedTronId + ' was killed!');
             }
         });
     },

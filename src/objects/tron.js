@@ -3,6 +3,7 @@ var Tron = function() {
     this.isAlive = true;
     this.points = 0;
     this.name = "";
+    this.blocks = 1;
 };
 
 Tron.prototype = new Character();
@@ -43,4 +44,20 @@ Tron.prototype.setName = function(game, name) {
     text.y = this.y;
     text.x = this.x;
     text.anchor.set(0.5);
+};
+
+Tron.prototype.triggerAttack = function(facingDirection) {
+    var self = this;
+    if (this.sprite.attKey.isDown && this.blocks > 0) {
+        self.blocks--;
+        if (self.blocks < 0) self.blocks = 0;
+        var block = this.game.add.sprite(this.sprite.x, this.sprite.y, 'block');
+        block.scale.x = 0.8;
+        block.scale.y = 0.8;
+
+        setTimeout(function() {
+            block.destroy();
+            self.blocks++;
+        }, 2000);
+    }
 };
