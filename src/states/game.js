@@ -139,7 +139,7 @@ Hackatron.Game.prototype = {
         this.fullscreenKey.onDown.add(this.toggleFullscreen, this);
 
         this.powerups = [];
-        this.powerupPlugins = ['speedBoost', 'portal', 'reverseMode', 'invincibleMode']; // 'ghostMode', 'saiyanMode'];
+        this.powerupPlugins = ['speedBoost', 'portal', 'reverseMode', 'invincibleMode', 'rageMode']; // 'ghostMode', 'saiyanMode'];
 
         setInterval(function() {
             this.powerups = this.powerups.filter(function(powerup) {

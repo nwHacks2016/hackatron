@@ -142,6 +142,58 @@ Powerup.plugins.invincibleMode = function() {
     };
 };
 
+Powerup.plugins.rageMode = function() {
+    return {
+        setup: function() {
+            var coord = Hackatron.game.state.states.Game.getValidCoord(0, 0);
+            this.sprite = this.game.add.sprite(coord.x * 16, coord.y * 16, this.game.add.bitmapData(16, 16));
+            this.sprite.key.copyRect('powerups', getRect(1, 1), 0, 0);
+            this.sprite.scale.x = 1;
+            this.sprite.scale.y = 1;
+            this.game.add.tween(this.sprite).to({alpha: 0}, 15000, "Linear", true, 0, -1);
+            this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
+
+            setTimeout(this.destroy, 15000);
+        },
+
+        update: function() {
+            this.game.physics.arcade.overlap(this.player.sprite, this.sprite, this.start.bind(this), null, this.game);
+        },
+
+        start: function() {
+            if (this.claimed) { return; }
+
+            this.claimed = true;
+            var width = 32;
+            var height = 32;
+            var padding = 0.75; // 75% padding
+            this.player.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
+            this.player.sprite.scale.x = 1.5;
+            this.player.sprite.scale.y = 1.5;
+            this.sprite.destroy();
+            setTimeout(this.stop, 4000);
+
+            console.log('Powerup START: Rage mode');
+        },
+
+        stop: function() {
+            this.finished = true;
+            // set back original
+            var width = 32;
+            var height = 32;
+            var padding = 0.35; // 35% padding
+            this.player.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
+            this.player.sprite.scale.x = 0.8;
+            this.player.sprite.scale.y = 0.8;
+            console.log('Powerup STOP: Rage mode');
+        },
+
+        destroy: function() {
+            this.sprite.destroy();
+        }
+    };
+};
+
 var getRect = function(x, y) {
     var rect = new Phaser.Rectangle(16 * (x-1), 16 * (y-1), 16, 16);
     return rect;
@@ -152,7 +204,7 @@ Powerup.plugins.speedBoost = function() {
         setup: function() {
             var coord = Hackatron.game.state.states.Game.getValidCoord(0, 0);
             this.sprite = this.game.add.sprite(coord.x * 16, coord.y * 16, this.game.add.bitmapData(16, 16));
-            this.sprite.key.copyRect('powerups', getRect(1, 1), 0, 0);
+            this.sprite.key.copyRect('powerups', getRect(6, 2), 0, 0);
             this.sprite.scale.x = 1;
             this.sprite.scale.y = 1;
             this.game.add.tween(this.sprite).to({alpha: 0}, 15000, "Linear", true, 0, -1);
