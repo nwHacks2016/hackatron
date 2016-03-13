@@ -11,23 +11,24 @@ Hackatron.Preload.prototype= {
         this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
         // this.load.setPreloadSprite(this.asset);
 
+        var baseURL = window.location.hostname === 'localhost' ? 'http://localhost:8080/assets/' : 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/assets/';
 
-        var baseURL = 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/assets/';
-		
         // main menu
         this.load.image('menu_background', baseURL + 'mainmenu.png');
         this.load.spritesheet('start_button', baseURL + 'startbutton_spritesheet.png', 155, 80);
-        this.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
 
         // game state
+        this.load.image('powerups', baseURL + 'powerups.png');
 		this.load.image('blueball', baseURL + 'blueball.png');
         this.load.image('pellet', baseURL + 'pellet.png');
         this.load.image('poop', baseURL + 'poop.png');
         this.load.image('tiles', baseURL + 'part2_tileset.png');
         this.load.json('JSONobj', baseURL + 'tiles1.json');
+        this.load.spritesheet('countdown', baseURL + 'countdown.png', 29, 27, 3);
+        this.load.image('tilesetImage', baseURL + 'tileset.png');
+        this.load.tilemap('tilesetMap', baseURL + 'tileset.json', null, Phaser.Tilemap.TILED_JSON);
         this.load.spritesheet('ghost', baseURL + 'ghost.png', 32, 32, 12);
         this.load.spritesheet('tron', baseURL + 'tron.png', 32, 32, 12);
-        this.load.tilemap('map', baseURL + 'tiles1.json', null, Phaser.Tilemap.TILED_JSON);
     },
 
     create: function() {

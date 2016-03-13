@@ -13,27 +13,45 @@
 
   <script src="vendor/easystar-0.1.7.min.js"></script>
   <script src="node_modules/phaser/build/phaser.js"></script>
+  <script src="src/objects/powerup.js"></script>
   <script src="src/objects/character.js"></script>
+  <script src="src/objects/countdown.js"></script>
   <script src="src/objects/ghost.js"></script>
   <script src="src/objects/pellet.js"></script>
   <script src="src/objects/tron.js"></script>
+  <script src="src/objects/portal.js"></script>
+  <script src="src/core/ai.js"></script>
   <script src="src/states/game.js"></script>
   <script src='src/states/lobby.js'></script>
   <script src="src/states/menu.js"></script>
   <script src='src/states/preload.js'></script>
 
     <script type="text/javascript">
+        WebFontConfig = {
+            google: { families: ['Orbitron:400,900:latin', 'Montserrat:400,700:latin'] }
+        };
+        (function() {
+            var wf = document.createElement('script');
+            wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+            wf.type = 'text/javascript';
+            wf.async = 'true';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(wf, s);
+        })();
+    </script>
 
+    <script type="text/javascript">
     window.onload = function () {
-        var game = new Phaser.Game(512, 512, Phaser.CANVAS, 'game');
+        Hackatron.game = new Phaser.Game(512, 512, Phaser.CANVAS, 'game');
 
-        game.state.add('Preload', Hackatron.Preload);
-        game.state.add('MainMenu', Hackatron.MainMenu);
-        game.state.add('Lobby', Hackatron.Lobby);
-        game.state.add('Game', Hackatron.Game);
+        Hackatron.game.state.add('Preload', Hackatron.Preload);
+        Hackatron.game.state.add('MainMenu', Hackatron.MainMenu);
+        Hackatron.game.state.add('Lobby', Hackatron.Lobby);
+        Hackatron.game.state.add('Game', Hackatron.Game);
 
-        game.state.start('Preload');
-    }
+        Hackatron.game.state.start('Preload');
+    };
     </script>
 </body>
 </html>
+<script src="src/objects/character.js"></script>
