@@ -28,6 +28,15 @@ Hackatron.Game.prototype = {
     preload: function() {
     },
 
+    toggleFullscreen: function() {
+        this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
+        if (this.game.scale.isFullScreen) {
+            this.game.scale.stopFullScreen();
+        } else {
+            this.game.scale.startFullScreen();
+        }
+    },
+
     create: function() {
         // Client set-up
         this.playerId = generateId();
@@ -108,6 +117,9 @@ Hackatron.Game.prototype = {
 
         this.ai = new AI();
         this.ai.init(jsonfile);
+
+        this.fullscreenKey = this.game.input.keyboard.addKey(Phaser.Keyboard.F);
+        this.fullscreenKey.onDown.add(this.toggleFullscreen, this);
     },
 
     update: function() {
