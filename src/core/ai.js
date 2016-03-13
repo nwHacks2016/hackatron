@@ -2,12 +2,12 @@ function AI() {
         
 }
 
-AI.prototype.init = function(jsonfile) {
+AI.prototype.init = function(mapData) {
         var mazeWidth = 32;
         var mazeHeight = 32;
 
         var convertedLevel = [];
-        var originalLevel = jsonfile.layers[0].data;
+        var originalLevel = mapData;
 
         for (var i = 0, l = Math.floor(originalLevel.length / 32); i < l; ++i) {
             var row = originalLevel.slice(i * 32, i * 32 + 32);
