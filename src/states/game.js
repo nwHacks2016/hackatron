@@ -427,7 +427,7 @@ Hackatron.Game.prototype = {
                     x: playerPos.posX,
                     y: playerPos.posY
                 };
-                var playerName = !clientInfo.playerName ? playerId.substring(0, 2) : clientInfo.playerName;
+                var playerName = !event.info.playerName ? playerId.substring(0, 2) : event.info.playerName;
                 player.init(playerParams);
                 player.setName(self, playerName);
                 self.playerList[event.info.playerId] = {'player': player};
