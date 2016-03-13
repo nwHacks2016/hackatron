@@ -15,6 +15,7 @@ Powerup.prototype.init = function(params) {
     this.setup = this.handler.setup.bind(this);
     this.start = this.handler.start.bind(this);
     this.stop = this.handler.stop.bind(this);
+    this.destroy = this.handler.destroy.bind(this);
 
     this.setup();
 };
@@ -31,6 +32,8 @@ Powerup.plugins.saiyanMode = function() {
             this.sprite.scale.x = 0.4;
             this.sprite.scale.y = 0.4;
             this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
+
+            setTimeout(this.stop, 15000);
         },
 
         update: function() {
@@ -44,13 +47,11 @@ Powerup.plugins.saiyanMode = function() {
             this.sprite.destroy();
 
             console.log('Powerup START: Phase mode');
-
-            setTimeout(this.stop, 2000);
         },
 
         stop: function() {
             this.finished = true;
-
+            this.sprite.destroy();
             console.log('Powerup STOP: Phase mode');
         }
     };
@@ -63,9 +64,10 @@ Powerup.plugins.ghostMode = function() {
             this.sprite = this.game.add.sprite(coord.x * 16, coord.y * 16, "blueball");
             this.sprite.scale.x = 0.4;
             this.sprite.scale.y = 0.4;
+            this.game.add.tween(this.sprite).to({alpha: 0}, 15000, "Linear", true, 0, -1);
             this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
 
-            setTimeout(this.stop, 2000);
+            setTimeout(this.destroy, 15000);
         },
 
         update: function() {
@@ -78,15 +80,16 @@ Powerup.plugins.ghostMode = function() {
             this.claimed = true;
             this.sprite.destroy();
 
-            setTimeout(this.stop, 2000);
-
             console.log('Powerup START: Ghost mode');
         },
 
         stop: function() {
             this.finished = true;
-
             console.log('Powerup STOP: Ghost mode');
+        },
+
+        destroy: function() {
+            this.sprite.destroy();
         }
     };
 };
@@ -98,7 +101,10 @@ Powerup.plugins.speedBoost = function() {
             this.sprite = this.game.add.sprite(coord.x * 16, coord.y * 16, "blueball");
             this.sprite.scale.x = 0.4;
             this.sprite.scale.y = 0.4;
+            this.game.add.tween(this.sprite).to({alpha: 0}, 15000, "Linear", true, 0, -1);
             this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
+
+            setTimeout(this.destroy, 15000);
         },
 
         update: function() {
@@ -110,9 +116,7 @@ Powerup.plugins.speedBoost = function() {
 
             this.claimed = true;
             this.player.speed *= 2;
-            this.sprite.destroy();
-
-            setTimeout(this.stop, 2000);
+            this.destroy();
 
             console.log('Powerup START: Speed boost');
         },
@@ -121,6 +125,10 @@ Powerup.plugins.speedBoost = function() {
             this.player.speed /= 2;
             this.finished = true;
             console.log('Powerup STOP: Speed boost');
+        },
+
+        destroy: function() {
+            this.sprite.destroy();
         }
     };
 };
@@ -132,7 +140,10 @@ Powerup.plugins.reverseMode = function() {
             this.sprite = this.game.add.sprite(coord.x * 16, coord.y * 16, "blueball");
             this.sprite.scale.x = 0.4;
             this.sprite.scale.y = 0.4;
+            this.game.add.tween(this.sprite).to({alpha: 0}, 15000, "Linear", true, 0, -1);
             this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
+
+            setTimeout(this.destroy, 15000);
         },
 
         update: function() {
@@ -144,9 +155,7 @@ Powerup.plugins.reverseMode = function() {
 
             this.claimed = true;
             this.player.speed *= -1;
-            this.sprite.destroy();
-
-            setTimeout(this.stop, 2000);
+            this.destroy();
 
             console.log('Powerup START: Reverse mode');
         },
@@ -155,6 +164,10 @@ Powerup.plugins.reverseMode = function() {
             this.player.speed *= -1;
             this.finished = true;
             console.log('Powerup STOP: Reverse mode');
+        },
+
+        destroy: function() {
+            this.sprite.destroy();
         }
     };
 };
@@ -171,13 +184,17 @@ Powerup.plugins.portal = function() {
             this.entryPortal = this.game.add.sprite(entryPortalCoord.x * 16, entryPortalCoord.y * 16, "poop");
             this.entryPortal.scale.x = 0.4;
             this.entryPortal.scale.y = 0.4;
+            this.game.add.tween(this.entryPortal).to({alpha: 0}, 15000, "Linear", true, 0, -1);
 
             this.exitPortal = this.game.add.sprite(exitPortalCoord.x * 16, exitPortalCoord.y * 16, "blueball");
             this.exitPortal.scale.x = 0.4;
             this.exitPortal.scale.y = 0.4;
+            this.game.add.tween(this.exitPortal).to({alpha: 0}, 15000, "Linear", true, 0, -1);
 
             this.game.physics.arcade.enable(this.entryPortal, Phaser.Physics.ARCADE);
             this.game.physics.arcade.enable(this.exitPortal, Phaser.Physics.ARCADE);
+
+            setTimeout(this.destroy, 15000);
         },
 
         update: function() {
@@ -195,10 +212,7 @@ Powerup.plugins.portal = function() {
                 this.player.teleport(this.entryPortal);
             }
 
-            this.entryPortal.destroy();
-            this.exitPortal.destroy();
-
-            setTimeout(this.stop, 2000);
+            this.destroy();
 
             console.log('Powerup START: Portal');
         },
@@ -206,6 +220,11 @@ Powerup.plugins.portal = function() {
         stop: function() {
             this.finished = true;
             console.log('Powerup STOP: Portal');
+        },
+
+        destroy: function() {
+            this.entryPortal.destroy();
+            this.exitPortal.destroy();
         }
     };
 };

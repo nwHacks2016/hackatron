@@ -158,7 +158,7 @@ Hackatron.Game.prototype = {
             powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.mapData, player: this.player});
 
             this.powerups.push(powerup);
-        }.bind(this), 3000);
+        }.bind(this), 1000);
 
         // this.startCountdown();
     },
