@@ -25,7 +25,11 @@ Character.prototype.setUpKeys = function(keys) {
 };
 
 Character.prototype._initSprite = function(params) {
+    var width = 32;
+    var height = 32;
+    var padding = 0.35; // 35% padding
     this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
+    this.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
     this.sprite.scale.x = 0.8;
     this.sprite.scale.y = 0.8;
     this.setUpKeys(params.keys);
