@@ -31,7 +31,6 @@ Hackatron.Preload.prototype= {
     },
 
     create: function() {
-        this.asset.cropEnabled = false;
     },
 
     update: function() {

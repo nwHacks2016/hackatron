@@ -18,6 +18,7 @@
   <script src="src/objects/pellet.js"></script>
   <script src="src/objects/tron.js"></script>
   <script src="src/states/game.js"></script>
+  <script src='src/states/lobby.js'></script>
   <script src="src/states/menu.js"></script>
   <script src='src/states/preload.js'></script>
 
@@ -28,6 +29,7 @@
 
         game.state.add('Preload', Hackatron.Preload);
         game.state.add('MainMenu', Hackatron.MainMenu);
+        game.state.add('Lobby', Hackatron.Lobby);
         game.state.add('Game', Hackatron.Game);
 
         game.state.start('Preload');
