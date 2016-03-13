@@ -5,11 +5,11 @@ var Portal = function() {
 
 Portal.prototype.constructor = Portal;
 
-Portal.prototype.init = function(game, data) {
-    this.data = data;
+Portal.prototype.init = function(game, mapData) {
+    this.mapData = mapData;
     this.game = game;
 
-    //console.log("data: ", data);
+    //console.log("mapData: ", mapData);
 
     var entryPortalCoord = this.getValidCoord();
     var exitPortalCoord = this.getValidCoord();
@@ -38,8 +38,8 @@ Portal.prototype.getValidCoord = function(x, y) {
     while (!coord) {
         var x = this.game.rnd.integerInRange(0, 32);
         var y = this.game.rnd.integerInRange(0, 32);
-        // data goes top to down and left to right
-        var cell = this.data[y * 32 + x];
+        // mapData goes top to down and left to right
+        var cell = this.mapData[y * 32 + x][0];
 
         //console.log(cell);
 
