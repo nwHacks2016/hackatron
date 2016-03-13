@@ -1,54 +1,53 @@
-
-
 var Portal = function() {
+    this.entryPortal = null;
+    this.exitPortal = null;
 };
 
 Portal.prototype.constructor = Portal;
 
 Portal.prototype.init = function(game, data) {
     this.data = data;
+    this.game = game;
     console.log(data);
-    this.isEntryGood = false;
-    this.isExitGood = false
-    var entryPortalCoord;
-    var exitPortalCoord;
-    while (!this.isExitGood || !this.isEntryGood) {
-        if (!this.isEntryGood) {
-            entryPortalCoord = this.checkIfValidCoord(game.rnd.integerInRange(0, 32), game.rnd.integerInRange(0, 32));
-            this.isEntryGood = entryPortalCoord.clean;
-        }
-        if (!this.isExitGood) {
-            exitPortalCoord = this.checkIfValidCoord(game.rnd.integerInRange(0, 32), game.rnd.integerInRange(0, 32));
-            this.isExitGood = exitPortalCoord.clean;
-        }
 
-    }
-    console.log("entry x: " + entryPortalCoord.x + "\ny: " + entryPortalCoord.y);
-    console.log("exit x: " + exitPortalCoord.x + "\ny: " + exitPortalCoord.y);
-    this.entryPortal = game.add.sprite(entryPortalCoord.x, entryPortalCoord.y, "poop");
-    this.exitPortal = game.add.sprite(exitPortalCoord.x, exitPortalCoord.y, "blueball");
-    game.physics.arcade.enable(this.entryPortal, Phaser.Physics.ARCADE);
-    game.physics.arcade.enable(this.exitPortal, Phaser.Physics.ARCADE);
+    var entryPortalCoord = this.getValidCoord();
+    var exitPortalCoord = this.getValidCoord();
 
-    this.entryPortal.scale.x = 0.5;
-    this.entryPortal.scale.y = 0.5;
-    this.exitPortal.scale.x = 0.5;
-    this.exitPortal.scale.y = 0.5;
+    console.log("entry x: " + entryPortalCoord.x * 16 + "\ny: " + entryPortalCoord.y * 16);
+    console.log("exit x: " + exitPortalCoord.x * 16 + "\ny: " + exitPortalCoord.y * 16);
+
+    this.entryPortal = this.game.add.sprite(entryPortalCoord.x * 16, entryPortalCoord.y * 16, "poop");
+    this.exitPortal = this.game.add.sprite(exitPortalCoord.x * 16, exitPortalCoord.y * 16, "blueball");
+
+    this.game.physics.arcade.enable(this.entryPortal, Phaser.Physics.ARCADE);
+    this.game.physics.arcade.enable(this.exitPortal, Phaser.Physics.ARCADE);
+
+    this.entryPortal.scale.x = 0.4;
+    this.entryPortal.scale.y = 0.4;
+    this.exitPortal.scale.x = 0.4;
+    this.exitPortal.scale.y = 0.4;
 };
 
 Portal.prototype.update = function() {
 };
 
-Portal.prototype.checkIfValidCoord = function(x, y) {
-    // data goes top to down and left to right
-    var value = this.data[y * 32 + x];
-    console.log(value);
-    var clean = true;
-    if (value !== 0)
-        clean = false;
-    return {
-        clean: clean,
-        x: x / 32 * 32 + 20, // floor it and make it the mutiple of 32
-        y: y * 32 % 470
+Portal.prototype.getValidCoord = function(x, y) {
+    var coord = null;
+
+    while (!coord) {
+        var x = this.game.rnd.integerInRange(0, 32);
+        var y = this.game.rnd.integerInRange(0, 32);
+        // data goes top to down and left to right
+        var cell = this.data[y * 32 + x];
+
+        console.log(cell);
+
+        if (cell === 0) {
+            coord = {x: x, y: y};
+        }
     }
+
+    console.log(coord);
+
+    return coord;
 }
