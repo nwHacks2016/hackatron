@@ -16,7 +16,7 @@ Hackatron.MainMenu.prototype = {
     },
 
     update: function() {
-        if (this.button.enterKey.isDown) {
+        if (this.button.enterKey.isDown || window.location.href.indexOf('localhost') !== -1) {
             this.startLobby();
         }
     },
