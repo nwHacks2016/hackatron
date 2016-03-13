@@ -26,6 +26,7 @@ Character.prototype.setUpKeys = function(keys) {
 
 Character.prototype._initSprite = function(params) {
     this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
+    this.sprite.body.setSize(20, 20, 10, 10);
     this.sprite.scale.x = 0.8;
     this.sprite.scale.y = 0.8;
     this.setUpKeys(params.keys);
