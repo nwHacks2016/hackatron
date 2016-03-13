@@ -22,6 +22,11 @@ AI.prototype.init = function(mapData) {
         //easystar.disableCornerCutting();
         // easystar.enableCornerCutting();
 
+
+        // self.currentPlayerXtile = Math.floor(self.player.sprite.x / 16);
+        // self.currentPlayerYtile = Math.floor(self.player.sprite.y / 16);
+        // self.currentGhostXtile = Math.floor(self.enemy.sprite.x / 16);
+        // self.currentGhostYtile = Math.floor(self.enemy.sprite.y / 16);
         // if (this.playerId === this.hostId) {
         //     var timeStep = 400;
         //

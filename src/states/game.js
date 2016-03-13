@@ -132,11 +132,6 @@ Hackatron.Game.prototype = {
             this.enemy = enemy;
         }
 
-        this.currentPlayerXtile = 0;
-        this.currentPlayerYtile = 0;
-        this.currentGhostXtile = 0;
-        this.currentGhostYtile = 0;
-
         this.ai = new AI();
         this.ai.init(this.mapData);
 
@@ -232,11 +227,6 @@ Hackatron.Game.prototype = {
             };
         }
         self.socket.emit('updateClientPosition', JSON.stringify(clientInfo));
-
-        self.currentPlayerXtile = Math.floor(self.player.sprite.x / 16);
-        self.currentPlayerYtile = Math.floor(self.player.sprite.y / 16);
-        self.currentGhostXtile = Math.floor(self.enemy.sprite.x / 16);
-        self.currentGhostYtile = Math.floor(self.enemy.sprite.y / 16);
     },
 
     pelletHelper: function(mapArray){
