@@ -17,18 +17,20 @@
   <script src="src/objects/ghost.js"></script>
   <script src="src/objects/pellet.js"></script>
   <script src="src/objects/tron.js"></script>
-  <script src="src/game.js"></script>
-  <script src="src/menu.js"></script>
+  <script src="src/states/game.js"></script>
+  <script src="src/states/menu.js"></script>
+  <script src='src/states/preload.js'></script>
 
     <script type="text/javascript">
 
     window.onload = function () {
         var game = new Phaser.Game(512, 512, Phaser.CANVAS, 'game');
 
+        game.state.add('Preload', Hackatron.Preload);
         game.state.add('MainMenu', Hackatron.MainMenu);
         game.state.add('Game', Hackatron.Game);
 
-        game.state.start('MainMenu');
+        game.state.start('Preload');
     }
     </script>
 </body>

@@ -26,7 +26,6 @@ function generateId() {
 
 Hackatron.Game.prototype = {
     preload: function() {
-        this.loadAssets();
     },
 
     create: function() {
