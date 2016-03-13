@@ -4,6 +4,7 @@ var Character = function() {
 Character.prototype.init = function(params) {
     this.name = 'Character';
     this.isAlive = true;
+    this.dirty = false;
     this.game = params.game;
     this.speed = params.speed;
     this.sprite = this.game.add.sprite(params.x, params.y, params.characterKey);
@@ -86,6 +87,7 @@ Character.prototype.updatePos = function() {
         if (this.sprite.y < 16) {
             this.sprite.y = 16;
         }
+        this.dirty = true;
         return 'walkUp';
     } else if (this.sprite.downKey.isDown) {
         this.sprite.animations.play('walkDown', 3, false);
@@ -95,6 +97,7 @@ Character.prototype.updatePos = function() {
         if (this.sprite.y > this.game.world.height - 16) {
             this.sprite.y = this.game.world.height - 16;
         }
+        this.dirty = true;
         return 'walkDown';
     } else if (this.sprite.leftKey.isDown) {
         this.sprite.animations.play('walkLeft', 3, false);
@@ -104,6 +107,7 @@ Character.prototype.updatePos = function() {
         if (this.sprite.x < 0) {
             this.sprite.x = this.game.world.width;
         }
+        this.dirty = true;
         return 'walkLeft';
     } else if (this.sprite.rightKey.isDown) {
         this.sprite.animations.play('walkRight', 3, false);
@@ -113,6 +117,7 @@ Character.prototype.updatePos = function() {
         }
         this.sprite.emitter.x = this.sprite.x;
         this.sprite.emitter.y = this.sprite.y + 15;
+        this.dirty = true;
         return 'walkRight';
     } else {
         this.sprite.emitter.on = false;

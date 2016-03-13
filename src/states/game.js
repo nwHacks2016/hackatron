@@ -59,24 +59,71 @@ Hackatron.Game.prototype = {
 
     create: function() {
         this.playerId = generateId();
-        this.hostId = this.playerId;
         this.playerList = {};
         this.socket = io.connect();
+        this.events = [];
 
         this.initPhysics();
         this.initMap();
         this.initPlayer();
-        this.initEnemy();
-        this.initAI();
-        this.initPowerUps();
         this.initCountdown();
         this.initSFX();
         this.initHotkeys();
+        this.initPowerUps();
 
         // Register to listen to events and inform
         // other players that you have joined the game
         this.registerToEvents();
         this.joinGame();
+
+        this.initEvents();
+    },
+
+    initEvents: function() {
+        var self = this;
+
+        setInterval(this.broadcastEvents.bind(this), 50);
+
+        // Send player position every 50ms
+        setInterval(function() {
+            var playerDirection = self.player.updatePos();
+
+            if (!self.player.dirty) { return; }
+
+            self.player.dirty = false;
+
+            var info = {
+                playerId: self.playerId,
+                playerPos: {
+                    posX: self.player.sprite.x,
+                    posY: self.player.sprite.y,
+                    direction: playerDirection
+                }
+            };
+
+            self.addEvent({key: 'updatePlayer', info: info});
+        }, 100);
+
+        if (self.playerId === self.hostId) {
+            // Send enemy position every 50ms
+            setInterval(function() {
+                var ghostDirection = self.enemy.updatePos();
+
+                if (!self.enemy.dirty) { return; }
+
+                self.enemy.dirty = false;
+
+                var info = {
+                    enemyPos: {
+                        posX: self.enemy.sprite.x,
+                        posY: self.enemy.sprite.y,
+                        direction: ghostDirection
+                    }
+                };
+
+                self.addEvent({key: 'updateEnemy', info: info});
+            }, 50);
+        }
     },
 
     initPhysics: function() {
@@ -88,12 +135,12 @@ Hackatron.Game.prototype = {
         this.fullscreenKey.onDown.add(this.toggleFullscreen, this);
     },
 
-    initAI: function() {
+    runAiSystem: function() {
         this.ai = new AI();
         this.ai.init(this.game, this.player, this.enemy, this.playerId, this.hostId, this.mapData);
     },
 
-    initEnemy: function() {
+    runEnemySystem: function() {
         // Create enemy for the host
         if (!this.enemy) {
             var coord = this.getValidCoord();
@@ -197,12 +244,18 @@ Hackatron.Game.prototype = {
                     return powerup;
                 }
             });
+        }.bind(this), 1000);
+    },
 
+    runPowerUpSystem: function() {
+        setInterval(function() {
             var randomPlugin = this.powerupPlugins[this.game.rnd.integerInRange(0, this.powerupPlugins.length-1)];
             var powerup = new Powerup();
-            powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.mapData, player: this.player});
+            var state = powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.mapData, player: this.player});
 
             this.powerups.push(powerup);
+
+            this.addEvent({key: 'powerupSpawned', info: {plugin: randomPlugin, state: state}});
         }.bind(this), 1000);
     },
 
@@ -245,13 +298,23 @@ Hackatron.Game.prototype = {
             }, 10);
         });
     },
+    addEvent: function(event) {
+        this.events.push(event);
+    },
+    broadcastEvents: function() {
+        if (!this.events.length) { return; }
+
+        console.log('Broadcasting events...', JSON.stringify({events: this.events}));
+
+        this.socket.emit('events', JSON.stringify({events: this.events}));
+        this.events = [];
+    },
     update: function() {
-        // this === Hackatron.Game
         var self = this;
         if (!self.player || !self.enemy) return;
 
         var collisionHandler = function() {
-            // this === Phaser.Game
+            // Scope: this = Phaser.Game
             if (self.player.invincible) { return; }
 
             self.player.kill();
@@ -259,9 +322,9 @@ Hackatron.Game.prototype = {
             //self.game.fx.play('monsterRoar');
             
             self.createExplodingParticles(self.player.sprite, function() {
-                self.socket.emit('tronKilled', JSON.stringify({
+                self.addEvent({key: 'tronKilled', info: {
                     killedTronId: self.playerId
-                }));
+                }});
 
                 self.enemy.updatePoints(self.player.points);
                 self.player.sprite.emitter.destroy();
@@ -271,15 +334,13 @@ Hackatron.Game.prototype = {
             self.ai.stopPathFinding();
         };
 
-        var ghostDirection = self.enemy.updatePos();
-        var playerDirection = self.player.updatePos();
         var block = self.player.triggerAttack(self.blockList);
 
         if (block !== null) {
-            self.socket.emit('blockSpawned', JSON.stringify ({
+            this.addEvent({key: 'blockSpawned', info: {
                 x: block.x,
                 y: block.y
-            }));
+            }})
 
             self.blockList.push(block);
         }
@@ -314,24 +375,6 @@ Hackatron.Game.prototype = {
         if (this.player.sprite.x > this.game.world.width) {
             this.player.sprite.x = 0;
         }
-
-        var clientInfo = {
-            playerName: Hackatron.playerName,
-            playerId: self.playerId,
-            playerPos: {
-                posX: self.player.sprite.x,
-                posY: self.player.sprite.y,
-                direction: playerDirection
-            }
-        };
-
-        if (self.playerId === self.hostId) {
-            clientInfo.enemyPos = {
-                posX: self.enemy.sprite.x,
-                posY: self.enemy.sprite.y
-            };
-        }
-        self.socket.emit('updateClientPosition', JSON.stringify(clientInfo));
     },
 
     pelletHelper: function(mapArray){
@@ -358,20 +401,23 @@ Hackatron.Game.prototype = {
 // ============================================================================
 //                          Socket Event Handlers
 // ============================================================================
-    registerToEvents: function () {
+    parseEvent: function(event) {
         var self = this;
+        console.log('Receiving.. ' + event.key + ' ' + JSON.stringify(event.info));
 
-        // Method for updating board local client game state using clientInfo
-        // broadcasted to all players. The clientInfo variable contains the
+        // Method for updating board local client game state using info
+        // broadcasted to all players. The info variable contains the
         // following keys:
         // {playerId, playersPos: {posX, posY, direction}, enemyPos: {posX, posY}}
-        self.socket.on('updateClientPosition', function(clientInfo) {
-            clientInfo = JSON.parse(clientInfo);
-
+        if (event.key === 'updatePlayer') {
             var player;
-            var playerId = clientInfo.playerId;
-            var playerPos = clientInfo.playerPos;
-            if (!self.playerList[clientInfo.playerId]) {
+            var playerId = event.info.playerId;
+            var playerPos = event.info.playerPos;
+
+            // Don't update ourself (bug?)
+            if (event.info.playerId === self.playerId) { return; }
+
+            if (!self.playerList[event.info.playerId]) {
                 player = new Tron();
                 var playerParams = {
                     game: self.game,
@@ -384,19 +430,20 @@ Hackatron.Game.prototype = {
                 var playerName = !clientInfo.playerName ? playerId.substring(0, 2) : clientInfo.playerName;
                 player.init(playerParams);
                 player.setName(self, playerName);
-                self.playerList[clientInfo.playerId] = {'player': player};
+                self.playerList[event.info.playerId] = {'player': player};
             } else {
-                player = self.playerList[clientInfo.playerId].player;
+                player = self.playerList[event.info.playerId].player;
             }
 
             // self.game.physics.arcade.collide(player.sprite, self.layer);
             // self.game.physics.arcade.collide(player.sprite, self.player.sprite, null, null, self.game);
 
-            if(player.sprite.body) {
+            if (player.sprite.body) {
                 player.sprite.body.velocity.x = 0;
                 player.sprite.body.velocity.y = 0;
                 player.sprite.animations.play(playerPos.direction, 3, false);
                 player.sprite.emitter.on = true;
+
                 switch(playerPos.direction) {
                     case 'walkUp':
                         // player.sprite.body.velocity.y = -PLAYER_SPEED;
@@ -427,39 +474,29 @@ Hackatron.Game.prototype = {
                 }
             }
 
-            if (self.playerId !== self.hostId) {
-                var enemyPos = clientInfo.enemyPos;
-                self.enemy.sprite.x = enemyPos.posX;
-                self.enemy.sprite.y = enemyPos.posY;
-            }
-
             player.sprite.x = playerPos.posX;
             player.sprite.y = playerPos.posY;
-
-        });
+        } else if (event.key === 'updateEnemy') {
+            self.enemy.sprite.x = event.info.enemyPos.posX;
+            self.enemy.sprite.y = event.info.enemyPos.posY;
         // When new player joins, host shall send them data about the 'enemyPos'
-        self.socket.on('newPlayer', function(playerInfo) {
-            playerInfo = JSON.parse(playerInfo);
-
+        } else if (event.key === 'newPlayer') {
             if (self.playerId === self.hostId) {
                 var gameData = {
-                    playerId: playerInfo.playerId,
+                    playerId: event.info.playerId,
                     hostId: self.hostId,
                     enemy: {
                         posX: self.enemy.sprite.x,
                         posY: self.enemy.sprite.y
                     }
                 };
-                self.socket.emit('welcomePlayer', JSON.stringify(gameData));
+
+                self.addEvent({key: 'welcomePlayer', info: gameData});
             }
-        });
-
         // Set up game state as a new player receiving game data from host
-        self.socket.on('welcomePlayer', function(gameData) {
-            gameData = JSON.parse(gameData);
-
-            if (self.playerId === gameData.playerId) {
-                self.hostId = gameData.hostId;
+        } else if (event.key === 'welcomePlayer') {
+            if (self.playerId === event.info.playerId) {
+                self.hostId = event.info.hostId;
 
                 if (self.enemy) {
                     self.enemy.sprite.emitter.destroy();
@@ -473,28 +510,29 @@ Hackatron.Game.prototype = {
                     speed: PLAYER_SPEED,
                     characterKey: 'ghost',
                     emitterKey: 'poop',
-                    x: gameData.enemy.posX,
-                    y: gameData.enemy.posY
+                    x: event.info.enemy.posX,
+                    y: event.info.enemy.posY
                 };
                 enemy.init(enemyParams);
                 self.enemy = enemy;
             }
-        });
+        // Method for handling received deaths of other clients
+        } else if (event.key === 'tronKilled') {
+            // TODO: fix this
+            // var player = self.playerList[event.killedTronId].player;
+            // if(self.enemy && player) {
+            //     self.enemy.killTron(player);
+            // }
+        // Method for handling spawned power ups by the host
+        } else if (event.key === 'powerupSpawned') {
+            // TODO: we already do this above, refactor it out
+            var powerup = new Powerup();
+            powerup.init({handler: Powerup.plugins[event.info.plugin], game: self.game, map: self.mapData, player: self.player, state: event.info.state});
 
-       // Method for handling received deaths of other clients
-        self.socket.on('tronKilled', function(eventInfo) {
-            eventInfo = JSON.parse(eventInfo);
-            var player = self.playerList[eventInfo.killedTronId].player;
-            if(self.enemy && player) {
-                self.enemy.killTron(player);
-            }
-        });
-
-        // Method for handling spawned blocks from other players
-        self.socket.on('blockSpawned', function(blockPos) {
-            blockPos = JSON.parse(blockPos);
-
-            var block = self.game.add.sprite(blockPos.x, blockPos.y, this.game.add.bitmapData(16, 16));
+            self.powerups.push(powerup);
+        // Method for handling spawned blocks by other players
+        } else if (event.key === 'blockSpawned') {
+            var block = self.game.add.sprite(event.info.x, event.info.y, self.game.add.bitmapData(16, 16));
             block.key.copyRect('powerups', getRect(5, 4), 0, 0);
             self.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
             block.scale.x = 0.8;
@@ -502,7 +540,7 @@ Hackatron.Game.prototype = {
             block.body.immovable = true;
 
             // Make block fade in 2.0 seconds
-            this.game.add.tween(block).to( { alpha: 0 }, 2000, "Linear", true, 0, -1);
+            self.game.add.tween(block).to({ alpha: 0 }, 2000, 'Linear', true, 0, -1);
 
             self.blockList.push(block);
             setTimeout(function() {
@@ -512,15 +550,45 @@ Hackatron.Game.prototype = {
 
                 block.destroy();
             }, 2000);
+        } else if (event.key === 'setHost') {
+            self.hostId = event.info.playerId;
+
+            // If this player is the new host, lets set them up
+            if (self.hostId === self.playerId) {
+                self.runEnemySystem();
+                self.runAiSystem();
+                self.runPowerUpSystem();
+            }
+        }
+    },
+    registerToEvents: function () {
+        var self = this;
+
+        // Method for receiving multiple events at once
+        // {events: [{key: 'eventName', info: {...data here...}]}
+        self.socket.on('events', function(data) {
+            JSON.parse(data).events.forEach(function(event) { self.parseEvent(event); });
+        });
+
+        // Route all the events to the event parser
+        ['updatePlayer',
+         'updateEnemy',
+         'newPlayer',
+         'welcomePlayer',
+         'tronKilled',
+         'powerupSpawned',
+         'blockSpawned',
+         'setHost'].forEach(function(key) {
+            self.socket.on(key, function(info) { self.parseEvent({key: key, info: info}); });
         });
     },
 
     // Method to broadcast to  other clients (if there are any) that you have
     // joined the game
     joinGame: function () {
-        this.socket.emit('newPlayer', JSON.stringify({
+        this.addEvent({key: 'newPlayer', info: {
             playerId: this.playerId,
             message: this.playerId + ' has joined the game!'
-        }));
+        }});
     }
 };
