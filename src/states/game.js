@@ -269,6 +269,23 @@ Hackatron.Game.prototype = {
             self.game.physics.arcade.collide(self.player.sprite, block);
         });
 
+        // Sanitize coords
+        if (this.player.sprite.y < 16) {
+            this.player.sprite.y = 16;
+        }
+
+        if (this.player.sprite.y > this.game.world.height - 16) {
+            this.player.sprite.y = this.game.world.height - 16;
+        }
+
+        if (this.player.sprite.x < 0) {
+            this.player.sprite.x = 0;
+        }
+
+        if (this.player.sprite.x > this.game.world.width) {
+            this.player.sprite.x = 0;
+        }
+
         var clientInfo = {
             playerId: self.playerId,
             playerPos: {
@@ -445,7 +462,9 @@ Hackatron.Game.prototype = {
         // Method for handling spawned blocks from other players
         self.socket.on('blockSpawned', function(blockPos) {
             blockPos = JSON.parse(blockPos);
-            var block = self.game.add.sprite(blockPos.x, blockPos.y, 'block');
+
+            var block = self.game.add.sprite(blockPos.x, blockPos.y, this.game.add.bitmapData(16, 16));
+            block.key.copyRect('powerups', getRect(5, 4), 0, 0);
             self.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
             block.scale.x = 0.8;
             block.scale.y = 0.8;

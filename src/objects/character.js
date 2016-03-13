@@ -83,12 +83,18 @@ Character.prototype.updatePos = function() {
         this.sprite.body.velocity.y = -this.speed;
         this.sprite.emitter.x = this.sprite.x + 15;
         this.sprite.emitter.y = this.sprite.y + 35;
+        if (this.sprite.y < 16) {
+            this.sprite.y = 16;
+        }
         return 'walkUp';
     } else if (this.sprite.downKey.isDown) {
         this.sprite.animations.play('walkDown', 3, false);
         this.sprite.body.velocity.y = this.speed;
         this.sprite.emitter.x = this.sprite.x + 15;
         this.sprite.emitter.y = this.sprite.y + -5;
+        if (this.sprite.y > this.game.world.height - 16) {
+            this.sprite.y = this.game.world.height - 16;
+        }
         return 'walkDown';
     } else if (this.sprite.leftKey.isDown) {
         this.sprite.animations.play('walkLeft', 3, false);
