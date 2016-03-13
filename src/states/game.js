@@ -170,6 +170,8 @@ Hackatron.Game.prototype = {
 
         var collisionHandler = function() {
             // this === Phaser.Game
+            if (self.player.invincible) { return; }
+
             self.socket.emit('tronKilled', JSON.stringify({
                 killedTronId: self.playerId
             }));
