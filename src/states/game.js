@@ -278,10 +278,6 @@ Hackatron.Game.prototype = {
             // self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
 
-        var portalTransition = function() {
-            self.player.teleport(self.portal.exitPortal);
-        };
-
         var ghostDirection = self.enemy.updatePos();
         var playerDirection = self.player.updatePos();
         var block = self.player.triggerAttack(self.blockList);
