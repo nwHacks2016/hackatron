@@ -46,6 +46,10 @@ Hackatron.Game.prototype = {
         this.layer.resizeWorld();
         var Keyboard = Phaser.Keyboard;
 
+        var portal = new Portal();
+        portal.init(this.game);
+        this.portal = portal;
+        this.game.physics.arcade.enable(this.portal);
         // Collision
         this.game.physics.arcade.enable(this.layer);
         this.map.setCollision([18, 52, 53, 54, 88, 89]);
@@ -134,6 +138,10 @@ Hackatron.Game.prototype = {
             // self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
 
+        var portalTransition = function() {
+            console.log("I hit the portal");
+        };
+
         var ghostDirection = self.enemy.updatePos();
         var playerDirection = self.player.updatePos();
         self.player.triggerAttack(playerDirection);
@@ -141,6 +149,8 @@ Hackatron.Game.prototype = {
         // Check for collisions
         self.game.physics.arcade.collide(self.player.sprite, self.layer);
         self.game.physics.arcade.collide(self.enemy.sprite, self.layer);
+        self.game.physics.arcade.overlap(self.player.sprite, this.portal.entryProtal, portalTransition, null, self.game);
+        self.game.physics.arcade.overlap(self.player.sprite, this.portal.exitProtal, portalTransition, null, self.game);
         self.game.physics.arcade.overlap(self.enemy.sprite, self.player.sprite, collisionHandler, null, self.game);
 
         var clientInfo = {
