@@ -7,6 +7,7 @@ Hackatron.Game = function(game) {
     this.hostId = null;
     this.player = null;
     this.playerId = null;
+    this.blockList = [];
     this.playerList = null;
 };
 
@@ -82,7 +83,7 @@ Hackatron.Game.prototype = {
         if (!this.enemy) {
             spawnPosY = 20;
             spawnPosX = 512 - 40;
-            enemyParams = {
+            var enemyParams = {
                 game: this.game,
                 speed:PLAYER_SPEED,
                 characterKey: 'ghost',
@@ -192,12 +193,25 @@ Hackatron.Game.prototype = {
 
         var ghostDirection = self.enemy.updatePos();
         var playerDirection = self.player.updatePos();
-        self.player.triggerAttack(playerDirection);
+        var block = self.player.triggerAttack(self.blockList);
+
+        if (block !== null) {
+            self.socket.emit('blockSpawned', JSON.stringify ({
+                x: block.x,
+                y: block.y
+            }));
+
+            self.blockList.push(block);
+        }
 
         // Check for collisions
         self.game.physics.arcade.collide(self.player.sprite, self.layer);
         self.game.physics.arcade.collide(self.enemy.sprite, self.layer);
         self.game.physics.arcade.overlap(self.enemy.sprite, self.player.sprite, collisionHandler, null, self.game);
+        self.blockList.forEach(function(block) {
+            console.log(block);
+            self.game.physics.arcade.collide(self.player.sprite, block);
+        });
 
         var clientInfo = {
             playerId: self.playerId,
@@ -261,9 +275,16 @@ Hackatron.Game.prototype = {
             var playerPos = clientInfo.playerPos;
             if (!self.playerList[clientInfo.playerId]) {
                 player = new Tron();
-                player.init(self, playerPos.posX, playerPos.posY, 'tron');
-                player.setName(self, clientInfo.playerId.substring(0,2));
-                self.setUpSprite({sprite: player.sprite, emitterKey: 'blueball'});
+                var playerParams = {
+                    game: self.game,
+                    characterKey: 'tron',
+                    emitterKey: 'blueball',
+                    speed: PLAYER_SPEED,
+                    x: playerPos.posX,
+                    y: playerPos.posY
+                };
+                player.init(playerParams);
+                player.setName(self, 'clientInfo.playerId.substring(0,2)');
                 self.playerList[clientInfo.playerId] = {'player': player};
             } else {
                 player = self.playerList[clientInfo.playerId].player;
@@ -348,11 +369,15 @@ Hackatron.Game.prototype = {
 
                 // Create a ghost
                 var enemy = new Ghost();
-                enemy.init(self, gameData.enemy.posX, gameData.enemy.posY, 'ghost');
-                self.setUpSprite({
-                    sprite: enemy.sprite,
-                    emitterKey: 'poop'
-                });
+                var enemyParams = {
+                    game: self.game,
+                    speed: PLAYER_SPEED,
+                    characterKey: 'ghost',
+                    emitterKey: 'poop',
+                    x: gameData.enemy.posX,
+                    y: gameData.enemy.posY
+                };
+                enemy.init(enemyParams);
                 self.enemy = enemy;
             }
         });
@@ -365,6 +390,25 @@ Hackatron.Game.prototype = {
                 self.enemy.killTron(player);
             }
         });
+
+        // Method for handling spawned blocks from other players
+        self.socket.on('blockSpawned', function(blockPos) {
+            blockPos = JSON.parse(blockPos);
+            var block = self.game.add.sprite(blockPos.x, blockPos.y, 'block');
+            self.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
+            block.scale.x = 0.8;
+            block.scale.y = 0.8;
+            block.body.immovable = true;
+
+            self.blockList.push(block);
+            setTimeout(function() {
+                self.blockList = self.blockList.filter(function(b) {
+                    return (b !== block);
+                });
+
+                block.destroy();
+            }, 2000);
+        });
     },
 
     // Method to broadcast to  other clients (if there are any) that you have
@@ -374,9 +418,5 @@ Hackatron.Game.prototype = {
             playerId: this.playerId,
             message: this.playerId + ' has joined the game!'
         }));
-    },
-
-// ============================================================================
-//                              Helper Methods
-// ============================================================================
+    }
 };

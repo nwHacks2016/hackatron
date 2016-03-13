@@ -46,18 +46,28 @@ Tron.prototype.setName = function(game, name) {
     text.anchor.set(0.5);
 };
 
-Tron.prototype.triggerAttack = function(facingDirection) {
+Tron.prototype.triggerAttack = function(blockList) {
     var self = this;
     if (this.sprite.attKey.isDown && this.blocks > 0) {
         self.blocks--;
         if (self.blocks < 0) self.blocks = 0;
         var block = this.game.add.sprite(this.sprite.x, this.sprite.y, 'block');
+        this.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
+        block.body.immovable = true;
         block.scale.x = 0.8;
         block.scale.y = 0.8;
+        blockList.push(block);
 
         setTimeout(function() {
             block.destroy();
             self.blocks++;
+            blockList.filter(function(b) {
+                return (b !== block);
+            });
         }, 2000);
+
+        return block;
     }
+
+    return null;
 };
