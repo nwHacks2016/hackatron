@@ -11,8 +11,7 @@ Hackatron.Preload.prototype= {
         this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
         // this.load.setPreloadSprite(this.asset);
 
-
-        var baseURL = 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/assets/';
+        var baseURL = window.location.hostname === 'localhost' ? 'http://localhost:8080/assets/' : 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/assets/';
 
         // main menu
         this.load.image('menu_background', baseURL + 'mainmenu.png');
