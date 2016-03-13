@@ -39,7 +39,7 @@ Portal.prototype.getValidCoord = function(x, y) {
         var x = this.game.rnd.integerInRange(0, 31);
         var y = this.game.rnd.integerInRange(0, 31);
         // mapData goes top to down and left to right
-        var cell = this.mapData[x][y].index;
+        var cell = this.mapData[y][x].index;
 
         //console.log(cell);
 
