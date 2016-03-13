@@ -79,4 +79,4 @@ Tron.prototype.triggerAttack = function(blockList) {
 Tron.prototype.teleport = function(oDestination) {
     this.sprite.x = oDestination.x;
     this.sprite.y = oDestination.y;
-}
+};

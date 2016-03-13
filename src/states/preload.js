@@ -23,7 +23,7 @@ Hackatron.Preload.prototype= {
         this.load.image('poop', baseURL + 'poop.png');
         this.load.image('tiles', baseURL + 'part2_tileset.png');
         this.load.json('JSONobj', baseURL + 'tiles1.json');
-        this.load.spritesheet('countdown', 'countdown.png', 27, 27, 3);
+        this.load.spritesheet('countdown', baseURL + 'countdown.png', 29, 27, 3);
         this.load.image('tilesetImage', baseURL + 'tileset.png');
         this.load.spritesheet('ghost', baseURL + 'ghost.png', 32, 32, 12);
         this.load.spritesheet('tron', baseURL + 'tron.png', 32, 32, 12);
