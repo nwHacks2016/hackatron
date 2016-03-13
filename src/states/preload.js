@@ -12,7 +12,7 @@ Hackatron.Preload.prototype= {
         // this.load.setPreloadSprite(this.asset);
 
 
-        var baseURL = 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/assets/';
+        var baseURL = 'https://raw.githubusercontent.com/tony-dinh/hackatron/develop/assets/';
 
         // main menu
         this.load.image('menu_background', baseURL + 'mainmenu.png');
