@@ -144,7 +144,7 @@ Hackatron.Game.prototype = {
         this.fullscreenKey.onDown.add(this.toggleFullscreen, this);
 
         this.powerups = [];
-        this.powerupPlugins = ['speedBoost', 'portal', 'ghostMode', 'saiyanMode'];
+        this.powerupPlugins = ['speedBoost', 'portal', 'reverseMode']; // 'ghostMode', 'saiyanMode'];
 
         setInterval(function() {
             this.powerups = this.powerups.filter(function(powerup) {
@@ -158,7 +158,7 @@ Hackatron.Game.prototype = {
             powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.mapData, player: this.player});
 
             this.powerups.push(powerup);
-        }.bind(this), 2000);
+        }.bind(this), 3000);
 
         // this.startCountdown();
     },
