@@ -110,7 +110,7 @@ Hackatron.Game.prototype = {
             self.addEvent({key: 'updatePlayer', info: info});
 
             lastUpdateInfo = info;
-        }, 30);
+        }, 100);
 
         // If this is the host
         // Send enemy position every 50ms
