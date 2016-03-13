@@ -138,9 +138,10 @@ Hackatron.Game.prototype = {
                 att: Phaser.Keyboard.SPACEBAR
             }
         };
-
-        this.player.init(playerParams);
-        this.player.setName(this, Hackatron.playerName);
+        player.init(playerParams);
+        var playerName = !Hackatron.playerName ? this.playerId.substring(0, 2) : Hackatron.playerName;
+        player.setName(this, playerName);
+        this.player = player;
     },
 
     initMap: function() {
@@ -321,6 +322,7 @@ Hackatron.Game.prototype = {
         }
 
         var clientInfo = {
+            playerName: Hackatron.playerName,
             playerId: self.playerId,
             playerPos: {
                 posX: self.player.sprite.x,
@@ -385,8 +387,9 @@ Hackatron.Game.prototype = {
                     x: playerPos.posX,
                     y: playerPos.posY
                 };
+                var playerName = !clientInfo.playerName ? playerId.substring(0, 2) : clientInfo.playerName;
                 player.init(playerParams);
-                player.setName(self, clientInfo.playerId.substring(0,2));
+                player.setName(self, playerName);
                 self.playerList[clientInfo.playerId] = {'player': player};
             } else {
                 player = self.playerList[clientInfo.playerId].player;
