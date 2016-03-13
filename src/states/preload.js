@@ -18,16 +18,15 @@ Hackatron.Preload.prototype= {
         this.load.spritesheet('start_button', baseURL + 'startbutton_spritesheet.png', 155, 80);
 
         // game state
+        this.load.image('powerups', baseURL + 'powerups.png');
 		this.load.image('blueball', baseURL + 'blueball.png');
         this.load.image('pellet', baseURL + 'pellet.png');
         this.load.image('poop', baseURL + 'poop.png');
-        this.load.image('tiles', baseURL + 'part2_tileset.png');
-        this.load.json('JSONobj', baseURL + 'tiles1.json');
         this.load.spritesheet('countdown', 'countdown.png', 27, 27, 3);
         this.load.image('tilesetImage', baseURL + 'tileset.png');
+        this.load.tilemap('tilesetMap', baseURL + 'tileset.json', null, Phaser.Tilemap.TILED_JSON);
         this.load.spritesheet('ghost', baseURL + 'ghost.png', 32, 32, 12);
         this.load.spritesheet('tron', baseURL + 'tron.png', 32, 32, 12);
-        this.load.tilemap('tilesetMap', baseURL + 'tileset.json', null, Phaser.Tilemap.TILED_JSON);
     },
 
     create: function() {
