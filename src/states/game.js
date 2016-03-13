@@ -550,7 +550,8 @@ Hackatron.Game.prototype = {
             }
         // Method for handling received deaths of other clients
         } else if (event.key === 'tronKilled') {
-            var player = self.playerList[event.info.killedTronId].player;
+            // var player = self.playerList[event.info.killedTronId].player;
+            var player = self.getPlayerById(event.info.killedTronId);
             self.enemy.updatePoints(player.points);
             player.sprite.emitter.destroy();
             player.nameText.destroy();
