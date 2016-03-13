@@ -87,6 +87,8 @@ AI.prototype.init = function(game, player, enemy, playerId, hostId, mapData) {
                     enemy.sprite.x = Math.floor(currentPath[currentPathIndex].x) * 16;
                     enemy.sprite.y = Math.floor(currentPath[currentPathIndex].y) * 16;
 
+                    enemy.dirty = true;
+
                     if (currentPathIndex < currentPath.length-1) {
                         ++currentPathIndex;
                     } else {

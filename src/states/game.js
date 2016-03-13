@@ -104,9 +104,10 @@ Hackatron.Game.prototype = {
             self.addEvent({key: 'updatePlayer', info: info});
         }, 100);
 
-        if (self.playerId === self.hostId) {
-            // Send enemy position every 50ms
-            setInterval(function() {
+        // If this is the host
+        // Send enemy position every 50ms
+        setInterval(function() {
+            if (self.playerId === self.hostId) {
                 var ghostDirection = self.enemy.updatePos();
 
                 if (!self.enemy.dirty) { return; }
@@ -122,8 +123,8 @@ Hackatron.Game.prototype = {
                 };
 
                 self.addEvent({key: 'updateEnemy', info: info});
-            }, 50);
-        }
+            }
+        }, 50);
     },
 
     initPhysics: function() {
@@ -477,8 +478,23 @@ Hackatron.Game.prototype = {
             player.sprite.x = playerPos.posX;
             player.sprite.y = playerPos.posY;
         } else if (event.key === 'updateEnemy') {
-            self.enemy.sprite.x = event.info.enemyPos.posX;
-            self.enemy.sprite.y = event.info.enemyPos.posY;
+            if (self.playerId !== self.hostId) {
+                if (!self.enemy) {
+                    self.enemy = new Ghost();
+
+                    self.enemy.init({
+                        game: self.game,
+                        speed: PLAYER_SPEED,
+                        characterKey: 'ghost',
+                        emitterKey: 'poop',
+                        x: event.info.enemyPos.posX,
+                        y: event.info.enemyPos.posY
+                    });
+                } else {
+                    self.enemy.sprite.x = event.info.enemyPos.posX;
+                    self.enemy.sprite.y = event.info.enemyPos.posY;
+                }
+            }
         // When new player joins, host shall send them data about the 'enemyPos'
         } else if (event.key === 'newPlayer') {
             if (self.playerId === self.hostId) {
@@ -497,24 +513,6 @@ Hackatron.Game.prototype = {
         } else if (event.key === 'welcomePlayer') {
             if (self.playerId === event.info.playerId) {
                 self.hostId = event.info.hostId;
-
-                if (self.enemy) {
-                    self.enemy.sprite.emitter.destroy();
-                    self.enemy.sprite.destroy();
-                }
-
-                // Create a ghost
-                var enemy = new Ghost();
-                var enemyParams = {
-                    game: self.game,
-                    speed: PLAYER_SPEED,
-                    characterKey: 'ghost',
-                    emitterKey: 'poop',
-                    x: event.info.enemy.posX,
-                    y: event.info.enemy.posY
-                };
-                enemy.init(enemyParams);
-                self.enemy = enemy;
             }
         // Method for handling received deaths of other clients
         } else if (event.key === 'tronKilled') {
