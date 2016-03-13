@@ -33,7 +33,9 @@ Hackatron.Lobby.prototype= {
         var nameField = document.createElement("input");
         nameField.id = "name-field";
         nameField.setAttribute("type", "text");
+        nameField.setAttribute("autofocus", "autofocus");
         document.body.appendChild(nameField);
+
 
 
         var style = {
