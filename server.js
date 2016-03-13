@@ -27,7 +27,7 @@ var findNewHost = function() {
         if (clients[hostClientId]) {
             var playerId = clients[hostClientId].playerId;
             console.log('New host: ' + playerId);
-            io.socket.emit('setHost', JSON.stringify({playerId: playerId}));
+            io.sockets.emit('setHost', JSON.stringify({playerId: playerId}));
         }
     }
 };
