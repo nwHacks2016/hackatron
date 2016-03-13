@@ -70,7 +70,7 @@ Hackatron.Game.prototype = {
             }
         };
         player.init(playerParams);
-        player.setName(this, this.playerId.substring(0,2));
+        player.setName(this, Hackatron.playerName);
         this.player = player;
 
         // Register to listen to events and inform
@@ -379,20 +379,4 @@ Hackatron.Game.prototype = {
 // ============================================================================
 //                              Helper Methods
 // ============================================================================
-    // Method for loading all assets/resources at game-level
-    // Resources loaded from gitHub since Heroku does not compile assets
-    loadAssets: function() {
-        var baseURL = `https://raw.githubusercontent.com/tony-dinh
-                      /hackatron/master/assets/`;
-        // this === Hackatron.Game
-        // load all resources/assets here
-        this.load.image('blueball', baseURL + 'blueball.png');
-        this.load.image('pellet', baseURL + 'pellet.png');
-        this.load.image('poop', baseURL + 'poop.png');
-        this.load.image('tiles', baseURL + 'part2_tileset.png');
-        this.load.json('JSONobj', baseURL + 'tiles1.json');
-        this.load.spritesheet('ghost', baseURL + 'ghost.png', 32, 32, 12);
-        this.load.spritesheet('tron', baseURL + 'tron.png', 32, 32, 12);
-        this.load.tilemap('map', baseURL + 'tiles1.json', null, Phaser.Tilemap.TILED_JSON);
-    }
 };

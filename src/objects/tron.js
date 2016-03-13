@@ -41,8 +41,8 @@ Tron.prototype.setName = function(game, name) {
     this.name = name;
     var text = game.add.text(game.world.centerX, game.world.centerY, name, style);  //some reason this doesn't fellow thie spirte
     this.nameText = text;
-    text.y = this.y;
-    text.x = this.x;
+    text.y = this.sprite.y - 10;
+    text.x = this.sprite.x;
     text.anchor.set(0.5);
 };
 

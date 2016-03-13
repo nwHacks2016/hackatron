@@ -17,7 +17,6 @@ Hackatron.Preload.prototype= {
         // main menu
         this.load.image('menu_background', baseURL + 'mainmenu.png');
         this.load.spritesheet('start_button', baseURL + 'startbutton_spritesheet.png', 155, 80);
-        this.load.script('webfont', '//ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js');
 
         // game state
 		this.load.image('blueball', baseURL + 'blueball.png');
@@ -31,7 +30,6 @@ Hackatron.Preload.prototype= {
     },
 
     create: function() {
-        this.asset.cropEnabled = false;
     },
 
     update: function() {
