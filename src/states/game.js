@@ -24,6 +24,7 @@ function generateId() {
     s4() + '-' + s4() + s4() + s4();
 }
 
+
 Hackatron.Game.prototype = {
     preload: function() {
     },
@@ -158,8 +159,54 @@ Hackatron.Game.prototype = {
         var countdown = new Countdown();
         countdown.init(this.game);
         countdown.start();
+
+
+        // var fx = this.game.add.audio('sfx');
+        // fx.addMarker('monsterRoar', 2, 1.2);
+        // fx.addMarker('playerEaten', 5, 0.5);
+        // fx.addMarker('playerInWater', 7, 0.5);
+        // fx.addMarker('jump', 0, 0.24);
     },
 
+    // TODO: causing some errors, not sure why
+    createExplodingParticles: function(sprite, cb) {
+        var self = this;
+
+        // create a Phaser.Group for all the particles of the explosion
+        self.explodingGroup = self.game.add.group();
+        self.explodingGroup.enableBody = true;
+        self.explodingGroup.physicsBodyType = Phaser.Physics.ARCADE;
+        var colors = ['#77DD77', '#B39EB5', '#C23B22', '#FFB347', '#FDFD96', '#836953', '#779ECB', '#FFD1DC'];
+
+        // create a black square as gfx for the particles
+        var explodingRect = self.game.make.bitmapData(5, 5);
+        explodingRect.ctx.fillStyle = colors[self.game.rnd.integerInRange(0, colors.length-1)];
+        explodingRect.ctx.fillRect(0, 0, 5, 5);
+
+        var explodingSprite = new Phaser.Sprite(self.game, sprite.x, sprite.y, explodingRect);
+        self.explodingGroup.add(explodingSprite);
+
+        explodingSprite = new Phaser.Sprite(self.game, sprite.x, sprite.y, explodingRect);
+        self.explodingGroup.add(explodingSprite);
+
+        // setup the animation for the particles. make them "jump" by setting a negative velocity
+        // and set timeout to make the blink before being finally destroyed
+        self.explodingGroup.forEach(function (sprite) {
+            sprite.body.gravity.y = 35;
+            sprite.body.velocity.setTo(self.game.rnd.integerInRange(-20, 20), self.game.rnd.integerInRange(-35, -50));
+
+            setTimeout(function () {
+                sprite.visible = false;
+                setTimeout(function () {
+                    sprite.visible = true;
+                    setTimeout(function () {
+                        sprite.destroy();
+                        cb && cb();
+                    }, 100);
+                }, 100);
+            }, 10);
+        });
+    },
     update: function() {
         // this === Hackatron.Game
         var self = this;
@@ -169,11 +216,20 @@ Hackatron.Game.prototype = {
             // this === Phaser.Game
             if (self.player.invincible) { return; }
 
-            self.socket.emit('tronKilled', JSON.stringify({
-                killedTronId: self.playerId
-            }));
+            self.player.kill();
 
-            self.enemy.killTron(self.player);
+            //self.game.fx.play('monsterRoar');
+            
+            self.createExplodingParticles(self.player.sprite, function() {
+                self.socket.emit('tronKilled', JSON.stringify({
+                    killedTronId: self.playerId
+                }));
+
+                self.enemy.updatePoints(self.player.points);
+                self.player.sprite.emitter.destroy();
+                self.player.nameText.destroy();
+                self.player.sprite.destroy();
+            });
             // //enemy.stopPathFinding;
             // var rebootGhost= function() {
             //     //enemy.startPathFinding;
