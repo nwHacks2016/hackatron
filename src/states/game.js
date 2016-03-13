@@ -102,7 +102,7 @@ Hackatron.Game.prototype = {
             };
 
             self.addEvent({key: 'updatePlayer', info: info});
-        }, 100);
+        }, 30);
 
         // If this is the host
         // Send enemy position every 50ms
@@ -124,7 +124,7 @@ Hackatron.Game.prototype = {
 
                 self.addEvent({key: 'updateEnemy', info: info});
             }
-        }, 200);
+        }, 30);
     },
 
     initPhysics: function() {
@@ -548,8 +548,8 @@ Hackatron.Game.prototype = {
             var block = self.game.add.sprite(event.info.x, event.info.y, self.game.add.bitmapData(16, 16));
             block.key.copyRect('powerups', getRect(5, 4), 0, 0);
             self.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
-            block.scale.x = 0.8;
-            block.scale.y = 0.8;
+            block.scale.x = 2.0;
+            block.scale.y = 2.0;
             block.body.immovable = true;
 
             // Make block fade in 2.0 seconds
@@ -570,7 +570,7 @@ Hackatron.Game.prototype = {
             if (self.hostId === self.playerId) {
                 console.log('Hey now the host, lets do this!');
                 self.runEnemySystem();
-                self.runAiSystem();
+                // self.runAiSystem();
                 self.runPowerUpSystem();
             }
         }
