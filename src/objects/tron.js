@@ -14,8 +14,8 @@ Tron.prototype.init = function() {
 };
 
 Tron.prototype.kill = function() {
-    this.isAlive = false; 
-    this.points = 0;     
+    this.isAlive = false;
+    this.points = 0;
 };
 
 Tron.prototype.updatePoints = function(points) {
@@ -31,11 +31,11 @@ Tron.prototype.eatPellet = function(pellet) {
 };
 
 Tron.prototype.setName = function(game, name) {
-    var style = { 
-        font: "15px Arial", 
-        fill: "#ffffff", 
+    var style = {
+        font: "15px Arial",
+        fill: "#ffffff",
         align: "center",
-        backgroundColor: "#000000" 
+        backgroundColor: "#000000"
     };
     this.name = name;
     var text = game.add.text(game.world.centerX, game.world.centerY, name, style);  //some reason this doesn't fellow thie spirte
@@ -43,4 +43,4 @@ Tron.prototype.setName = function(game, name) {
     text.y = this.y;
     text.x = this.x;
     text.anchor.set(0.5);
-}
+};
