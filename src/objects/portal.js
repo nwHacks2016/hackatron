@@ -36,14 +36,14 @@ Portal.prototype.getValidCoord = function(x, y) {
     var coord = null;
 
     while (!coord) {
-        var x = this.game.rnd.integerInRange(0, 32);
-        var y = this.game.rnd.integerInRange(0, 32);
+        var x = this.game.rnd.integerInRange(0, 31);
+        var y = this.game.rnd.integerInRange(0, 31);
         // mapData goes top to down and left to right
-        var cell = this.mapData[y * 32 + x][0];
+        var cell = this.mapData[x][y].index;
 
         //console.log(cell);
 
-        if (cell === 0) {
+        if (cell === -1) {
             coord = {x: x, y: y};
         }
     }
