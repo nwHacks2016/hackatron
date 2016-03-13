@@ -138,10 +138,9 @@ Hackatron.Game.prototype = {
                 att: Phaser.Keyboard.SPACEBAR
             }
         };
-        player.init(playerParams);
         var playerName = !Hackatron.playerName ? this.playerId.substring(0, 2) : Hackatron.playerName;
-        player.setName(this, playerName);
-        this.player = player;
+        this.player.init(playerParams);
+        this.player.setName(this, playerName);
     },
 
     initMap: function() {
