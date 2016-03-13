@@ -330,11 +330,11 @@ Hackatron.Game.prototype = {
                 self.addEvent({key: 'tronKilled', info: {
                     killedTronId: self.playerId
                 }});
-
                 self.enemy.updatePoints(self.player.points);
                 self.player.sprite.emitter.destroy();
                 self.player.nameText.destroy();
                 self.player.sprite.destroy();
+                self.player.kill();
             });
 
             if (self.ai) {
@@ -521,11 +521,13 @@ Hackatron.Game.prototype = {
             }
         // Method for handling received deaths of other clients
         } else if (event.key === 'tronKilled') {
-            // TODO: fix this
-            // var player = self.playerList[event.killedTronId].player;
-            // if(self.enemy && player) {
-            //     self.enemy.killTron(player);
-            // }
+            var player = self.playerList[event.info.killedTronId].player;
+            self.enemy.updatePoints(player.points);
+            player.sprite.emitter.destroy();
+            player.nameText.destroy();
+            player.sprite.destroy();
+            player.kill();
+
         // Method for handling spawned power ups by the host
         } else if (event.key === 'powerupSpawned') {
             // TODO: we already do this above, refactor it out
