@@ -29,9 +29,12 @@ Hackatron.Preload.prototype= {
         this.load.tilemap('tilesetMap', baseURL + 'tileset.json', null, Phaser.Tilemap.TILED_JSON);
         this.load.spritesheet('ghost', baseURL + 'ghost.png', 32, 32, 12);
         this.load.spritesheet('tron', baseURL + 'tron.png', 32, 32, 12);
+        this.load.audio('music1', [baseURL + 'music1.mp3']);
     },
 
     create: function() {
+        this.game.music = this.game.add.audio('music1', 1, true);
+        this.game.music.play('', 0, 1, true);
     },
 
     update: function() {

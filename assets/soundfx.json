@@ -1,0 +1,33 @@
+{
+  "resources": [
+    "soundfx.ogg",
+    "soundfx.mp3"
+  ],
+  "spritemap": {
+    "jump": {
+      "start": 0,
+      "end": 0.24387755102040817,
+      "loop": false
+    },
+    "monsterRoar": {
+      "start": 1.9999999999999998,
+      "end": 3.202380952380952,
+      "loop": false
+    },
+    "playerEaten": {
+      "start": 5,
+      "end": 5.521587301587301,
+      "loop": false
+    },
+    "playerInWater": {
+      "start": 7,
+      "end": 7.500181405895692,
+      "loop": false
+    },
+    "simplebg": {
+      "start": 9,
+      "end": 16.68580498866213,
+      "loop": false
+    }
+  }
+}
