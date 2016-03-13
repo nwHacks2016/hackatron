@@ -82,7 +82,9 @@ Hackatron.Game.prototype = {
     initEvents: function() {
         var self = this;
 
-        setInterval(this.broadcastEvents.bind(this), 50);
+        setInterval(this.broadcastEvents.bind(this), 100);
+
+        var lastUpdateInfo = null;
 
         // Send player position every 50ms
         setInterval(function() {
@@ -90,18 +92,24 @@ Hackatron.Game.prototype = {
 
             if (!self.player.dirty) { return; }
 
-            self.player.dirty = false;
-
             var info = {
                 playerId: self.playerId,
                 playerPos: {
-                    posX: self.player.sprite.x,
-                    posY: self.player.sprite.y,
+                    posX: Math.floor(self.player.sprite.x),
+                    posY: Math.floor(self.player.sprite.y),
                     direction: playerDirection
                 }
             };
 
+            // Don't send an event if its the same as last time
+            if (lastUpdateInfo && info.playerPos.posX == lastUpdateInfo.playerPos.posX
+                && info.playerPos.posY == lastUpdateInfo.playerPos.posY) {
+                return;
+            }
+
             self.addEvent({key: 'updatePlayer', info: info});
+
+            lastUpdateInfo = info;
         }, 30);
 
         // If this is the host
