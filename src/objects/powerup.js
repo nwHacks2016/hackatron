@@ -33,7 +33,7 @@ Powerup.plugins.saiyanMode = function() {
             this.sprite.scale.y = 0.4;
             this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
 
-            setTimeout(this.stop, 15000);
+            setTimeout(this.destroy, 15000);
         },
 
         update: function() {
@@ -45,6 +45,7 @@ Powerup.plugins.saiyanMode = function() {
 
             this.claimed = true;
             this.sprite.destroy();
+            setTimeout(this.stop, 4000);
 
             console.log('Powerup START: Phase mode');
         },
@@ -79,6 +80,7 @@ Powerup.plugins.ghostMode = function() {
 
             this.claimed = true;
             this.sprite.destroy();
+            setTimeout(this.stop, 4000);
 
             console.log('Powerup START: Ghost mode');
         },
@@ -117,6 +119,7 @@ Powerup.plugins.speedBoost = function() {
             this.claimed = true;
             this.player.speed *= 2;
             this.destroy();
+            setTimeout(this.stop, 4000);
 
             console.log('Powerup START: Speed boost');
         },
@@ -156,6 +159,7 @@ Powerup.plugins.reverseMode = function() {
             this.claimed = true;
             this.player.speed *= -1;
             this.destroy();
+            setTimeout(this.stop, 4000);
 
             console.log('Powerup START: Reverse mode');
         },
@@ -213,6 +217,7 @@ Powerup.plugins.portal = function() {
             }
 
             this.destroy();
+            setTimeout(this.stop, 4000);
 
             console.log('Powerup START: Portal');
         },
