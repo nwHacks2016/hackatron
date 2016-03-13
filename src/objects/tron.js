@@ -4,7 +4,6 @@ var Tron = function() {
     this.isAlive = true;
     this.speedBoost = 1;
     this.points = 0;
-    this.name = "";
     this.blocks = 1;
 };
 
@@ -40,12 +39,13 @@ Tron.prototype.setName = function(game, name) {
         align: "center",
         backgroundColor: "#000000"
     };
+
     this.name = name;
-    var text = game.add.text(game.world.centerX, game.world.centerY, name, style);  //some reason this doesn't fellow thie spirte
-    this.nameText = text;
-    text.y = this.y;
-    text.x = this.x;
-    text.anchor.set(0.5);
+
+    this.nameText = game.add.text(0, 0, name, style);  //some reason this doesn't fellow thie spirte
+    this.nameText.anchor.set(0.5);
+
+    this.sprite.addChild(this.nameText);
 };
 
 Tron.prototype.triggerAttack = function(blockList) {
