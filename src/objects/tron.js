@@ -1,6 +1,8 @@
 var Tron = function() {
     Character.call(this);
+    this.name = 'Tron';
     this.isAlive = true;
+    this.speedBoost = 1;
     this.points = 0;
     this.name = "";
     this.blocks = 1;

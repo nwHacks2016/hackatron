@@ -1,5 +1,6 @@
 var Ghost = function() {
     Character.apply(this, arguments);
+    this.name = 'Ghost';
     this.points = 0;
 };
 
