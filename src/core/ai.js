@@ -58,7 +58,7 @@ AI.prototype.init = function(game, player, enemy, playerId, hostId, mapData) {
 
         // Delayed start to give players a chance
         setTimeout(function() {
-            setInterval(function() {
+            this.pathFindingInterval = setInterval( function() {
                 var currentPlayerXtile = Math.floor(player.sprite.x / 16);
                 var currentPlayerYtile = Math.floor(player.sprite.y / 16);
                 var currentGhostXtile = Math.floor(enemy.sprite.x / 16);
@@ -98,3 +98,7 @@ AI.prototype.init = function(game, player, enemy, playerId, hostId, mapData) {
         }.bind(this), 5000);
     }
 };
+
+AI.prototype.stopPathFinding = function () {
+    clearInterval(this.pathFindingInterval)
+}

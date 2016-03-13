@@ -268,12 +268,7 @@ Hackatron.Game.prototype = {
                 self.player.nameText.destroy();
                 self.player.sprite.destroy();
             });
-            // //enemy.stopPathFinding;
-            // var rebootGhost= function() {
-            //     //enemy.startPathFinding;
-            // };
-            //
-            // self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
+            self.ai.stopPathFinding();
         };
 
         var ghostDirection = self.enemy.updatePos();
