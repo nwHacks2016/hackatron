@@ -6,12 +6,12 @@ Pellet = function(type) {
 Pellet.init = function(game, x, y, key) {
 	var pellet = game.add.sprite(x, y, key);
 	pellet.isAlive = true;
-	this.type = type;
+	this.type = type
     return pellet;
 };
 
 Pellet.prototype.eaten = function() {
-    this.isAlive = false;
+    this.isAlive = false; 
 };
 
 Pellet.prototype.getPoints = function() {

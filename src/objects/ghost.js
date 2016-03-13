@@ -1,6 +1,5 @@
 var Ghost = function() {
     Character.apply(this, arguments);
-    this.name = 'Ghost';
     this.points = 0;
 };
 
@@ -17,7 +16,6 @@ Ghost.prototype.killTron = function(tron) {
     tron.sprite.emitter.destroy();
     tron.nameText.destroy();
     tron.sprite.destroy();
-    tron.kill();
 };
 
 Ghost.prototype.updatePoints = function(points) {

@@ -1,4 +1,5 @@
 Hackatron = {
+    score: 0
 };
 
 Hackatron.Game = function(game) {
@@ -6,7 +7,6 @@ Hackatron.Game = function(game) {
     this.hostId = null;
     this.player = null;
     this.playerId = null;
-    this.blockList = [];
     this.playerList = null;
 };
 
@@ -28,36 +28,6 @@ Hackatron.Game.prototype = {
     preload: function() {
     },
 
-    toggleFullscreen: function() {
-        this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
-        if (this.game.scale.isFullScreen) {
-            this.game.scale.stopFullScreen();
-        } else {
-            this.game.scale.startFullScreen();
-        }
-    },
-
-    getValidCoord: function(x, y) {
-        var coord = null;
-
-        while (!coord) {
-            var x = this.game.rnd.integerInRange(0, 31);
-            var y = this.game.rnd.integerInRange(0, 31);
-            // mapData goes top to down and left to right
-            var cell = this.mapData[y][x].index;
-
-            //console.log(cell);
-
-            if (cell === -1) {
-                coord = {x: x, y: y};
-            }
-        }
-
-        //console.log(coord);
-
-        return coord;
-    },
-
     create: function() {
         // Client set-up
         this.playerId = generateId();
@@ -67,13 +37,12 @@ Hackatron.Game.prototype = {
         this.game.physics.startSystem(Phaser.Physics.ARCADE);
 
         // Create the map
-        // this.pelletHelper(data);
-        this.map = this.add.tilemap('tilesetMap');
-        this.map.addTilesetImage('tileset', 'tilesetImage');
-
-        this.mapData = this.map.layers[0].data;
-
-        this.layer = this.map.createLayer('Base');
+        var jsonfile = this.cache.getJSON('JSONobj');
+        var data = jsonfile.layers[0].data;
+        this.pelletHelper(data);
+        this.map = this.add.tilemap('map');
+        this.map.addTilesetImage('Wall', 'tiles');
+        this.layer = this.map.createLayer('Tile Layer 1');
         this.layer.resizeWorld();
         var Keyboard = Phaser.Keyboard;
 
@@ -96,12 +65,11 @@ Hackatron.Game.prototype = {
                 up: Keyboard.UP,
                 down: Keyboard.DOWN,
                 left: Keyboard.LEFT,
-                right: Keyboard.RIGHT,
-                att: Keyboard.SPACEBAR
+                right: Keyboard.RIGHT
             }
         };
         player.init(playerParams);
-        player.setName(this, Hackatron.playerName);
+        player.setName(this, this.playerId.substring(0,2));
         this.player = player;
 
         // Register to listen to events and inform
@@ -111,11 +79,10 @@ Hackatron.Game.prototype = {
 
         // Create enemy for the host
         if (!this.enemy) {
-            spawnPosY = 20;
-            spawnPosX = 512 - 40;
+            var spawnPosY = 20;
+            var spawnPosX = 512 - 40;
             var enemyParams = {
                 game: this.game,
-                speed: PLAYER_SPEED,
                 characterKey: 'ghost',
                 emitterKey: 'poop',
                 x: spawnPosX,
@@ -132,32 +99,73 @@ Hackatron.Game.prototype = {
             this.enemy = enemy;
         }
 
-        this.ai = new AI();
-        this.ai.init(this.mapData);
+        // Add score text
+        this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
+        this.scoreText.addColor('White', 0);
 
-        this.fullscreenKey = this.game.input.keyboard.addKey(Phaser.Keyboard.F);
-        this.fullscreenKey.onDown.add(this.toggleFullscreen, this);
+        this.currentPlayerXtile = 0;
+        this.currentPlayerYtile = 0;
+        this.currentGhostXtile = 0;
+        this.currentGhostYtile = 0;
+        var mazeWidth = 32;
+        var mazeHeight = 32;
 
-        this.powerups = [];
-        this.powerupPlugins = ['speedBoost', 'portal', 'reverseMode', 'invincibleMode', 'rageMode']; // 'ghostMode', 'saiyanMode'];
+        var convertedLevel = [];
+        var originalLevel = jsonfile.layers[0].data;
 
-        setInterval(function() {
-            this.powerups = this.powerups.filter(function(powerup) {
-                if (!powerup.ended) {
-                    return powerup;
-                }
-            });
+        for (var i = 0, l = Math.floor(originalLevel.length / 32); i < l; ++i) {
+            var row = originalLevel.slice(i * 32, i * 32 + 32);
 
-            var randomPlugin = this.powerupPlugins[this.game.rnd.integerInRange(0, this.powerupPlugins.length-1)];
-            var powerup = new Powerup();
-            powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.mapData, player: this.player});
+            convertedLevel.push(row);
+        }
 
-            this.powerups.push(powerup);
-        }.bind(this), 1000);
 
-        var countdown = new Countdown();
-        countdown.init(this.game);
-        countdown.start();
+
+        this.easystar = new EasyStar.js();
+        this.easystar.setGrid(convertedLevel);
+        this.easystar.setAcceptableTiles([0]);
+        // easystar.enableDiagonals();
+        //easystar.disableCornerCutting();
+        // easystar.enableCornerCutting();
+
+        // if (this.playerId === this.hostId) {
+        //     var timeStep = 400;
+        //
+        //     setInterval(function() {
+        //            if (!currentPath) {
+        //                 this.easystar.findPath(this.currentGhostXtile, this.currentGhostYtile, this.currentPlayerXtile, this.currentPlayerYtile, function( path ) {
+        //
+        //                     if (!path || path.length < 2) {
+        //                         console.log("The path to the destination point was not found.");
+        //                         return;
+        //                     }
+        //
+        //                     currentPath = path;
+        //
+        //                     // Periodically reset
+        //                     setTimeout(function() {
+        //                         currentPathIndex = 0;
+        //                         currentPath = null;
+        //                     }, 3000);
+        //                 }.bind(this));
+        //
+        //            }
+        //          this.easystar.calculate();
+        //
+        //     if (currentPath && currentPathIndex < currentPath.length) {
+        //         enemy.sprite.x = Math.floor(currentPath[currentPathIndex].x) * 16;
+        //         enemy.sprite.y = Math.floor(currentPath[currentPathIndex].y) * 16;
+        //
+        //             if (currentPathIndex < currentPath.length-1) {
+        //                 ++currentPathIndex;
+        //             } else {
+        //                 currentPathIndex = 0;
+        //                 currentPath = null;
+        //             }
+        //     }
+        //
+        //     }.bind(this), 100);
+        // }
     },
 
     update: function() {
@@ -167,8 +175,6 @@ Hackatron.Game.prototype = {
 
         var collisionHandler = function() {
             // this === Phaser.Game
-            if (self.player.invincible) { return; }
-
             self.socket.emit('tronKilled', JSON.stringify({
                 killedTronId: self.playerId
             }));
@@ -182,36 +188,11 @@ Hackatron.Game.prototype = {
             // self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
 
-        var portalTransition = function() {
-            self.player.teleport(self.portal.exitPortal);
-        };
-
-        var ghostDirection = self.enemy.updatePos();
-        var playerDirection = self.player.updatePos();
-        var block = self.player.triggerAttack(self.blockList);
-
-        if (block !== null) {
-            self.socket.emit('blockSpawned', JSON.stringify ({
-                x: block.x,
-                y: block.y
-            }));
-
-            self.blockList.push(block);
-        }
-
-        // Check for collisions
+        var playerDirection = self.updateCharPos(self.player.sprite);
+        var ghostDirection = self.updateCharPos(self.enemy.sprite);
         self.game.physics.arcade.collide(self.player.sprite, self.layer);
         self.game.physics.arcade.collide(self.enemy.sprite, self.layer);
         self.game.physics.arcade.overlap(self.enemy.sprite, self.player.sprite, collisionHandler, null, self.game);
-
-        self.powerups.forEach(function(powerup) {
-            powerup.update();
-        });
-
-        self.blockList.forEach(function(block) {
-            console.log(block);
-            self.game.physics.arcade.collide(self.player.sprite, block);
-        });
 
         var clientInfo = {
             playerId: self.playerId,
@@ -229,6 +210,59 @@ Hackatron.Game.prototype = {
             };
         }
         self.socket.emit('updateClientPosition', JSON.stringify(clientInfo));
+
+        self.currentPlayerXtile = Math.floor(self.player.sprite.x / 16);
+        self.currentPlayerYtile = Math.floor(self.player.sprite.y / 16);
+        self.currentGhostXtile = Math.floor(self.enemy.sprite.x / 16);
+        self.currentGhostYtile = Math.floor(self.enemy.sprite.y / 16);
+    },
+
+     updateCharPos: function(sprite) {
+        if (!(sprite &&
+            sprite.body &&
+            sprite.upKey &&
+            sprite.downKey &&
+            sprite.leftKey &&
+            sprite.rightKey)) {
+            return;
+        }
+        sprite.body.velocity.x = 0;
+        sprite.body.velocity.y = 0;
+        sprite.emitter.on = true;
+
+        if (sprite.upKey.isDown) {
+            sprite.animations.play('walkUp', 3, false);
+            sprite.body.velocity.y = -PLAYER_SPEED;
+            sprite.emitter.x = sprite.x + 15;
+            sprite.emitter.y = sprite.y + 35;
+            return 'walkUp';
+        } else if (sprite.downKey.isDown) {
+            sprite.animations.play('walkDown', 3, false);
+            sprite.body.velocity.y = PLAYER_SPEED;
+            sprite.emitter.x = sprite.x + 15;
+            sprite.emitter.y = sprite.y + -5;
+            return 'walkDown';
+        } else if (sprite.leftKey.isDown) {
+            sprite.animations.play('walkLeft', 3, false);
+            sprite.body.velocity.x = -PLAYER_SPEED;
+            sprite.emitter.x = sprite.x + 30;
+            sprite.emitter.y = sprite.y + 15;
+            if (sprite.x < 0) {
+                sprite.x = this.world.width;
+            }
+            return 'walkLeft';
+        } else if (sprite.rightKey.isDown) {
+            sprite.animations.play('walkRight', 3, false);
+            sprite.body.velocity.x = PLAYER_SPEED;
+            if (sprite.x > this.world.width) {
+                sprite.x = 0;
+            }
+            sprite.emitter.x = sprite.x;
+            sprite.emitter.y = sprite.y + 15;
+            return 'walkRight';
+        } else {
+            sprite.emitter.on = false;
+        }
     },
 
     pelletHelper: function(mapArray){
@@ -236,15 +270,15 @@ Hackatron.Game.prototype = {
         var x = 0;
         var y = 0;
         var pos = 1;
-        for (pos = 1; pos < mapArray.length ; pos++) {
-            if (pos % 32 === 0) {
+        for(pos = 1; pos < mapArray.length ; pos++){
+            if(pos % 32 === 0){
                 x = 0;
                 y++;
             }
-            else {
+            else
                 x++;
-            }
-            if (mapArray[pos] === 0) {
+
+            if(mapArray[pos] === 0){
                 var pellet = this.add.sprite(x*16+2, y*16+2, 'pellet');
                 pellet.scale.x = 0.005;
                 pellet.scale.y = 0.005;
@@ -270,16 +304,9 @@ Hackatron.Game.prototype = {
             var playerPos = clientInfo.playerPos;
             if (!self.playerList[clientInfo.playerId]) {
                 player = new Tron();
-                var playerParams = {
-                    game: self.game,
-                    characterKey: 'tron',
-                    emitterKey: 'blueball',
-                    speed: PLAYER_SPEED,
-                    x: playerPos.posX,
-                    y: playerPos.posY
-                };
-                player.init(playerParams);
+                player.init(self, playerPos.posX, playerPos.posY, 'tron');
                 player.setName(self, clientInfo.playerId.substring(0,2));
+                self.setUpSprite({sprite: player.sprite, emitterKey: 'blueball'});
                 self.playerList[clientInfo.playerId] = {'player': player};
             } else {
                 player = self.playerList[clientInfo.playerId].player;
@@ -364,15 +391,11 @@ Hackatron.Game.prototype = {
 
                 // Create a ghost
                 var enemy = new Ghost();
-                var enemyParams = {
-                    game: self.game,
-                    speed: PLAYER_SPEED,
-                    characterKey: 'ghost',
-                    emitterKey: 'poop',
-                    x: gameData.enemy.posX,
-                    y: gameData.enemy.posY
-                };
-                enemy.init(enemyParams);
+                enemy.init(self, gameData.enemy.posX, gameData.enemy.posY, 'ghost');
+                self.setUpSprite({
+                    sprite: enemy.sprite,
+                    emitterKey: 'poop'
+                });
                 self.enemy = enemy;
             }
         });
@@ -383,29 +406,8 @@ Hackatron.Game.prototype = {
             var player = self.playerList[eventInfo.killedTronId].player;
             if(self.enemy && player) {
                 self.enemy.killTron(player);
+                console.log(eventInfo.killedTronId + ' was killed!');
             }
-        });
-
-        // Method for handling spawned blocks from other players
-        self.socket.on('blockSpawned', function(blockPos) {
-            blockPos = JSON.parse(blockPos);
-            var block = self.game.add.sprite(blockPos.x, blockPos.y, 'block');
-            self.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
-            block.scale.x = 0.8;
-            block.scale.y = 0.8;
-            block.body.immovable = true;
-
-            // Make block fade in 2.0 seconds
-            this.game.add.tween(block).to( { alpha: 0 }, 2000, "Linear", true, 0, -1);
-
-            self.blockList.push(block);
-            setTimeout(function() {
-                self.blockList = self.blockList.filter(function(b) {
-                    return (b !== block);
-                });
-
-                block.destroy();
-            }, 2000);
         });
     },
 
@@ -416,5 +418,25 @@ Hackatron.Game.prototype = {
             playerId: this.playerId,
             message: this.playerId + ' has joined the game!'
         }));
+    },
+
+// ============================================================================
+//                              Helper Methods
+// ============================================================================
+    // Method for loading all assets/resources at game-level
+    // Resources loaded from gitHub since Heroku does not compile assets
+    loadAssets: function() {
+        var baseURL = `https://raw.githubusercontent.com/tony-dinh
+                      /hackatron/master/assets/`;
+        // this === Hackatron.Game
+        // load all resources/assets here
+        this.load.image('blueball', baseURL + 'blueball.png');
+        this.load.image('pellet', baseURL + 'pellet.png');
+        this.load.image('poop', baseURL + 'poop.png');
+        this.load.image('tiles', baseURL + 'part2_tileset.png');
+        this.load.json('JSONobj', baseURL + 'tiles1.json');
+        this.load.spritesheet('ghost', baseURL + 'ghost.png', 32, 32, 12);
+        this.load.spritesheet('tron', baseURL + 'tron.png', 32, 32, 12);
+        this.load.tilemap('map', baseURL + 'tiles1.json', null, Phaser.Tilemap.TILED_JSON);
     }
 };

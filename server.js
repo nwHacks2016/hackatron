@@ -1,5 +1,5 @@
-var express = require('express');
-var http = require('http');
+var express = require('express')
+  , http = require('http');
 
 var app = express();
 
@@ -29,18 +29,14 @@ io.sockets.on('connection', function(socket) {
 
     socket.on('welcomePlayer', function(data) {
         socket.broadcast.emit('welcomePlayer', data);
-    });
+    })
 
     socket.on('tronKilled', function(data) {
         socket.broadcast.emit('tronKilled', data);
-    });
-
-    socket.on('blockSpawned', function(data) {
-        socket.broadcast.emit('blockSpawned', data);
-    });
+    })
 });
 
-console.log('\nOpen localhost:8080 on your browser.');
+console.log('\nOpen localhost:8080 on your browser.')
 console.log('.\n.\n.');
 console.log('Listening...');
 server.listen(process.env.PORT || 8080);
