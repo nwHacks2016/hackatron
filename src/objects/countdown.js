@@ -18,17 +18,23 @@ Countdown.prototype.start = function() {
     tween1 = self.game.add.tween(count1.scale).to({ x: 3, y: 3}, 500, "Linear", true);
 
     tween1.onComplete.add(function() {
-        tween1.stop();
+        // tween1.stop();
+        self.game.add.tween(count1).to( { alpha: 0 }, 200, "Linear", true);
+
         var count2 = self.game.add.sprite(centerX, centerY, 'countdown');
         count2.frame = 1;
         tween2 = self.game.add.tween(count2.scale).to({ x: 3, y: 3}, 500, "Linear", true);
         tween2.onComplete.add(function() {
-            tween2.stop();
+            // tween2.stop();
+            self.game.add.tween(count2).to( { alpha: 0 }, 200, "Linear", true);
+
+
             var count3 = self.game.add.sprite(centerX, centerY, 'countdown');
             count3.frame = 2;
             tween3 = self.game.add.tween(count3.scale).to({ x: 3, y: 3}, 500, "Linear", true);
             tween3.onComplete.add(function() {
-                tween3.stop();
+                self.game.add.tween(count3).to( { alpha: 0 }, 200, "Linear", true);
+
             });
         });
     });

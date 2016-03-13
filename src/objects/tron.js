@@ -61,7 +61,11 @@ Tron.prototype.triggerAttack = function(blockList) {
         blockList.push(block);
 
         // makes block fade away within a 2.0 seconds
-        this.game.add.tween(block).to( { alpha: 0 }, 2000, "Linear", true, 0, -1);
+        var tween = this.game.add.tween(block).to( { alpha: 0 }, 2000, "Linear", true);
+        tween.onComplete.add(function() {
+            tween.stop();
+        });
+
         setTimeout(function() {
             block.destroy();
             self.blocks++;

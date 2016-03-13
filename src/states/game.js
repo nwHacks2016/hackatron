@@ -155,9 +155,9 @@ Hackatron.Game.prototype = {
             this.powerups.push(powerup);
         }.bind(this), 1000);
 
-        var countdown = new Countdown();
-        countdown.init(this.game);
-        countdown.start();
+        // var countdown = new Countdown();
+        // countdown.init(this.game);
+        // countdown.start();
     },
 
     update: function() {
