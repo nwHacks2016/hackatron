@@ -37,6 +37,27 @@ Hackatron.Game.prototype = {
         }
     },
 
+    getValidCoord: function(x, y) {
+        var coord = null;
+
+        while (!coord) {
+            var x = this.game.rnd.integerInRange(0, 31);
+            var y = this.game.rnd.integerInRange(0, 31);
+            // mapData goes top to down and left to right
+            var cell = this.mapData[y][x].index;
+
+            //console.log(cell);
+
+            if (cell === -1) {
+                coord = {x: x, y: y};
+            }
+        }
+
+        //console.log(coord);
+
+        return coord;
+    },
+
     create: function() {
         // Client set-up
         this.playerId = generateId();
@@ -50,20 +71,11 @@ Hackatron.Game.prototype = {
         this.map = this.add.tilemap('tilesetMap');
         this.map.addTilesetImage('tileset', 'tilesetImage');
 
-        var mapData = this.map.layers[0].data;
+        this.mapData = this.map.layers[0].data;
 
         this.layer = this.map.createLayer('Base');
         this.layer.resizeWorld();
         var Keyboard = Phaser.Keyboard;
-
-        var portal = new Portal();
-        portal.init(this.game, mapData);
-        this.portal = portal;
-
-        // setInterval(function() {
-        //     var portal = new Portal();
-        //     portal.init(this.game, mapData);
-        // }.bind(this), 2000);
 
         // Collision
         this.game.physics.arcade.enable(this.layer);
@@ -126,10 +138,27 @@ Hackatron.Game.prototype = {
         this.currentGhostYtile = 0;
 
         this.ai = new AI();
-        this.ai.init(mapData);
+        this.ai.init(this.mapData);
 
         this.fullscreenKey = this.game.input.keyboard.addKey(Phaser.Keyboard.F);
         this.fullscreenKey.onDown.add(this.toggleFullscreen, this);
+
+        this.powerups = [];
+        this.powerupPlugins = ['speedBoost', 'portal', 'ghostMode', 'saiyanMode'];
+
+        setInterval(function() {
+            this.powerups = this.powerups.filter(function(powerup) {
+                if (!powerup.ended) {
+                    return powerup;
+                }
+            });
+
+            var randomPlugin = this.powerupPlugins[this.game.rnd.integerInRange(0, this.powerupPlugins.length-1)];
+            var powerup = new Powerup();
+            powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.mapData, player: this.player});
+
+            this.powerups.push(powerup);
+        }.bind(this), 2000);
     },
 
     update: function() {
@@ -152,10 +181,6 @@ Hackatron.Game.prototype = {
             // self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
 
-        var portalTransition = function() {
-            self.player.teleport(self.portal.exitPortal);
-        }
-
         var ghostDirection = self.enemy.updatePos();
         var playerDirection = self.player.updatePos();
         var block = self.player.triggerAttack(self.blockList);
@@ -172,8 +197,12 @@ Hackatron.Game.prototype = {
         // Check for collisions
         self.game.physics.arcade.collide(self.player.sprite, self.layer);
         self.game.physics.arcade.collide(self.enemy.sprite, self.layer);
-        self.game.physics.arcade.overlap(self.player.sprite, this.portal.entryPortal,portalTransition, null, self.game);
         self.game.physics.arcade.overlap(self.enemy.sprite, self.player.sprite, collisionHandler, null, self.game);
+
+        self.powerups.forEach(function(powerup) {
+            powerup.update();
+        });
+
         self.blockList.forEach(function(block) {
             console.log(block);
             self.game.physics.arcade.collide(self.player.sprite, block);

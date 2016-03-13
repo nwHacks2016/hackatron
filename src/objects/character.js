@@ -6,21 +6,7 @@ Character.prototype.init = function(params) {
     this.game = params.game;
     this.speed = params.speed;
     this.sprite = this.game.add.sprite(params.x, params.y, params.characterKey);
-    this.buffs = [];
     this._initSprite(params);
-
-    setInterval(function() {
-        this.buffs = this.buffs.filter(function(buff) {
-            if (!buff.ended) {
-                return buff;
-            }
-        });
-
-        var buff = new Buff();
-        buff.init({handler: Buff.plugins.speedBoost, character: this});
-
-        this.buffs.push(buff);
-    }.bind(this), 5000);
 };
 
 // Method for registering hardware keys to a given sprite
