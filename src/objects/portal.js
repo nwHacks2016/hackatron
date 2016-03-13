@@ -8,13 +8,14 @@ Portal.prototype.constructor = Portal;
 Portal.prototype.init = function(game, data) {
     this.data = data;
     this.game = game;
-    console.log(data);
+
+    //console.log("data: ", data);
 
     var entryPortalCoord = this.getValidCoord();
     var exitPortalCoord = this.getValidCoord();
 
-    console.log("entry x: " + entryPortalCoord.x * 16 + "\ny: " + entryPortalCoord.y * 16);
-    console.log("exit x: " + exitPortalCoord.x * 16 + "\ny: " + exitPortalCoord.y * 16);
+    //console.log("entry x: " + entryPortalCoord.x * 16 + "\ny: " + entryPortalCoord.y * 16);
+    //console.log("exit x: " + exitPortalCoord.x * 16 + "\ny: " + exitPortalCoord.y * 16);
 
     this.entryPortal = this.game.add.sprite(entryPortalCoord.x * 16, entryPortalCoord.y * 16, "poop");
     this.exitPortal = this.game.add.sprite(exitPortalCoord.x * 16, exitPortalCoord.y * 16, "blueball");
@@ -40,14 +41,14 @@ Portal.prototype.getValidCoord = function(x, y) {
         // data goes top to down and left to right
         var cell = this.data[y * 32 + x];
 
-        console.log(cell);
+        //console.log(cell);
 
         if (cell === 0) {
             coord = {x: x, y: y};
         }
     }
 
-    console.log(coord);
+    //console.log(coord);
 
     return coord;
 }
