@@ -48,13 +48,16 @@ Hackatron.Game.prototype = {
         // Create the map
         var jsonfile = this.cache.getJSON('JSONobj');
         var data = jsonfile.layers[0].data;
-        this.pelletHelper(data);
+        // this.pelletHelper(data);
         this.map = this.add.tilemap('map');
         this.map.addTilesetImage('Wall', 'tiles');
         this.layer = this.map.createLayer('Tile Layer 1');
         this.layer.resizeWorld();
         var Keyboard = Phaser.Keyboard;
 
+        var portal = new Portal();
+        portal.init(this.game, data);
+        this.portal = portal;
         // Collision
         this.game.physics.arcade.enable(this.layer);
         this.map.setCollision([18, 52, 53, 54, 88, 89]);
@@ -142,6 +145,10 @@ Hackatron.Game.prototype = {
             // self.game.time.events.add(Phaser.Timer.SECOND * 2, rebootGhost, this);
         };
 
+        var portalTransition = function() {
+            self.player.teleport(self.portal.exitPortal);
+        }
+
         var ghostDirection = self.enemy.updatePos();
         var playerDirection = self.player.updatePos();
         var block = self.player.triggerAttack(self.blockList);
@@ -158,6 +165,7 @@ Hackatron.Game.prototype = {
         // Check for collisions
         self.game.physics.arcade.collide(self.player.sprite, self.layer);
         self.game.physics.arcade.collide(self.enemy.sprite, self.layer);
+        self.game.physics.arcade.overlap(self.player.sprite, this.portal.entryPortal,portalTransition, null, self.game);
         self.game.physics.arcade.overlap(self.enemy.sprite, self.player.sprite, collisionHandler, null, self.game);
         self.blockList.forEach(function(block) {
             console.log(block);

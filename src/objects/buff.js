@@ -45,12 +45,12 @@ Buff.plugins.ghostMode = function() {
 Buff.plugins.speedBoost = function() {
     return {
         start: function() {
-            console.log('Buff START: Speed boost');
+            // console.log('Buff START: Speed boost');
             this.character.speed *= 2;
         },
 
         stop: function() {
-            console.log('Buff STOP: Speed boost');
+            // console.log('Buff STOP: Speed boost');
             this.character.speed /= 2;
             this.ended = true;
         }
