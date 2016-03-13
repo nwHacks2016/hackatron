@@ -1,5 +1,4 @@
 Hackatron = {
-    score: 0
 };
 
 Hackatron.Game = function(game) {
@@ -101,10 +100,6 @@ Hackatron.Game.prototype = {
             enemy.init(enemyParams);
             this.enemy = enemy;
         }
-
-        // Add score text
-        this.scoreText = this.add.text(this.world.width - 128, 0, 'Score: 0');
-        this.scoreText.addColor('White', 0);
 
         this.currentPlayerXtile = 0;
         this.currentPlayerYtile = 0;
