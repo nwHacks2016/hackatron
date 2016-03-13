@@ -18,7 +18,7 @@ Buff.prototype.init = function(params) {
 
 Buff.plugins = {};
 
-Buff.plugins.phaseMode = function() {
+Buff.plugins.saiyanMode = function() {
     return {
         start: function() {
             console.log('Buff START: Phase mode');

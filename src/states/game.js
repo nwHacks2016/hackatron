@@ -228,7 +228,7 @@ Hackatron.Game.prototype = {
                     y: playerPos.posY
                 };
                 player.init(playerParams);
-                player.setName(self, 'clientInfo.playerId.substring(0,2)');
+                player.setName(self, clientInfo.playerId.substring(0,2));
                 self.playerList[clientInfo.playerId] = {'player': player};
             } else {
                 player = self.playerList[clientInfo.playerId].player;
