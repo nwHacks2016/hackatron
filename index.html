@@ -44,17 +44,19 @@
     window.onload = function () {
         Hackatron.game = new Phaser.Game(512, 512, Phaser.CANVAS, 'game');
         // Zelda
-        Hackatron.mapConfig = {
-          tilesetFilename: 'tileset2',
-          tilesetKey: 'Top',
-          floorTile: 2041
-        };
-        // Tron
         // Hackatron.mapConfig = {
-        //   tilesetFilename: 'tileset',
-        //   tilesetKey: 'tileset',
-        //   floorTile: -1
+        //   tilesetMapFilename: 'tileset2',
+        //   tilesetImageFilename: 'tileset2',
+        //   tilesetKey: 'Top',
+        //   floorTile: 2041
         // };
+        // Tron
+        Hackatron.mapConfig = {
+          tilesetMapFilename: 'tileset',
+          tilesetImageFilename: 'single-tile',
+          tilesetKey: 'aaaa222',
+          floorTile: 1081
+        };
 
         Hackatron.game.state.add('Preload', Hackatron.Preload);
         Hackatron.game.state.add('MainMenu', Hackatron.MainMenu);
