@@ -24,6 +24,8 @@ Hackatron.Preload.prototype= {
         this.load.image('poop', baseURL + 'poop.png');
         this.load.spritesheet('countdown', baseURL + 'countdown.png', 29, 27, 3);
         this.load.spritesheet('glitch', baseURL + 'glitch-block.png', 32, 32, 3);
+        this.load.spritesheet('speedBoost', baseURL + 'speed-buff.png', 32, 32, 6);
+        this.load.spritesheet('saiyanMode', baseURL + 'saiyan-buff.png', 32, 32, 7);
         this.load.image('tilesetImage', baseURL + Hackatron.mapConfig.tilesetImageFilename + '.png');
         this.load.tilemap('tilesetMap', baseURL + Hackatron.mapConfig.tilesetMapFilename + '.json', null, Phaser.Tilemap.TILED_JSON);
         this.load.spritesheet('ghost', baseURL + 'ghost.png', 32, 32, 12);

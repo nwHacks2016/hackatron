@@ -42,10 +42,11 @@ Powerup.plugins.saiyanMode = function() {
                 };
             }
 
-            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, this.game.add.bitmapData(16, 16));
-            this.sprite.key.copyRect('powerups', getRect(1, 1), 0, 0);
-            this.sprite.scale.x = 1.2;
-            this.sprite.scale.y = 1.2;
+            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, 'saiyanMode');
+            this.sprite.animations.add('buffLoop', [0,1,2,3,4,5,6], 6, true, true);
+            this.sprite.animations.play('buffLoop');
+            this.sprite.scale.x = 0.8;
+            this.sprite.scale.y = 0.8;
             this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
 
             setTimeout(this.destroy, 15000);
@@ -73,6 +74,10 @@ Powerup.plugins.saiyanMode = function() {
             this.finished = true;
             this.sprite.destroy();
             console.log('Powerup STOP: Phase mode');
+        },
+        
+        destroy: function() {
+            this.sprite.destroy();
         }
     };
 };
@@ -257,10 +262,11 @@ Powerup.plugins.speedBoost = function() {
                 };
             }
 
-            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, this.game.add.bitmapData(16, 16));
-            this.sprite.key.copyRect('powerups', getRect(6, 2), 0, 0);
-            this.sprite.scale.x = 1.2;
-            this.sprite.scale.y = 1.2;
+            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, 'speedBoost');
+            this.sprite.animations.add('buffLoop', [0,1,2,3,4,5], 6, true, true);
+            this.sprite.animations.play('buffLoop');
+            this.sprite.scale.x = 0.8;
+            this.sprite.scale.y = 0.8;
             this.game.add.tween(this.sprite).to({alpha: 0}, 15000, 'Linear', true, 0, -1);
             this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
 

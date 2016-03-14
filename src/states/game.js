@@ -12,6 +12,7 @@ Hackatron.Game = function(game) {
 
 var PLAYER_SPEED = 200;
 var UPDATE_INTERVAL = 100;
+var POWERUP_SPAWN_INTERVAL = 1000;
 
 function generateId() {
   function s4() {
@@ -250,7 +251,7 @@ Hackatron.Game.prototype = {
             this.powerups.push([]);
         }
 
-        this.powerupPlugins = ['speedBoost', 'portal', 'reverseMode', 'invincibleMode', 'rageMode']; // 'ghostMode', 'saiyanMode'];
+        this.powerupPlugins = ['speedBoost', 'portal', 'reverseMode', 'invincibleMode', 'rageMode', 'saiyanMode']; // 'ghostMode', 'saiyanMode'];
 
         setInterval(function() {
             this.powerups.forEach(function(row) {
@@ -276,7 +277,7 @@ Hackatron.Game.prototype = {
             this.powerups[powerup.state.coord.x][powerup.state.coord.y] = powerup;
 
             this.addEvent({key: 'powerupSpawned', info: {plugin: randomPlugin, state: powerup.state}});
-        }.bind(this), 1000);
+        }.bind(this), POWERUP_SPAWN_INTERVAL);
     },
 
     // TODO: causing some errors, not sure why
