@@ -49,12 +49,14 @@ Tron.prototype.triggerAttack = function(blockList) {
     if (this.sprite.attKey.isDown && this.blocks > 0) {
         self.blocks--;
         if (self.blocks < 0) self.blocks = 0;
-        var block = this.game.add.sprite(this.sprite.x, this.sprite.y, this.game.add.bitmapData(16, 16));
-        block.key.copyRect('powerups', getRect(5, 4), 0, 0);
+        var offsetY = -10;
+        var block = this.game.add.sprite(this.sprite.x, this.sprite.y + offsetY, 'glitch');
+        block.animations.add('glitchLoop', [0,1,2], 12, true, true);
+        block.animations.play('glitchLoop');
         this.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
         block.body.immovable = true;
-        block.scale.x = 2;
-        block.scale.y = 2;
+        block.scale.x = 1.25;
+        block.scale.y = 1.25;
         blockList.push(block);
 
         // makes block fade away within a 2.0 seconds

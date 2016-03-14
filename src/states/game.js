@@ -550,7 +550,6 @@ Hackatron.Game.prototype = {
             }
         // Method for handling received deaths of other clients
         } else if (event.key === 'tronKilled') {
-            // var player = self.playerList[event.info.killedTronId].player;
             var player = self.getPlayerById(event.info.killedTronId);
             self.enemy.updatePoints(player.points);
             player.sprite.emitter.destroy();
@@ -580,11 +579,13 @@ Hackatron.Game.prototype = {
             }
         // Method for handling spawned blocks by other players
         } else if (event.key === 'blockSpawned') {
-            var block = self.game.add.sprite(event.info.x, event.info.y, self.game.add.bitmapData(16, 16));
-            block.key.copyRect('powerups', getRect(5, 4), 0, 0);
+            var block = self.game.add.sprite(event.info.x, event.info.y, 'glitch');
+            // block.key.copyRect('powerups', getRect(5, 4), 0, 0);
             self.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
-            block.scale.x = 2.0;
-            block.scale.y = 2.0;
+            block.animations.add('glitchLoop', [0,1,2], 12, true, true);
+            block.animations.play('glitchLoop');
+            block.scale.x = 1.25;
+            block.scale.y = 1.25;
             block.body.immovable = true;
 
             // Make block fade in 2.0 seconds

@@ -23,6 +23,7 @@ Hackatron.Preload.prototype= {
         this.load.image('pellet', baseURL + 'pellet.png');
         this.load.image('poop', baseURL + 'poop.png');
         this.load.spritesheet('countdown', baseURL + 'countdown.png', 29, 27, 3);
+        this.load.spritesheet('glitch', baseURL + 'glitch-block.png', 32, 32, 3);
         this.load.image('tilesetImage', baseURL + Hackatron.mapConfig.tilesetImageFilename + '.png');
         this.load.tilemap('tilesetMap', baseURL + Hackatron.mapConfig.tilesetMapFilename + '.json', null, Phaser.Tilemap.TILED_JSON);
         this.load.spritesheet('ghost', baseURL + 'ghost.png', 32, 32, 12);
