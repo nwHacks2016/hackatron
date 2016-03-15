@@ -33,7 +33,7 @@ Hackatron.Game.prototype = {
             var x = this.game.rnd.integerInRange(0, 31);
             var y = this.game.rnd.integerInRange(0, 31);
             // mapData goes top to down and left to right
-            var cell = this.mapData[y][x].index;
+            var cell = this.map.data[y][x].index;
 
             //console.log(cell);
 
@@ -135,7 +135,7 @@ Hackatron.Game.prototype = {
 
     runAiSystem: function() {
         this.ai = new AI();
-        this.ai.init(this.game, this.player, this.enemy, this.mapData);
+        this.ai.init({game: this.game, player: this.player, enemy: this.enemy, map: this.map});
     },
 
     runEnemySystem: function() {
@@ -183,33 +183,8 @@ Hackatron.Game.prototype = {
     },
 
     initMap: function() {
-        this.map = this.add.tilemap('tilesetMap');
-        this.map.addTilesetImage(Hackatron.mapConfig.tilesetKey, 'tilesetImage');
-
-        this.mapData = this.map.layers[0].data;
-
-        this.layer = this.map.createLayer('Base');
-        this.layer.resizeWorld();
-
-        // Collision
-        //this.game.physics.arcade.enable(this.layer);
-
-        var nonGroundTilesMap = {};
-        var nonGroundTiles = [];
-
-        this.mapData.forEach(function(column) {
-            column.forEach(function(cell) {
-                if (cell.index !== Hackatron.mapConfig.floorTile) {
-                    nonGroundTilesMap[cell.index] = true;
-                }
-            });
-        });
-
-        for (index in nonGroundTilesMap) {
-            nonGroundTiles.push(parseInt(index));
-        }
-
-        this.map.setCollision(nonGroundTiles);
+        this.map = new Map2D();
+        this.map.init({game: this.game, player: this.player, enemy: this.enemy});
     },
 
     initCountdown: function() {
@@ -255,7 +230,7 @@ Hackatron.Game.prototype = {
             var onStarted = function() {
                 self.addEvent({key: 'foundPowerup', info: {state: powerup.state, playerId: self.player.id}});
             };
-            powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.mapData, player: this.player, onStarted: onStarted});
+            powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.map, player: this.player, onStarted: onStarted});
 
             this.powerups[powerup.state.coord.x][powerup.state.coord.y] = powerup;
 
@@ -347,9 +322,9 @@ Hackatron.Game.prototype = {
             self.blocks.push(block);
         }
 
-        self.game.physics.arcade.collide(self.player.character.sprite, self.layer);
+        self.game.physics.arcade.collide(self.player.character.sprite, self.map.layer);
         if (self.enemy) {
-            self.game.physics.arcade.collide(self.enemy.character.sprite, self.layer);
+            self.game.physics.arcade.collide(self.enemy.character.sprite, self.map.layer);
             self.game.physics.arcade.overlap(self.enemy.character.sprite, self.player.character.sprite, collisionHandler, null, self.game);
         }
 
@@ -424,7 +399,7 @@ Hackatron.Game.prototype = {
 
         self.players[playerId] = player;
 
-        self.game.physics.arcade.collide(player.character.sprite, self.layer);
+        self.game.physics.arcade.collide(player.character.sprite, self.map.layer);
         self.game.physics.arcade.collide(player.character.sprite, self.player.character.sprite, null, null, self.game);
 
         return self.players[playerId];
@@ -555,7 +530,7 @@ Hackatron.Game.prototype = {
             var onStarted = function() {
                 self.addEvent({key: 'foundPowerup', info: {playerId: self.player.id, state: powerup.state}});
             };
-            powerup.init({handler: Powerup.plugins[event.info.plugin], game: self.game, map: self.mapData, player: self.player, state: event.info.state, onStarted: onStarted});
+            powerup.init({handler: Powerup.plugins[event.info.plugin], game: self.game, map: self.map, player: self.player, state: event.info.state, onStarted: onStarted});
 
             self.powerups[powerup.state.coord.x][powerup.state.coord.y] = powerup;
         // Method for handling spawned blocks by other players
