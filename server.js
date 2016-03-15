@@ -12,66 +12,92 @@ app.use(express.static(__dirname));
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
 var clients = [];
-var hostClientId = null;
+var host = null;
 
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+var setHost = function(client) {
+    console.log('Setting host to player: ' + client.player.id);
+    host = client;
+};
+
 var findNewHost = function() {
     if (clients.length > 0) {
-        hostClientId = getRandomInt(0, clients.length-1);
+        var i = getRandomInt(0, clients.length-1);
+        var client = clients[i];
 
         // Make sure client had time to initialize the player
-        if (clients[hostClientId]) {
-            var playerId = clients[hostClientId].playerId;
-            console.log('New host: ' + playerId);
-            io.sockets.emit('setHost', JSON.stringify({playerId: playerId}));
+        if (client) {
+            setHost(client);
+
+            console.log('New host: ' + host.player.id);
+            io.sockets.emit('setHost', {player: host.player});
         }
     }
 };
 
+var getClientHost = function() {
+    if (!clients.length) { return; }
+    return clients.reduce(function(previousClient, currentClient) { if (previousClient.player.id === host.player.id) { return previousClient; } else if (currentClient.player.id === host.player.id) { return currentClient; }});
+};
+
+var findClientBySocket = function(socket) {
+    if (!clients.length) { return; }
+    return clients.reduce(function(previousClient, currentClient) { if (previousClient.socket === socket) { return previousClient; } else if (currentClient.socket === socket) { return currentClient; }});
+};
+
+var addClient = function(client) {
+    console.log('Adding player: ' + client.player.id);
+    clients.push(client);
+};
+
+var removeClient = function(client) {
+    console.log('Removing player: ' + client.player.id);
+
+    clients.splice(clients.indexOf(client), 1);
+};
+
 // Monitor the clients to make sure they are still defined
-setTimeout(function() {
-    if (!clients[hostClientId]) {
-        hostClientId = null;
-        findNewHost();
+var monitorHost = function() {
+    if (host) {
+        //console.log('Host: ', host.player.id);
     } else {
-        console.log(clients[hostClientId].playerId);
+        findNewHost();
     }
-}, 40);
+
+    setTimeout(monitorHost, 100);
+};
+
+setTimeout(monitorHost, 100);
 
 var parseEvent = function(socket, event) {
     if (event.key === 'newPlayer') {
-        socket.playerId = event.info.id;
-        clients.push(socket);
+        console.log('Handshaking...');
 
-        console.log('New player: ' + event.info.id);
+        addClient({socket: socket, player: event.info.player});
 
-        // If it's the first client, then lets set it as the new host
-        if (hostClientId === null) {
-            hostClientId = 0;
-            console.log('New host: ' + clients[hostClientId].playerId);
+        // If it's the first client or there's no hosts, lets set it as the new host
+        if (!host) {
+            setHost(clients[clients.length-1]);
+            console.log('New host: ' + host.player.id);
         }
 
-        if (!clients[hostClientId]) {
-            hostClientId = null;
-            findNewHost();
-        }
-
-        socket.emit('setHost', {playerId: clients[hostClientId].playerId});
-        //socket.broadcast.emit('newPlayer', event.info);
+        socket.emit('setHost', {player: host.player});
     } else {
         //socket.broadcast.emit(event.key, event.info);
     }
 };
 
 io.sockets.on('connection', function(socket) {
-    console.log('New client');
+    console.log('New connection.. waiting for handshake');
+
+    // TODO: give them 10 seconds to identify as a newPlayer, or cut them off
 
     socket.on('events', function(data) {
-        console.log('Incoming events: ' + data);
+        //console.log('Incoming events: ' + data);
         data = JSON.parse(data);
 
         data.events.forEach(function(event) { parseEvent(socket, event); });
@@ -80,23 +106,29 @@ io.sockets.on('connection', function(socket) {
     });
 
     socket.on('disconnect', function() {
-        var clientId = clients.indexOf(socket);
-        clients.splice(clientId, 1);
-        console.log('aaaa', clientId);
+        var client = findClientBySocket(socket);
+
+        if (!client) { return; }
+
+        removeClient(client);
+
+        console.log('player left', client.player.id);
 
         // If this client was the host,
         // and there's at least one more client connected,
         // lets choose a new random host,
         // and broadcast it to everybody
-        if (clientId === hostClientId) {
-            hostClientId = null;
+        if (client.player.id === host.player.id) {
+            host = null;
             findNewHost();
         }
+
+        io.sockets.emit('removePlayer', {player: client.player});
     });
 });
 
-console.log('\nOpen localhost:8080 on your browser.');
-console.log('.\n.\n.');
+monitorHost();
+console.log('Open localhost:8080 on your browser.');
 console.log('Listening...');
 
 server.listen(process.env.PORT || 8080);

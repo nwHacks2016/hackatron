@@ -77,17 +77,14 @@ Hackatron.Game.prototype = {
 
         // Send player position every 50ms
         setInterval(function() {
-            var playerDirection = self.player.character.updatePos();
+            self.player.character.updatePos();
 
             if (!self.player.character.dirty) { return; }
 
             var info = {
                 id: self.player.id,
-                position: {
-                    x: Math.floor(self.player.character.sprite.x),
-                    y: Math.floor(self.player.character.sprite.y),
-                    direction: playerDirection
-                }
+                position: self.player.character.position,
+                direction: self.player.character.direction
             };
 
             // Don't send an event if its the same as last time
@@ -105,18 +102,15 @@ Hackatron.Game.prototype = {
         // Send enemy position every 50ms
         setInterval(function() {
             if (self.player.id === self.hostId) {
-                var direction = self.enemy.character.updatePos();
+                self.enemy.character.updatePos();
 
                 if (!self.enemy.character.dirty) { return; }
 
                 self.enemy.character.dirty = false;
 
                 var info = {
-                    position: {
-                        x: self.enemy.character.sprite.x,
-                        y: self.enemy.character.sprite.y,
-                        direction: direction
-                    }
+                    position: self.enemy.character.position,
+                    direction: self.enemy.character.direction
                 };
 
                 self.addEvent({key: 'updateEnemy', info: info});
@@ -147,8 +141,10 @@ Hackatron.Game.prototype = {
             this.enemy.init({
                 game: this.game,
                 speed: PLAYER_SPEED,
-                x: coord.x * 16,
-                y: coord.y * 16,
+                position: {
+                    x: coord.x * 16,
+                    y: coord.y * 16
+                },
                 keys: {
                     up: Phaser.Keyboard.W,
                     down: Phaser.Keyboard.S,
@@ -167,8 +163,10 @@ Hackatron.Game.prototype = {
             game: this.game,
             name: Hackatron.playerName,
             speed: PLAYER_SPEED,
-            x: coord.x * 16,
-            y: coord.y * 16,
+            position: {
+                x: coord.x * 16,
+                y: coord.y * 16
+            },
             keys: {
                 up: Phaser.Keyboard.UP,
                 down: Phaser.Keyboard.DOWN,
@@ -228,7 +226,7 @@ Hackatron.Game.prototype = {
             var randomPlugin = this.powerupPlugins[this.game.rnd.integerInRange(0, this.powerupPlugins.length-1)];
             var powerup = new Powerup();
             var onStarted = function() {
-                self.addEvent({key: 'foundPowerup', info: {state: powerup.state, playerId: self.player.id}});
+                self.addEvent({key: 'foundPowerup', info: {state: powerup.state, player: {id: self.player.id}}});
             };
             powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.map, player: this.player, onStarted: onStarted});
 
@@ -303,7 +301,7 @@ Hackatron.Game.prototype = {
             }
 
             self.addEvent({key: 'playerKilled', info: {
-                playerId: self.player.id
+                player: {id: self.player.id}
             }});
 
             if (self.ai) {
@@ -380,12 +378,11 @@ Hackatron.Game.prototype = {
         }
     },
     getPlayerById: function(playerId) {
-        var self = this;
-        if (playerId == self.player.id) {
-            return self.player;
+        if (playerId == this.player.id) {
+            return this.player;
         }
-        if (self.players[playerId]) {
-            return self.players[playerId];
+        if (this.players[playerId]) {
+            return this.players[playerId];
         }
 
         var player = new Player();
@@ -393,16 +390,16 @@ Hackatron.Game.prototype = {
         player.init({
             id: playerId,
             name: playerId.substring(0, 2),
-            game: self.game,
+            game: this.game,
             speed: PLAYER_SPEED
         });
 
-        self.players[playerId] = player;
+        this.players[playerId] = player;
 
-        self.game.physics.arcade.collide(player.character.sprite, self.map.layer);
-        self.game.physics.arcade.collide(player.character.sprite, self.player.character.sprite, null, null, self.game);
+        this.game.physics.arcade.collide(player.character.sprite, this.map.layer);
+        this.game.physics.arcade.collide(player.character.sprite, this.player.character.sprite, null, null, this.game);
 
-        return self.players[playerId];
+        return player;
     },
 
 // ============================================================================
@@ -415,7 +412,7 @@ Hackatron.Game.prototype = {
         // Method for updating board local client game state using info
         // broadcasted to all players. The info variable contains the
         // following keys:
-        // {playerId, playersPos: {x, y, direction}, position: {x, y}}
+        // {player: {id: 1}, position: {x, y}, direction: 'walkRight'}
         if (event.key === 'updatePlayer') {
             var id = event.info.id;
             var position = event.info.position;
@@ -424,18 +421,16 @@ Hackatron.Game.prototype = {
             if (event.info.id === self.player.id) { return; }
 
             var player = self.getPlayerById(id);
-
-            player.character.sprite.x = position.x;
-            player.character.sprite.y = position.y;
+            player.character.position = position;
 
             // disable animations for now - lag?
             // if (player.character.sprite.body) {
             //     player.character.sprite.body.velocity.x = 0;
             //     player.character.sprite.body.velocity.y = 0;
-            //     player.character.sprite.animations.play(position.direction, 3, false);
+            //     player.character.sprite.animations.play(direction, 3, false);
             //     player.character.sprite.emitter.on = true;
 
-            //     switch(position.direction) {
+            //     switch(direction) {
             //         case 'walkUp':
             //             // player.character.sprite.body.velocity.y = -PLAYER_SPEED;
             //             player.character.sprite.emitter.x = player.character.sprite.x + 15;
@@ -472,12 +467,10 @@ Hackatron.Game.prototype = {
                     self.enemy.init({
                         game: self.game,
                         speed: PLAYER_SPEED,
-                        x: event.info.position.x,
-                        y: event.info.position.y
+                        position: event.info.position
                     });
                 } else {
-                    self.enemy.character.sprite.x = event.info.position.x;
-                    self.enemy.character.sprite.y = event.info.position.y;
+                    self.enemy.character.position = event.info.position;
                 }
             }
         // When new player joins, host shall send them data about the 'position'
@@ -490,28 +483,30 @@ Hackatron.Game.prototype = {
                     players.push({
                         id: player.id,
                         name: player.name,
-                        x: player.character.sprite.x,
-                        y: player.character.sprite.y
+                        position: player.character.position
                     });
                 }
 
                 var powerups = [];
 
                 var gameData = {
-                    playerId: event.info.playerId,
-                    enemy: {
-                        x: self.enemy.character.sprite.x,
-                        y: self.enemy.character.sprite.y
-                    },
+                    player: {id: event.info.player.id},
+                    enemy: {position: self.enemy.character.position},
                     powerups: powerups,
                     players: players
                 };
 
                 self.addEvent({key: 'welcomePlayer', info: gameData});
             }
+
+            var player = self.getPlayerById(event.info.player.id);
+            player.name = event.info.player.name;
+            player.character.position = event.info.player.position;
+
+            console.log(event.info.player.id + ' has joined the game!');
         // Set up game state as a new player receiving game data from host
         } else if (event.key === 'welcomePlayer') {
-            if (self.player.id === event.info.playerId) {
+            if (self.player.id === event.info.player.id) {
                 // Setup players
                 // Setup powerups
                 // Setup enemy 
@@ -520,15 +515,23 @@ Hackatron.Game.prototype = {
 
         // Method for handling received deaths of other clients
         } else if (event.key === 'playerKilled') {
-            var player = self.getPlayerById(event.info.playerId);
+            var player = self.getPlayerById(event.info.player.id);
             self.enemy.addPoints(player.points);
             player.kill();
+        // Method for handling player leaves
+        } else if (event.key === 'removePlayer') {
+            if (self.players[event.info.player.id]) {
+                var player = self.players[event.info.player.id];
+                player.kill();
+
+                delete self.players[event.info.player.id];
+            }
         // Method for handling spawned power ups by the host
         } else if (event.key === 'powerupSpawned') {
             // TODO: we already do this above, refactor it out
             var powerup = new Powerup();
             var onStarted = function() {
-                self.addEvent({key: 'foundPowerup', info: {playerId: self.player.id, state: powerup.state}});
+                self.addEvent({key: 'foundPowerup', info: {player: {id: self.player.id}, state: powerup.state}});
             };
             powerup.init({handler: Powerup.plugins[event.info.plugin], game: self.game, map: self.map, player: self.player, state: event.info.state, onStarted: onStarted});
 
@@ -540,7 +543,7 @@ Hackatron.Game.prototype = {
 
             if (powerup) {
                 self.powerups[event.info.state.coord.x][event.info.state.coord.y] = null;
-                powerup.player = self.getPlayerById(event.info.playerId);
+                powerup.player = self.getPlayerById(event.info.player.id);
                 powerup.start();
             }
         // Method for handling spawned blocks by other players
@@ -566,7 +569,7 @@ Hackatron.Game.prototype = {
                 block.destroy();
             }, 2000);
         } else if (event.key === 'setHost') {
-            self.hostId = event.info.playerId;
+            self.hostId = event.info.player.id;
 
             // If this player is the new host, lets set them up
             if (self.hostId === self.player.id) {
@@ -590,6 +593,7 @@ Hackatron.Game.prototype = {
         ['updatePlayer',
          'updateEnemy',
          'newPlayer',
+         'removePlayer',
          'welcomePlayer',
          'playerKilled',
          'powerupSpawned',
@@ -604,8 +608,11 @@ Hackatron.Game.prototype = {
     // joined the game
     joinGame: function () {
         this.addEvent({key: 'newPlayer', info: {
-            id: this.player.id,
-            message: this.player.id + ' has joined the game!'
+            player: {
+                id: this.player.id,
+                name: this.player.name,
+                position: this.player.character.position
+            }
         }});
     }
 };

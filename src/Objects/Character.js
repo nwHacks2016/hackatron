@@ -18,7 +18,13 @@ Character.prototype.init = function(params) {
     this.points = 0;
     this.game = params.game;
     this.speed = params.speed;
-    this.sprite = this.game.add.sprite(params.x, params.y, params.characterKey);
+
+    if (params.position) {
+        this.position = params.position;
+    } else {
+        this.position = {x: 0, y: 0};
+    }
+
     this._initSprite(params);
 };
 
@@ -43,13 +49,16 @@ Character.prototype.kill = function() {
 };
 
 Character.prototype._initSprite = function(params) {
-    var width = 32;
-    var height = 32;
+    var width = 32; // temp
+    var height = 32; // temp
     var padding = 0.35; // 35% padding
-    this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
-    this.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
+
+    this.sprite = this.game.add.sprite(this.position.x, this.position.y, params.characterKey);
     this.sprite.scale.x = 0.8;
     this.sprite.scale.y = 0.8;
+
+    this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
+    this.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
 
     this._addAnimationsToSprite(this.sprite);
 
@@ -100,7 +109,7 @@ Character.prototype.updatePos = function() {
             this.sprite.y = 16;
         }
         this.dirty = true;
-        return 'walkUp';
+        this.direction = 'walkUp';
     } else if (this.sprite.downKey.isDown) {
         this.sprite.animations.play('walkDown', 3, false);
         this.sprite.body.velocity.y = this.speed;
@@ -110,7 +119,7 @@ Character.prototype.updatePos = function() {
             this.sprite.y = this.game.world.height - 16;
         }
         this.dirty = true;
-        return 'walkDown';
+        this.direction = 'walkDown';
     } else if (this.sprite.leftKey.isDown) {
         this.sprite.animations.play('walkLeft', 3, false);
         this.sprite.body.velocity.x = -this.speed;
@@ -120,7 +129,7 @@ Character.prototype.updatePos = function() {
             this.sprite.x = this.game.world.width;
         }
         this.dirty = true;
-        return 'walkLeft';
+        this.direction = 'walkLeft';
     } else if (this.sprite.rightKey.isDown) {
         this.sprite.animations.play('walkRight', 3, false);
         this.sprite.body.velocity.x = this.speed;
@@ -130,8 +139,23 @@ Character.prototype.updatePos = function() {
         this.sprite.emitter.x = this.sprite.x;
         this.sprite.emitter.y = this.sprite.y + 15;
         this.dirty = true;
-        return 'walkRight';
+        this.direction = 'walkRight';
     } else {
         this.sprite.emitter.on = false;
+        this.direction = null;
     }
 };
+
+Object.defineProperty(Character.prototype, 'position', {
+    get: function() {
+        if (!this.sprite) { return this._position; }
+
+        return {x: Math.floor(this.sprite.x), y: Math.floor(this.sprite.y)};
+    },
+    set: function(position) {
+        if (!this.sprite) { return this._position = position; }
+
+        this.sprite.x = Math.floor(position.x);
+        this.sprite.y = Math.floor(position.y);
+    }
+});

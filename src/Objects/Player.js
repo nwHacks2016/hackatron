@@ -2,7 +2,7 @@ var Player = function() {
 };
 
 Player.prototype.toString = function() {
-    return '[Player]';
+    return '[Player x=' + this.position.x + ' y=' + this.position.y + ']';
 };
 
 Player.prototype.init = function(params) {
