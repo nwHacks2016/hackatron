@@ -228,7 +228,10 @@ Hackatron.Game.prototype = {
             var onStarted = function() {
                 self.addEvent({key: 'foundPowerup', info: {state: powerup.state, player: {id: self.player.id}}});
             };
-            powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.map, player: this.player, onStarted: onStarted});
+            var onDestroy = function() {
+                self.powerups[powerup.state.coord.x][powerup.state.coord.y] = null;
+            };
+            powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.map, player: this.player, onStarted: onStarted, onDestroy: onDestroy});
 
             this.powerups[powerup.state.coord.x][powerup.state.coord.y] = powerup;
 
@@ -445,15 +448,7 @@ Hackatron.Game.prototype = {
             // }
         } else if (event.key === 'updateEnemy') {
             if (self.player.id !== self.hostId) {
-                if (!self.enemy) {
-                    self.enemy = new Enemy();
-
-                    self.enemy.init({
-                        game: self.game,
-                        speed: PLAYER_SPEED,
-                        position: event.info.position
-                    });
-                } else {
+                if (self.enemy) {
                     self.enemy.character.position = event.info.position;
                 }
             }
@@ -472,6 +467,18 @@ Hackatron.Game.prototype = {
                 }
 
                 var powerups = [];
+                for(row in self.powerups) {
+                    for(column in self.powerups[row]) {
+                        var powerup = self.powerups[row][column];
+
+                        if (!powerup) { continue; }
+
+                        powerups.push({
+                            handler: powerup.handler,
+                            state: powerup.state
+                        });
+                    }
+                }
 
                 var gameData = {
                     player: {id: event.info.player.id},
@@ -492,8 +499,31 @@ Hackatron.Game.prototype = {
         } else if (event.key === 'welcomePlayer') {
             if (self.player.id === event.info.player.id) {
                 // Setup players
-                // Setup powerups
+                event.info.players.forEach(function() {
+                    var player = self.getPlayerById(event.info.player.id);
+                    player.name = event.info.player.name;
+                    player.character.position = event.info.player.position;
+                });
+
                 // Setup enemy 
+                self.enemy = new Enemy();
+
+                self.enemy.init({
+                    game: self.game,
+                    speed: PLAYER_SPEED,
+                    position: event.info.enemy.position
+                });
+
+                // Setup powerups
+                event.info.powerups.forEach(function(powerupInfo) {
+                    var powerup = new Powerup();
+                    var onDestroy = function() {
+                        self.powerups[powerup.state.coord.x][powerup.state.coord.y] = null;
+                    };
+                    powerup.init({handler: Powerup.plugins[powerupInfo.handler.key], game: self.game, map: self.map, player: self.player, state: powerupInfo.state, onDestroy: onDestroy});
+
+                    self.powerups[powerup.state.coord.x][powerup.state.coord.y] = powerup;
+                });
             }
 
 
@@ -517,7 +547,10 @@ Hackatron.Game.prototype = {
             var onStarted = function() {
                 self.addEvent({key: 'foundPowerup', info: {player: {id: self.player.id}, state: powerup.state}});
             };
-            powerup.init({handler: Powerup.plugins[event.info.plugin], game: self.game, map: self.map, player: self.player, state: event.info.state, onStarted: onStarted});
+            var onDestroy = function() {
+                self.powerups[powerup.state.coord.x][powerup.state.coord.y] = null;
+            };
+            powerup.init({handler: Powerup.plugins[event.info.plugin], game: self.game, map: self.map, player: self.player, state: event.info.state, onStarted: onStarted, onDestroy: onDestroy});
 
             self.powerups[powerup.state.coord.x][powerup.state.coord.y] = powerup;
         // Method for handling spawned blocks by other players

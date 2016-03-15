@@ -23,11 +23,12 @@ Powerup.prototype.init = function(params) {
     this.state = params.state;
     this.game = params.game;
     this.player = params.player;
-    this.mapData = params.mapData;
+    this.map = params.map;
     this.handler = params.handler();
 
     // Events
     this.onStarted = params.onStarted;
+    this.onDestroy = params.onDestroy;
 
     // Plugin methods
     this.key = this.handler.key;
@@ -75,7 +76,7 @@ Powerup.plugins.saiyanMode = function() {
             if (this.claimed) { return; }
 
             this.claimed = true;
-            this.sprite.destroy();
+            this.destroy();
             setTimeout(this.stop, 4000);
 
             this.onStarted && this.onStarted();
@@ -85,12 +86,13 @@ Powerup.plugins.saiyanMode = function() {
 
         stop: function() {
             this.finished = true;
-            this.sprite.destroy();
             console.log('Powerup STOP: Phase mode');
         },
         
         destroy: function() {
             this.sprite.destroy();
+
+            this.onDestroy && this.onDestroy();
         }
     };
 };
@@ -125,7 +127,7 @@ Powerup.plugins.ghostMode = function() {
             if (this.claimed) { return; }
 
             this.claimed = true;
-            this.sprite.destroy();
+            this.destroy();
             setTimeout(this.stop, 4000);
 
             this.onStarted && this.onStarted();
@@ -140,6 +142,8 @@ Powerup.plugins.ghostMode = function() {
 
         destroy: function() {
             this.sprite.destroy();
+
+            this.onDestroy && this.onDestroy();
         }
     };
 };
@@ -176,7 +180,7 @@ Powerup.plugins.invincibleMode = function() {
             this.claimed = true;
             this.player.character.invincible = true;
             this.tween = this.game.add.tween(this.player.character.sprite).to({alpha: 0}, 400, 'Linear', true, 0, -1);
-            this.sprite.destroy();
+            this.destroy();
             setTimeout(this.stop, 4000);
 
             this.onStarted && this.onStarted();
@@ -194,6 +198,8 @@ Powerup.plugins.invincibleMode = function() {
 
         destroy: function() {
             this.sprite.destroy();
+
+            this.onDestroy && this.onDestroy();
         }
     };
 };
@@ -234,7 +240,7 @@ Powerup.plugins.rageMode = function() {
             this.player.character.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
             this.player.character.sprite.scale.x = 1.5;
             this.player.character.sprite.scale.y = 1.5;
-            this.sprite.destroy();
+            this.destroy();
             setTimeout(this.stop, 4000);
 
             this.onStarted && this.onStarted();
@@ -256,6 +262,8 @@ Powerup.plugins.rageMode = function() {
 
         destroy: function() {
             this.sprite.destroy();
+
+            this.onDestroy && this.onDestroy();
         }
     };
 };
@@ -313,6 +321,8 @@ Powerup.plugins.speedBoost = function() {
 
         destroy: function() {
             this.sprite.destroy();
+
+            this.onDestroy && this.onDestroy();
         }
     };
 };
@@ -362,6 +372,8 @@ Powerup.plugins.reverseMode = function() {
 
         destroy: function() {
             this.sprite.destroy();
+
+            this.onDestroy && this.onDestroy();
         }
     };
 };
@@ -431,6 +443,8 @@ Powerup.plugins.portal = function() {
         destroy: function() {
             this.entryPortal.destroy();
             this.exitPortal.destroy();
+
+            this.onDestroy && this.onDestroy();
         }
     };
 };
