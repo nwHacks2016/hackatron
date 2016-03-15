@@ -13,6 +13,8 @@ var PLAYER_SPEED = 200;
 var UPDATE_INTERVAL = 100;
 var POWERUP_SPAWN_INTERVAL = 1000;
 
+var updateTimeout;
+
 Hackatron.Game.prototype = {
     preload: function() {
     },
@@ -207,7 +209,7 @@ Hackatron.Game.prototype = {
             this.powerups.push([]);
         }
 
-        this.powerupPlugins = ['speedBoost', 'portal', 'reverseMode', 'invincibleMode', 'rageMode', 'saiyanMode']; // 'ghostMode', 'saiyanMode'];
+        this.powerupHandlers = ['speedBoost', 'portal', 'reverseMode', 'invincibleMode', 'rageMode', 'saiyanMode']; // ghostMode
 
         setInterval(function() {
             this.powerups.forEach(function(row) {
@@ -223,7 +225,7 @@ Hackatron.Game.prototype = {
     runPowerUpSystem: function() {
         var self = this;
         setInterval(function() {
-            var randomPlugin = this.powerupPlugins[this.game.rnd.integerInRange(0, this.powerupPlugins.length-1)];
+            var randomHandler = this.powerupHandlers[this.game.rnd.integerInRange(0, this.powerupHandlers.length-1)];
             var powerup = new Powerup();
             var onStarted = function() {
                 self.addEvent({key: 'foundPowerup', info: {state: powerup.state, player: {id: self.player.id}}});
@@ -231,11 +233,11 @@ Hackatron.Game.prototype = {
             var onDestroy = function() {
                 self.powerups[powerup.state.coord.x][powerup.state.coord.y] = null;
             };
-            powerup.init({handler: Powerup.plugins[randomPlugin], game: this.game, map: this.map, player: this.player, onStarted: onStarted, onDestroy: onDestroy});
+            powerup.init({handler: Powerup.plugins[randomHandler], game: this.game, map: this.map, player: this.player, onStarted: onStarted, onDestroy: onDestroy});
 
             this.powerups[powerup.state.coord.x][powerup.state.coord.y] = powerup;
 
-            this.addEvent({key: 'powerupSpawned', info: {plugin: randomPlugin, state: powerup.state}});
+            this.addEvent({key: 'powerupSpawned', info: {plugin: randomHandler, state: powerup.state}});
         }.bind(this), POWERUP_SPAWN_INTERVAL);
     },
 
@@ -407,45 +409,55 @@ Hackatron.Game.prototype = {
             if (event.info.id === self.player.id) { return; }
 
             var player = self.getPlayerById(id);
-            player.character.position = position;
-            player.character.sprite.animations.play(event.info.direction, 3, false);
+            
+            //player.character.sprite.animations.play(event.info.direction, 3, false);
 
             // disable animations for now - lag?
-            // if (player.character.sprite.body) {
-            //     player.character.sprite.body.velocity.x = 0;
-            //     player.character.sprite.body.velocity.y = 0;
-            //     player.character.sprite.animations.play(direction, 3, false);
-            //     player.character.sprite.emitter.on = true;
+            if (player.character.sprite.body) {
+                clearTimeout(updateTimeout);
 
-            //     switch(direction) {
-            //         case 'walkUp':
-            //             // player.character.sprite.body.velocity.y = -PLAYER_SPEED;
-            //             player.character.sprite.emitter.x = player.character.sprite.x + 15;
-            //             player.character.sprite.emitter.y = player.character.sprite.y + 35;
-            //             break;
+                player.character.sprite.animations.play(event.info.direction, 3, false);
+                player.character.sprite.emitter.on = true;
 
-            //         case 'walkDown':
-            //             // player.character.sprite.body.velocity.y = PLAYER_SPEED;
-            //             player.character.sprite.emitter.x = player.character.sprite.x + 15;
-            //             player.character.sprite.emitter.y = player.character.sprite.y + -5;
-            //             break;
+                switch(event.info.direction) {
+                    case 'walkUp':
+                        player.character.sprite.body.velocity.x = 0;
+                        player.character.sprite.body.velocity.y = -PLAYER_SPEED;
+                        player.character.sprite.emitter.x = player.character.sprite.x + 15;
+                        player.character.sprite.emitter.y = player.character.sprite.y + 35;
+                        break;
 
-            //         case 'walkLeft':
-            //             // player.character.sprite.body.velocity.x = -PLAYER_SPEED;
-            //             player.character.sprite.emitter.x = player.character.sprite.x + 30;
-            //             player.character.sprite.emitter.y = player.character.sprite.y + 15;
-            //             break;
+                    case 'walkDown':
+                        player.character.sprite.body.velocity.x = 0;
+                        player.character.sprite.body.velocity.y = PLAYER_SPEED;
+                        player.character.sprite.emitter.x = player.character.sprite.x + 15;
+                        player.character.sprite.emitter.y = player.character.sprite.y + -5;
+                        break;
 
-            //         case 'walkRight':
-            //             // player.character.sprite.body.velocity.x = PLAYER_SPEED;
-            //             player.character.sprite.emitter.x = player.character.sprite.x;
-            //             player.character.sprite.emitter.y = player.character.sprite.y + 15;
-            //             break;
-            //        default:
-            //             player.character.sprite.emitter.on = false;
-            //             break;
-            //     }
-            // }
+                    case 'walkLeft':
+                        player.character.sprite.body.velocity.y = 0;
+                        player.character.sprite.body.velocity.x = -PLAYER_SPEED;
+                        player.character.sprite.emitter.x = player.character.sprite.x + 30;
+                        player.character.sprite.emitter.y = player.character.sprite.y + 15;
+                        break;
+
+                    case 'walkRight':
+                        player.character.sprite.body.velocity.y = 0;
+                        player.character.sprite.body.velocity.x = PLAYER_SPEED;
+                        player.character.sprite.emitter.x = player.character.sprite.x;
+                        player.character.sprite.emitter.y = player.character.sprite.y + 15;
+                        break;
+                   default:
+                        player.character.sprite.emitter.on = false;
+                        break;
+                }
+
+                updateTimeout = setTimeout(function() {
+                    player.character.position = position;
+                    player.character.sprite.body.velocity.x = 0;
+                    player.character.sprite.body.velocity.y = 0;
+                }, 200);
+            }
         } else if (event.key === 'updateEnemy') {
             if (self.player.id !== self.hostId) {
                 if (self.enemy) {
