@@ -101,4 +101,4 @@ AI.prototype.init = function(game, player, enemy, mapData) {
 
 AI.prototype.stopPathFinding = function () {
     clearInterval(this.pathFindingInterval)
-}
+};
