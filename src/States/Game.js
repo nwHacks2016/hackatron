@@ -338,23 +338,6 @@ Hackatron.Game.prototype = {
             console.log(block);
             self.game.physics.arcade.collide(self.player.character.sprite, block);
         });
-
-        // Sanitize coords
-        if (this.player.character.sprite.y < 16) {
-            this.player.character.sprite.y = 16;
-        }
-
-        if (this.player.character.sprite.y > this.game.world.height - 16) {
-            this.player.character.sprite.y = this.game.world.height - 16;
-        }
-
-        if (this.player.character.sprite.x < 0) {
-            this.player.character.sprite.x = 0;
-        }
-
-        if (this.player.character.sprite.x > this.game.world.width) {
-            this.player.character.sprite.x = 0;
-        }
     },
 
     pelletHelper: function(mapArray){
@@ -422,6 +405,7 @@ Hackatron.Game.prototype = {
 
             var player = self.getPlayerById(id);
             player.character.position = position;
+            player.character.sprite.animations.play(event.info.direction, 3, false);
 
             // disable animations for now - lag?
             // if (player.character.sprite.body) {
