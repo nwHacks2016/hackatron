@@ -1,7 +1,7 @@
 Hackatron.Lobby = function(game) {
 };
 
-Hackatron.Lobby.prototype= {
+Hackatron.Lobby.prototype = {
     preload: function() {
     },
 

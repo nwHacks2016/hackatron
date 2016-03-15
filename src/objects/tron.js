@@ -1,45 +1,23 @@
 var Tron = function() {
-    Character.call(this);
-    this.name = 'Tron';
-    this.speedBoost = 1;
-    this.points = 0;
-    this.blocks = 1;
 };
 
 Tron.prototype = new Character();
 
 Tron.prototype.constructor = Tron;
 
-Tron.prototype.init = function() {
-    Character.prototype.init.apply(this, arguments);
+Tron.prototype.toString = function() {
+    return '[Tron]';
 };
 
-Tron.prototype.updatePoints = function(points) {
-    this.points = this.points + points;
-    if(this.points < 0) {
-        this.points = 0;
-    }
+Tron.prototype.init = function(params) {
+    Character.prototype.init.apply(this, arguments);
+
+    this.blocks = 1;
 };
 
 Tron.prototype.eatPellet = function(pellet) {
-    this.updatePoints(pellet.getPoints());
+    this.addPoints(pellet.getPoints());
     pellet.eaten();
-};
-
-Tron.prototype.setName = function(game, name) {
-    var style = {
-        font: "15px Arial",
-        fill: "#ffffff",
-        align: "center",
-        backgroundColor: "#000000"
-    };
-
-    this.name = name;
-
-    this.nameText = game.add.text(0, 0, name, style);  //some reason this doesn't fellow thie spirte
-    this.nameText.anchor.set(0.5);
-
-    this.sprite.addChild(this.nameText);
 };
 
 Tron.prototype.triggerAttack = function(blockList) {
@@ -79,7 +57,7 @@ Tron.prototype.triggerAttack = function(blockList) {
     return null;
 };
 
-Tron.prototype.teleport = function(oDestination) {
-    this.sprite.x = oDestination.x;
-    this.sprite.y = oDestination.y;
+Tron.prototype.teleport = function(destination) {
+    this.sprite.x = destination.x;
+    this.sprite.y = destination.y;
 };

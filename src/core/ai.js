@@ -58,10 +58,10 @@ AI.prototype.init = function(game, player, enemy, mapData) {
     // Delayed start to give players a chance
     setTimeout(function() {
         this.pathFindingInterval = setInterval( function() {
-            var currentPlayerXtile = Math.floor(player.sprite.x / 16);
-            var currentPlayerYtile = Math.floor(player.sprite.y / 16);
-            var currentGhostXtile = Math.floor(enemy.sprite.x / 16);
-            var currentGhostYtile = Math.floor(enemy.sprite.y / 16);
+            var currentPlayerXtile = Math.floor(player.character.sprite.x / 16);
+            var currentPlayerYtile = Math.floor(player.character.sprite.y / 16);
+            var currentGhostXtile = Math.floor(enemy.character.sprite.x / 16);
+            var currentGhostYtile = Math.floor(enemy.character.sprite.y / 16);
 
              if (!currentPath) {
                 this.easystar.findPath(currentGhostXtile, currentGhostYtile, currentPlayerXtile, currentPlayerYtile, function(path) {
@@ -83,10 +83,10 @@ AI.prototype.init = function(game, player, enemy, mapData) {
             this.easystar.calculate();
 
             if (currentPath && currentPathIndex < currentPath.length) {
-                enemy.sprite.x = Math.floor(currentPath[currentPathIndex].x) * 16;
-                enemy.sprite.y = Math.floor(currentPath[currentPathIndex].y) * 16;
+                enemy.character.sprite.x = Math.floor(currentPath[currentPathIndex].x) * 16;
+                enemy.character.sprite.y = Math.floor(currentPath[currentPathIndex].y) * 16;
 
-                enemy.dirty = true;
+                enemy.character.dirty = true;
 
                 if (currentPathIndex < currentPath.length-1) {
                     ++currentPathIndex;

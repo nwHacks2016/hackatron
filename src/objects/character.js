@@ -1,33 +1,49 @@
 var Character = function() {
+    GameObject.apply(this, arguments);
+};
+
+Character.prototype = new GameObject();
+
+Character.prototype.constructor = Character;
+
+Character.prototype.toString = function() {
+    return '[Character]';
 };
 
 Character.prototype.init = function(params) {
-    this.name = 'Character';
+    GameObject.prototype.init.apply(this, arguments);
+
     this.isAlive = true;
     this.dirty = false;
+    this.points = 0;
     this.game = params.game;
     this.speed = params.speed;
     this.sprite = this.game.add.sprite(params.x, params.y, params.characterKey);
     this._initSprite(params);
 };
 
+Character.prototype.toString = function() {
+    return '[Character]';
+};
+
+Character.prototype.removePoints = function() {
+    this.points -= points;
+
+    if (this.points < 0) {
+        this.points = 0;
+    }
+};
+
+Character.prototype.addPoints = function(points) {
+    this.points += points;
+};
+
 Character.prototype.kill = function() {
     this.isAlive = false;
     this.points = 0;
-};
 
-// Method for registering hardware keys to a given sprite
-Character.prototype.setUpKeys = function(keys) {
-    if (!keys) return;
-    this.sprite.upKey = this.game.input.keyboard.addKey(keys.up);
-    this.sprite.downKey = this.game.input.keyboard.addKey(keys.down);
-    this.sprite.leftKey = this.game.input.keyboard.addKey(keys.left);
-    this.sprite.rightKey = this.game.input.keyboard.addKey(keys.right);
-
-    // register attack key if it exists
-    if(keys.att) {
-        this.sprite.attKey = this.game.input.keyboard.addKey(keys.att);
-    }
+    this.sprite.emitter.destroy();
+    this.sprite.destroy();
 };
 
 Character.prototype._initSprite = function(params) {
@@ -38,7 +54,7 @@ Character.prototype._initSprite = function(params) {
     this.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
     this.sprite.scale.x = 0.8;
     this.sprite.scale.y = 0.8;
-    this.setUpKeys(params.keys);
+
     this._addAnimationsToSprite(this.sprite);
 
     var emitter = this.game.add.emitter(this.sprite.x, this.sprite.y, 50);

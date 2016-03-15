@@ -1,12 +1,20 @@
-Pellet = function(type) {
+var Pellet = function(type) {
+    GameObject.apply(this, arguments);
+
     this.isAlive = true;
     this.type = type;
 };
 
+Pellet.prototype = new GameObject();
+
+Pellet.prototype.constructor = Pellet;
+
 Pellet.init = function(game, x, y, key) {
-	var pellet = game.add.sprite(x, y, key);
-	pellet.isAlive = true;
-	this.type = type;
+    GameObject.prototype.init.apply(this, arguments);
+
+    var pellet = game.add.sprite(x, y, key);
+    pellet.isAlive = true;
+    this.type = type;
     return pellet;
 };
 

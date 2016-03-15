@@ -44,10 +44,10 @@ setTimeout(function() {
 
 var parseEvent = function(socket, event) {
     if (event.key === 'newPlayer') {
-        socket.playerId = event.info.playerId;
+        socket.playerId = event.info.id;
         clients.push(socket);
 
-        console.log('New player: ' + socket.playerId);
+        console.log('New player: ' + event.info.id);
 
         // If it's the first client, then lets set it as the new host
         if (hostClientId === null) {
