@@ -22,10 +22,6 @@ Character.prototype.init = function(params) {
     this._initSprite(params);
 };
 
-Character.prototype.toString = function() {
-    return '[Character]';
-};
-
 Character.prototype.removePoints = function() {
     this.points -= points;
 

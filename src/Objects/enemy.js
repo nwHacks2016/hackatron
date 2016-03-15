@@ -19,7 +19,6 @@ Enemy.prototype.init = function(params) {
     }
 };
 
-// Method for registering hardware keys to a given sprite
 Enemy.prototype.setupKeys = function(keys) {
     this.character.sprite.upKey = this.game.input.keyboard.addKey(keys.up);
     this.character.sprite.downKey = this.game.input.keyboard.addKey(keys.down);
