@@ -1,10 +1,8 @@
 class Tron extends Character {
-    toString() {
-        return '[Tron]';
-    }
+    toString() { '[Tron]' }
 
     init(params) {
-        Character.prototype.init.apply(this, arguments);
+        super.init(params);
 
         this.blocks = 1;
     }

@@ -1,7 +1,5 @@
 class Character extends GameObject {
-    toString() {
-        return '[Character]';
-    }
+    toString() { '[Character]' }
 
     init(params) {
         super.init(params);

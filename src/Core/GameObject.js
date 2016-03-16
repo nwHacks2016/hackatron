@@ -1,5 +1,5 @@
 class GameObject {
-    toString() { return '[GameObject]'; }
+    toString() { '[GameObject]' }
 
     init(params) {
         this.position = {x: 0, y: 0};
@@ -10,7 +10,7 @@ class GameObject {
         this.type = null;
         this.visible = false;
 
-        Object.assign(this, params);
+        Object.assign(this, params); // extends this with the params
 
         this._initSprite(params);
     }

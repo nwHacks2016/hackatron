@@ -1,19 +1,16 @@
 class Enemy {
-    toString() {
-        return '[Enemy]';
-    }
+    toString() { '[Enemy]' }
 
     init(params) {
-        params.characterKey = 'ghost';
-        params.emitterKey = 'poop';
-        this.character = new Ghost(params);
+        params = Object.assign(params, {characterKey: 'ghost', emitterKey: 'poop'});
+
+        this.character = new Ghost();
         this.character.init(params);
 
-        this.id = params.id;
-        this.game = params.game;
+        Object.assign(this, params); // extends this with the params
 
-        if (params.keys) {
-            this.setupKeys(params.keys);
+        if (this.keys) {
+            this.setupKeys(this.keys);
         }
     }
 

@@ -2,7 +2,7 @@ var Player = function() {
 };
 
 Player.prototype.toString = function() {
-    return '[Player x=' + this.position.x + ' y=' + this.position.y + ']';
+    return `[Player x=${this.position.x} y=${this.position.y}]`;
 };
 
 Player.prototype.init = function(params) {
@@ -62,3 +62,18 @@ Object.defineProperty(Player.prototype, 'name', {
         this.character.sprite.addChild(this.nameText);
     }
 });
+
+// Wow, we may want this for "logic scripts"
+// 
+// function createInterface(name) {
+//   return class {
+//     ['findBy' + name]() {
+//       return 'Found by ' + name;
+//     }
+//   }
+// }
+ 
+// const Interface = createInterface('Email');
+// const instance = new Interface();
+ 
+// console.log(instance.findByEmail()); 

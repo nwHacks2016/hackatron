@@ -1,7 +1,5 @@
 class Powerup extends GameObject {
-    toString() {
-        return '[Powerup]';
-    }
+    toString() { '[Powerup]' }
 
     init(params) {
         super.init(params);

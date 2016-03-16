@@ -1,9 +1,7 @@
 class Ghost extends Character {
-    toString() {
-        return '[Ghost]';
-    }
+    toString() { '[Ghost]' };
 
-    init() {
-        super.init.apply(this, arguments);
+    init(params) {
+        super.init(params);
     }
 }
