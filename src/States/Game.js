@@ -37,7 +37,8 @@ Hackatron.Game.prototype = {
 
             //console.log(cell);
 
-            if (cell === Hackatron.mapConfig.floorTile) {
+            // Check it's a floor tile with no power up there yet
+            if (cell === Hackatron.mapConfig.floorTile && !this.powerups[x][y]) {
                 position = {x: x, y: y};
             }
         }
@@ -58,11 +59,11 @@ Hackatron.Game.prototype = {
 
         this.initPhysics();
         this.initMap();
+        this.initPowerUps();
         this.initPlayer();
         this.initCountdown();
         this.initSFX();
         this.initHotkeys();
-        this.initPowerUps();
 
         // Register to listen to events and inform
         // other players that you have joined the game
@@ -340,6 +341,8 @@ Hackatron.Game.prototype = {
             self.game.physics.arcade.collide(self.enemy.character.sprite, self.map.layer);
             self.game.physics.arcade.overlap(self.enemy.character.sprite, self.player.character.sprite, collisionHandler, null, self.game);
         }
+
+        self.game.world.bringToTop(self.player.character.sprite);
 
         self.powerups.forEach(function(row) {
             row.forEach(function(powerup) {

@@ -3,14 +3,15 @@ class Powerup extends GameObject {
 
     static get handlers() {
         return {
-            'SaiyanMode': SaiyanMode,
-            'GhostMode': GhostMode,
-            'InvincibleMode': InvincibleMode,
-            'SpeedBoost': SpeedBoost,
-            'ReverseMode': ReverseMode,
-            'RageMode': RageMode,
-            'Teleport': Teleport,
-            'Portal': Portal
+            'Saiyan': SaiyanHandler,
+            'Ghost': GhostHandler,
+            'Invincible': InvincibleHandler,
+            'SpeedBoost': SpeedBoostHandler,
+            'Reverse': ReverseHandler,
+            'Rage': RageHandler,
+            'Teleport': TeleportHandler,
+            'Portal': PortalHandler,
+            'Freeze': FreezeHandler
         }
     }
 
@@ -126,7 +127,7 @@ class PowerupHandler {
 
 // Handlers
 
-class SaiyanMode extends PowerupHandler {
+class SaiyanHandler extends PowerupHandler {
     constructor(params) {
         super(params);
         this.name = 'Saiyan mode';
@@ -137,7 +138,7 @@ class SaiyanMode extends PowerupHandler {
 }
 
 
-class GhostMode extends PowerupHandler {
+class GhostHandler extends PowerupHandler {
     constructor(params) {
         super(params);
         this.name = 'Ghost mode';
@@ -148,7 +149,7 @@ class GhostMode extends PowerupHandler {
 }
 
 
-class InvincibleMode extends PowerupHandler {
+class InvincibleHandler extends PowerupHandler {
     constructor(params) {
         super(params);
         this.name = 'Invincible mode';
@@ -168,7 +169,7 @@ class InvincibleMode extends PowerupHandler {
 }
 
 
-class RageMode extends PowerupHandler {
+class RageHandler extends PowerupHandler {
     constructor(params) {
         super(params);
         this.name = 'Rage mode';
@@ -198,7 +199,7 @@ class RageMode extends PowerupHandler {
 }
 
 
-class SpeedBoost extends PowerupHandler {
+class SpeedBoostHandler extends PowerupHandler {
     constructor(params) {
         super(params);
         this.name = 'Speed boost';
@@ -217,10 +218,10 @@ class SpeedBoost extends PowerupHandler {
 }
 
 
-class ReverseMode extends PowerupHandler {
+class ReverseHandler extends PowerupHandler {
     constructor(params) {
         super(params);
-        this.name = 'Reverse mode';
+        this.name = 'ReverseHandler mode';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'powerups';
         this.spritePosition = {row: 2, column: 2};
@@ -236,7 +237,7 @@ class ReverseMode extends PowerupHandler {
 }
 
 
-class Teleport extends PowerupHandler {
+class TeleportHandler extends PowerupHandler {
     constructor(params) {
         super(params);
         this.name = 'Teleport';
@@ -250,8 +251,27 @@ class Teleport extends PowerupHandler {
     }
 }
 
+// Freezes the player for 3 seconds
+class FreezeHandler extends PowerupHandler {
+    constructor(params) {
+        super(params);
+        this.name = 'Lockup';
+        this.spriteMode = 'tilemap';
+        this.spriteTilemap = 'powerups';
+        this.spritePosition = {row: 1, column: 7};
+    }
 
-class Portal extends PowerupHandler {
+    // onStarted() {
+    //     this.player.character.speed = 0;
+    // }
+
+    // onStopped() {
+    //     this.player.character.speed = 1;
+    // }
+}
+
+
+class PortalHandler extends PowerupHandler {
     constructor(params) {
         super(params);
         this.name = 'Portal';
@@ -295,17 +315,11 @@ class Portal extends PowerupHandler {
     }
 
     start(type) {
-        if (this.claimed) { return; }
-
-        this.claimed = true;
         if (type === 'entry') {
             this.player.character.teleport(this.exitPortal);
         } else if (type === 'exit') {
             this.player.character.teleport(this.entryPortal);
         }
-
-        this.destroy();
-        setTimeout(this.stop.bind(this), this.durationTime);
 
         this.onStarted();
 

@@ -5,6 +5,7 @@ class Tron extends Character {
         super.init(params);
 
         this.blocks = 1;
+        this.teleported = false;
     }
 
     eatPellet(pellet) {
@@ -50,7 +51,13 @@ class Tron extends Character {
     }
 
     teleport(destination) {
+        if (this.teleported) { return; }
+
         this.sprite.x = destination.x;
         this.sprite.y = destination.y;
+
+        this.teleported = true;
+
+        setTimeout(() => { this.teleported = false; }, 2000);
     }
 }
