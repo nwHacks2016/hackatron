@@ -13,7 +13,7 @@ Map2D.prototype.init = function(params) {
 
     this.data = this.tilemap.layers[0].data;
 
-    this.layer = this.tilemap.createLayer('Base');
+    this.layer = this.tilemap.createLayer('Background');
     this.layer.resizeWorld();
 
     // Collision

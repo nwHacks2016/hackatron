@@ -1,149 +1,98 @@
-var Character = function() {
-    GameObject.apply(this, arguments);
-};
-
-Character.prototype = new GameObject();
-
-Character.prototype.constructor = Character;
-
-Character.prototype.toString = function() {
-    return '[Character]';
-};
-
-Character.prototype.init = function(params) {
-    GameObject.prototype.init.apply(this, arguments);
-
-    this.isAlive = true;
-    this.dirty = false;
-    this.points = 0;
-    this.game = params.game;
-    this.speed = params.speed;
-
-    if (params.position) {
-        this.position = params.position;
-    } else {
-        this.position = {x: 0, y: 0};
+class Character extends GameObject {
+    toString() {
+        return '[Character]';
     }
 
-    this._initSprite(params);
-};
+    init(params) {
+        super.init(params);
 
-Character.prototype.removePoints = function() {
-    this.points -= points;
-
-    if (this.points < 0) {
+        this.isAlive = true;
+        this.dirty = false;
         this.points = 0;
-    }
-};
+        this.game = params.game;
+        this.speed = params.speed;
 
-Character.prototype.addPoints = function(points) {
-    this.points += points;
-};
-
-Character.prototype.kill = function() {
-    this.isAlive = false;
-    this.points = 0;
-
-    this.sprite.emitter.destroy();
-    this.sprite.destroy();
-};
-
-Character.prototype._initSprite = function(params) {
-    var width = 32; // temp
-    var height = 32; // temp
-    var padding = 0.35; // 35% padding
-
-    this.sprite = this.game.add.sprite(this.position.x, this.position.y, params.characterKey);
-    this.sprite.scale.x = 0.8;
-    this.sprite.scale.y = 0.8;
-
-    this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
-    this.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
-
-    this._addAnimationsToSprite(this.sprite);
-
-    var emitter = this.game.add.emitter(this.sprite.x, this.sprite.y, 50);
-    emitter.width = 5;
-    emitter.makeParticles(params.emitterKey);
-    emitter.setXSpeed();
-    emitter.setYSpeed();
-    emitter.setRotation();
-    emitter.setAlpha(1, 0.4, 800);
-    emitter.setScale(0.2, 0.05, 0.2, 0.05, 2000, Phaser.Easing.Quintic.Out);
-    emitter.start(false,250, 1);
-
-    this.sprite.emitter = emitter;
-};
-
-Character.prototype._addAnimationsToSprite = function() {
-    this.sprite.animations.add('walkUp', [9,10,11], 3, false, true);
-    this.sprite.animations.add('walkDown', [0,1,2], 3, false, true);
-    this.sprite.animations.add('walkLeft', [3,4,5], 3, false, true);
-    this.sprite.animations.add('walkRight', [6,7,8], 3, false, true);
-};
-
-Character.prototype.updatePos = function() {
-    if (!this.isAlive) { return; }
-
-    if (!(this.sprite &&
-        this.sprite.body &&
-        this.sprite.upKey &&
-        this.sprite.downKey &&
-        this.sprite.leftKey &&
-        this.sprite.rightKey)) {
-        return;
+        this._addAnimationsToSprite();
     }
 
-    this.sprite.body.velocity.x = 0;
-    this.sprite.body.velocity.y = 0;
-    this.sprite.emitter.on = true;
+    removePoints() {
+        this.points -= points;
 
-    //console.log(this.name + ' ' + this.sprite.x + ',' + this.sprite.y);
-
-    if (this.sprite.upKey.isDown) {
-        this.sprite.animations.play('walkUp', 3, false);
-        this.sprite.body.velocity.y = -this.speed;
-        this.sprite.emitter.x = this.sprite.x + 15;
-        this.sprite.emitter.y = this.sprite.y + 35;
-        this.direction = 'walkUp';
-        this.dirty = true;
-    } else if (this.sprite.downKey.isDown) {
-        this.sprite.animations.play('walkDown', 3, false);
-        this.sprite.body.velocity.y = this.speed;
-        this.sprite.emitter.x = this.sprite.x + 15;
-        this.sprite.emitter.y = this.sprite.y + -5;
-        this.direction = 'walkDown';
-        this.dirty = true;
-    } else if (this.sprite.leftKey.isDown) {
-        this.sprite.animations.play('walkLeft', 3, false);
-        this.sprite.body.velocity.x = -this.speed;
-        this.sprite.emitter.x = this.sprite.x + 30;
-        this.sprite.emitter.y = this.sprite.y + 15;
-        this.direction = 'walkLeft';
-        this.dirty = true;
-    } else if (this.sprite.rightKey.isDown) {
-        this.sprite.animations.play('walkRight', 3, false);
-        this.sprite.body.velocity.x = this.speed;
-        this.sprite.emitter.x = this.sprite.x;
-        this.sprite.emitter.y = this.sprite.y + 15;
-        this.direction = 'walkRight';
-        this.dirty = true;
-    } else {
-        this.sprite.emitter.on = false;
-        this.direction = null;
+        if (this.points < 0) {
+            this.points = 0;
+        }
     }
-};
 
-Object.defineProperty(Character.prototype, 'position', {
-    get: function() {
-        if (!this.sprite) { return this._position; }
-
-        return {x: Math.floor(this.sprite.x), y: Math.floor(this.sprite.y)};
-    },
-    set: function(position) {
-        if (!this.sprite) { return this._position = position; }
-
-        this.sprite.x = Math.floor(position.x);
-        this.sprite.y = Math.floor(position.y);
+    addPoints(points) {
+        this.points += points;
     }
-});
+
+    kill() {
+        this.isAlive = false;
+        this.points = 0;
+
+        this.sprite.emitter.destroy();
+        this.sprite.destroy();
+    }
+
+    _addAnimationsToSprite() {
+        this.sprite.animations.add('walkUp', [9,10,11], 3, false, true);
+        this.sprite.animations.add('walkDown', [0,1,2], 3, false, true);
+        this.sprite.animations.add('walkLeft', [3,4,5], 3, false, true);
+        this.sprite.animations.add('walkRight', [6,7,8], 3, false, true);
+    }
+
+    updatePos() {
+        if (!this.isAlive) { return; }
+
+        if (!(this.sprite &&
+            this.sprite.body &&
+            this.sprite.upKey &&
+            this.sprite.downKey &&
+            this.sprite.leftKey &&
+            this.sprite.rightKey)) {
+            return;
+        }
+
+        this.sprite.body.velocity.x = 0;
+        this.sprite.body.velocity.y = 0;
+        this.sprite.emitter.on = true;
+
+        //console.log(this.name + ' ' + this.sprite.x + ',' + this.sprite.y);
+
+        if (this.sprite.upKey.isDown) {
+            this.sprite.animations.play('walkUp', 3, false);
+            this.sprite.body.velocity.y = -this.speed;
+            this.sprite.emitter.x = this.sprite.x + 15;
+            this.sprite.emitter.y = this.sprite.y + 35;
+            this.direction = 'walkUp';
+            this.dirty = true;
+        } else if (this.sprite.downKey.isDown) {
+            this.sprite.animations.play('walkDown', 3, false);
+            this.sprite.body.velocity.y = this.speed;
+            this.sprite.emitter.x = this.sprite.x + 15;
+            this.sprite.emitter.y = this.sprite.y + -5;
+            this.direction = 'walkDown';
+            this.dirty = true;
+        } else if (this.sprite.leftKey.isDown) {
+            this.sprite.animations.play('walkLeft', 3, false);
+            this.sprite.body.velocity.x = -this.speed;
+            this.sprite.emitter.x = this.sprite.x + 30;
+            this.sprite.emitter.y = this.sprite.y + 15;
+            this.direction = 'walkLeft';
+            this.dirty = true;
+        } else if (this.sprite.rightKey.isDown) {
+            this.sprite.animations.play('walkRight', 3, false);
+            this.sprite.body.velocity.x = this.speed;
+            this.sprite.emitter.x = this.sprite.x;
+            this.sprite.emitter.y = this.sprite.y + 15;
+            this.direction = 'walkRight';
+            this.dirty = true;
+        } else {
+            this.sprite.emitter.on = false;
+            this.direction = null;
+        }
+    }
+}
+
+

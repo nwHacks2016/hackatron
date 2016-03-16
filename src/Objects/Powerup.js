@@ -1,46 +1,41 @@
-var Powerup = function() {
-    GameObject.apply(this, arguments);
-};
+class Powerup extends GameObject {
+    toString() {
+        return '[Powerup]';
+    }
 
-Powerup.prototype = new GameObject();
+    init(params) {
+        super.init(params);
 
-Powerup.prototype.constructor = Powerup;
+        // TODO: this guy should move a lot of this logic over to GamePlugin
 
-Powerup.prototype.toString = function() {
-    return '[Powerup]';
-};
+        this.finished = false;
+        this.claimed = false;
 
-Powerup.prototype.init = function(params) {
-    GameObject.prototype.init.apply(this, arguments);
+        // Deps
+        // TODO: clean up
+        this.state = params.state;
+        this.game = params.game;
+        this.player = params.player;
+        this.map = params.map;
+        this.handler = params.handler();
 
-    // TODO: this guy should move a lot of this logic over to GamePlugin
+        // Events
+        this.onStarted = params.onStarted;
+        this.onDestroy = params.onDestroy;
 
-    this.finished = false;
-    this.claimed = false;
+        // Plugin methods
+        this.key = this.handler.key;
+        this.update = this.handler.update.bind(this);
+        this.setup = this.handler.setup.bind(this);
+        this.start = this.handler.start.bind(this);
+        this.stop = this.handler.stop.bind(this);
+        this.destroy = this.handler.destroy.bind(this);
 
-    // Deps
-    // TODO: clean up
-    this.state = params.state;
-    this.game = params.game;
-    this.player = params.player;
-    this.map = params.map;
-    this.handler = params.handler();
+        // should return the JSON necessary for networking
+        return this.setup();
+    }
+}
 
-    // Events
-    this.onStarted = params.onStarted;
-    this.onDestroy = params.onDestroy;
-
-    // Plugin methods
-    this.key = this.handler.key;
-    this.update = this.handler.update.bind(this);
-    this.setup = this.handler.setup.bind(this);
-    this.start = this.handler.start.bind(this);
-    this.stop = this.handler.stop.bind(this);
-    this.destroy = this.handler.destroy.bind(this);
-
-    // should return the JSON necessary for networking
-    return this.setup();
-};
 
 // Plugins
 
