@@ -185,6 +185,14 @@ Hackatron.Game.prototype = {
     initMap: function() {
         this.map = new Map2D();
         this.map.init({game: this.game, player: this.player, enemy: this.enemy});
+
+        var start = this.map.tilemap.objects['GameObjects'][0];
+        var end = this.map.tilemap.objects['GameObjects'][1];
+
+        var teleStart = new Phaser.Rectangle(start.x, start.y, start.width, start.height);
+        var teleEnd = new Phaser.Rectangle(end.x, end.y, end.width, end.height);
+
+        // TODO: do stuff with tele points
     },
 
     initCountdown: function() {
@@ -410,8 +418,6 @@ Hackatron.Game.prototype = {
 
             var player = self.getPlayerById(id);
             
-            //player.character.sprite.animations.play(event.info.direction, 3, false);
-
             // disable animations for now - lag?
             if (player.character.sprite.body) {
                 clearTimeout(updateTimeout);
