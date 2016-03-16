@@ -5,19 +5,40 @@
 <!--[if gt IE 8]><!--> <html> <!--<![endif]-->
 <head>
   <title>Hackatron</title>
-  <link href="css/style.css" rel="stylesheet" type="text/css">
+  <link href="css/style.css" rel="stylesheet" type="text/css" />
   <script src="/socket.io/socket.io.js"></script>
+
+  <script type="text/javascript">
+      WebFontConfig = {
+          google: { families: ['Orbitron:400,900:latin', 'Montserrat:400,700:latin', 'Press Start 2P:400:latin'] }
+      };
+      (function() {
+          var wf = document.createElement('script');
+          wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+          wf.type = 'text/javascript';
+          wf.async = 'true';
+          var s = document.getElementsByTagName('script')[0];
+          s.parentNode.insertBefore(wf, s);
+      })();
+  </script>
 </head>
 <body>
-  <div id="hackatron"></div>
+  <div id="game"></div>
+  <div id="ui"></div>
+
+  <script src="vendor/react.js"></script>
+  <script src="vendor/react-dom.js"></script>
 
   <script src="vendor/easystar-0.1.7.min.js"></script>
   <script src="node_modules/phaser/build/phaser.js"></script>
   <script src="vendor/phaser-debug.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.js"></script>
+
   <script src="src/Core/Utils.js"></script>
   <script src="src/Core/GameObject.js"></script>
   <script src="src/Core/GamePlugin.js"></script>
   <script src="src/Core/AI.js"></script>
+
   <script src="src/Objects/Map2D.js"></script>
   <script src="src/Objects/Powerup.js"></script>
   <script src="src/Objects/Character.js"></script>
@@ -27,51 +48,47 @@
   <script src="src/Objects/Tron.js"></script>
   <script src="src/Objects/Player.js"></script>
   <script src="src/Objects/Enemy.js"></script>
+
   <script src="src/States/Game.js"></script>
   <script src='src/States/Lobby.js'></script>
   <script src="src/States/Menu.js"></script>
   <script src='src/States/Preload.js'></script>
 
-    <script type="text/javascript">
-        WebFontConfig = {
-            google: { families: ['Orbitron:400,900:latin', 'Montserrat:400,700:latin'] }
-        };
-        (function() {
-            var wf = document.createElement('script');
-            wf.src = 'https://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-            wf.type = 'text/javascript';
-            wf.async = 'true';
-            var s = document.getElementsByTagName('script')[0];
-            s.parentNode.insertBefore(wf, s);
-        })();
-    </script>
+  <script src="src/UI/UI.js" type="text/babel"></script>
+  <script src="src/UI/Screens/StartScreen.js" type="text/babel"></script>
+  <script src="src/UI/Screens/HostScreen.js" type="text/babel"></script>
+  <script src="src/UI/Screens/JoinScreen.js" type="text/babel"></script>
 
-    <script type="text/javascript">
-    window.onload = function () {
-        Hackatron.debug = window.location.href.indexOf('localhost') !== -1;
-        Hackatron.game = new Phaser.Game(512, 512, Phaser.AUTO, 'game');
-        // Zelda
-        // Hackatron.mapConfig = {
-        //   tilesetMapFilename: 'tileset2',
-        //   tilesetImageFilename: 'tileset2',
-        //   tilesetKey: 'Top',
-        //   floorTile: 2041
-        // };
-        // Tron
-        Hackatron.mapConfig = {
-          tilesetMapFilename: 'tileset',
-          tilesetImageFilename: 'single-tile',
-          tilesetKey: 'aaaa222',
-          floorTile: 1081
-        };
+  <script type="text/babel">
+      ReactDOM.render(<UI />, document.getElementById('ui'));
+  </script>
 
-        Hackatron.game.state.add('Preload', Hackatron.Preload);
-        Hackatron.game.state.add('MainMenu', Hackatron.MainMenu);
-        Hackatron.game.state.add('Lobby', Hackatron.Lobby);
-        Hackatron.game.state.add('Game', Hackatron.Game);
+  <script type="text/javascript">
+      window.onload = function () {
+          Hackatron.debug = window.location.href.indexOf('localhost') !== -1;
+          Hackatron.game = new Phaser.Game(512, 512, Phaser.AUTO, document.getElementById('game'));
+          // Zelda
+          // Hackatron.mapConfig = {
+          //   tilesetMapFilename: 'tileset2',
+          //   tilesetImageFilename: 'tileset2',
+          //   tilesetKey: 'Top',
+          //   floorTile: 2041
+          // };
+          // Tron
+          Hackatron.mapConfig = {
+            tilesetMapFilename: 'tileset',
+            tilesetImageFilename: 'single-tile',
+            tilesetKey: 'aaaa222',
+            floorTile: 1081
+          };
 
-        Hackatron.game.state.start('Preload');
-    };
-    </script>
+          Hackatron.game.state.add('Preload', Hackatron.Preload);
+          Hackatron.game.state.add('Menu', Hackatron.Menu);
+          Hackatron.game.state.add('Lobby', Hackatron.Lobby);
+          Hackatron.game.state.add('Game', Hackatron.Game);
+
+          Hackatron.game.state.start('Preload');
+      };
+  </script>
 </body>
 </html>

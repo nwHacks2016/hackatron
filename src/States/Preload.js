@@ -34,13 +34,13 @@ Hackatron.Preload.prototype= {
     },
 
     create: function() {
-        this.game.music = this.game.add.audio('music1', 1, true);
-        this.game.music.play('', 0, 1, true);
+        // this.game.music = this.game.add.audio('music1', 1, true);
+        // this.game.music.play('', 0, 1, true);
     },
 
     update: function() {
         if(!!this.ready) {
-            this.game.state.start('MainMenu');
+            this.game.state.start('Menu');
         }
     },
 

@@ -17,10 +17,6 @@ var POWERUP_SPAWN_INTERVAL = 1000;
 var updateTimeout;
 
 Hackatron.Game.prototype = {
-    preload: function() {
-
-    },
-
     toggleFullscreen: function() {
         this.game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
         if (this.game.scale.isFullScreen) {
@@ -74,6 +70,10 @@ Hackatron.Game.prototype = {
         this.joinGame();
 
         this.initEvents();
+
+
+        window.UI_state.screenKey = 'ingame';
+        window.UIIII.setState(window.UI_state);
     },
 
     initEvents: function() {

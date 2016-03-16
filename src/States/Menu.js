@@ -1,7 +1,7 @@
-Hackatron.MainMenu = function(game) {
+Hackatron.Menu = function(game) {
 };
 
-Hackatron.MainMenu.prototype = {
+Hackatron.Menu.prototype = {
     preload: function() {
     },
 
@@ -13,6 +13,10 @@ Hackatron.MainMenu.prototype = {
         button.enterKey = this.input.keyboard.addKey(Phaser.Keyboard.ENTER);
         this.button = button;
         button.anchor.setTo(0.5,0.5);
+
+        window.UI_state.screenKey = 'menu';
+        window.UIIII.setState(window.UI_state);
+        
     },
 
     update: function() {
