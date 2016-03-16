@@ -48,7 +48,7 @@ Hackatron.Lobby.prototype = {
     },
 
     update: function() {
-        if (this.game.canvas.enterKey.isDown || window.location.href.indexOf('localhost') !== -1) {
+        if (this.game.canvas.enterKey.isDown || Hackatron.skipIntro) {
             var nameField = document.getElementById('name-field');
             Hackatron.playerName = nameField.value;
             document.body.removeChild(nameField);

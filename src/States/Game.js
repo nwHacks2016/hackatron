@@ -1,4 +1,5 @@
 Hackatron = {
+    skipIntro: true
 };
 
 Hackatron.Game = function(game) {
@@ -28,10 +29,10 @@ Hackatron.Game.prototype = {
         }
     },
 
-    getValidCoord: function(x, y) {
-        var coord = null;
+    getValidPosition: function() {
+        var position = null;
 
-        while (!coord) {
+        while (!position) {
             var x = this.game.rnd.integerInRange(0, 31);
             var y = this.game.rnd.integerInRange(0, 31);
             // mapData goes top to down and left to right
@@ -40,13 +41,13 @@ Hackatron.Game.prototype = {
             //console.log(cell);
 
             if (cell === Hackatron.mapConfig.floorTile) {
-                coord = {x: x, y: y};
+                position = {x: x, y: y};
             }
         }
 
-        //console.log(coord);
+        //console.log(position);
 
-        return coord;
+        return position;
     },
 
     create: function() {
@@ -137,15 +138,15 @@ Hackatron.Game.prototype = {
     runEnemySystem: function() {
         // Create enemy for the host
         if (!this.enemy) {
-            var coord = this.getValidCoord();
+            var position = this.getValidPosition();
 
             this.enemy = new Enemy();
             this.enemy.init({
                 game: this.game,
                 speed: PLAYER_SPEED,
                 position: {
-                    x: coord.x * 16,
-                    y: coord.y * 16
+                    x: position.x * 16,
+                    y: position.y * 16
                 },
                 keys: {
                     up: Phaser.Keyboard.W,
@@ -158,7 +159,7 @@ Hackatron.Game.prototype = {
     },
 
     initPlayer: function() {
-        var coord = this.getValidCoord();
+        var position = this.getValidPosition();
 
         var playerParams = {
             id: Utils.generateId(),
@@ -166,8 +167,8 @@ Hackatron.Game.prototype = {
             name: Hackatron.playerName,
             speed: PLAYER_SPEED,
             position: {
-                x: coord.x * 16,
-                y: coord.y * 16
+                x: position.x * 16,
+                y: position.y * 16
             },
             keys: {
                 up: Phaser.Keyboard.UP,
@@ -217,12 +218,10 @@ Hackatron.Game.prototype = {
             this.powerups.push([]);
         }
 
-        this.powerupHandlers = ['speedBoost', 'portal', 'reverseMode', 'invincibleMode', 'rageMode', 'saiyanMode']; // ghostMode
-
         setInterval(function() {
             this.powerups.forEach(function(row) {
                 row.forEach(function(powerup) {
-                    if (powerup && powerup.ended) {
+                    if (powerup && powerup.handler.ended) {
                         self.powerups[row][powerup] = null;
                     }
                 });
@@ -233,19 +232,16 @@ Hackatron.Game.prototype = {
     runPowerUpSystem: function() {
         var self = this;
         setInterval(function() {
-            var randomHandler = this.powerupHandlers[this.game.rnd.integerInRange(0, this.powerupHandlers.length-1)];
+            var powerupHandlers = Object.keys(Powerup.handlers);
+            var randomHandler = powerupHandlers[this.game.rnd.integerInRange(0, powerupHandlers.length-1)];
             var powerup = new Powerup();
-            var onStarted = function() {
-                self.addEvent({key: 'foundPowerup', info: {state: powerup.state, player: {id: self.player.id}}});
-            };
-            var onDestroy = function() {
-                self.powerups[powerup.state.coord.x][powerup.state.coord.y] = null;
-            };
-            powerup.init({handler: Powerup.plugins[randomHandler], game: this.game, map: this.map, player: this.player, onStarted: onStarted, onDestroy: onDestroy});
+            powerup.init({key: randomHandler, game: this.game, map: this.map, player: this.player});
+            powerup.handler.on('started', () => { self.addEvent({key: 'foundPowerup', info: {state: powerup.handler.state, player: {id: self.player.id}}}); });
+            powerup.handler.on('destroyed', () => { self.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = null; });
 
-            this.powerups[powerup.state.coord.x][powerup.state.coord.y] = powerup;
+            this.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = powerup;
 
-            this.addEvent({key: 'powerupSpawned', info: {plugin: randomHandler, state: powerup.state}});
+            this.addEvent({key: 'powerupSpawned', info: {handler: {key: randomHandler, state: powerup.handler.state}}});
         }.bind(this), POWERUP_SPAWN_INTERVAL);
     },
 
@@ -342,7 +338,7 @@ Hackatron.Game.prototype = {
         self.powerups.forEach(function(row) {
             row.forEach(function(powerup) {
                 if (powerup) {
-                    powerup.update();
+                    powerup.handler.update();
                 }
             });
         });
@@ -491,10 +487,7 @@ Hackatron.Game.prototype = {
 
                         if (!powerup) { continue; }
 
-                        powerups.push({
-                            handler: powerup.handler,
-                            state: powerup.state
-                        });
+                        powerups.push({handler: { key: powerup.handler.key, state: powerup.handler.state }});
                     }
                 }
 
@@ -535,12 +528,10 @@ Hackatron.Game.prototype = {
                 // Setup powerups
                 event.info.powerups.forEach(function(powerupInfo) {
                     var powerup = new Powerup();
-                    var onDestroy = function() {
-                        self.powerups[powerup.state.coord.x][powerup.state.coord.y] = null;
-                    };
-                    powerup.init({handler: Powerup.plugins[powerupInfo.handler.key], game: self.game, map: self.map, player: self.player, state: powerupInfo.state, onDestroy: onDestroy});
+                    powerup.init({key: powerupInfo.handler.key, game: self.game, map: self.map, player: self.player, state: powerupInfo.handler.state});
+                    powerup.handler.on('destroyed', () => { self.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = null; });
 
-                    self.powerups[powerup.state.coord.x][powerup.state.coord.y] = powerup;
+                    self.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = powerup;
                 });
             }
 
@@ -562,24 +553,20 @@ Hackatron.Game.prototype = {
         } else if (event.key === 'powerupSpawned') {
             // TODO: we already do this above, refactor it out
             var powerup = new Powerup();
-            var onStarted = function() {
-                self.addEvent({key: 'foundPowerup', info: {player: {id: self.player.id}, state: powerup.state}});
-            };
-            var onDestroy = function() {
-                self.powerups[powerup.state.coord.x][powerup.state.coord.y] = null;
-            };
-            powerup.init({handler: Powerup.plugins[event.info.plugin], game: self.game, map: self.map, player: self.player, state: event.info.state, onStarted: onStarted, onDestroy: onDestroy});
+            powerup.init({key: event.info.handler.key, game: self.game, map: self.map, player: self.player, state: event.info.handler.state});
+            powerup.handler.on('started', () => { self.addEvent({key: 'foundPowerup', info: {player: {id: self.player.id}, state: powerup.handler.state}}); });
+            powerup.handler.on('destroyed', () => { self.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = null; });
 
-            self.powerups[powerup.state.coord.x][powerup.state.coord.y] = powerup;
+            self.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = powerup;
         // Method for handling spawned blocks by other players
         } else if (event.key === 'foundPowerup') {
             // TODO: we already do this above, refactor it out
-            var powerup = self.powerups[event.info.state.coord.x][event.info.state.coord.y];
+            var powerup = self.powerups[event.info.handler.state.position.x][event.info.handler.state.position.y];
 
             if (powerup) {
-                self.powerups[event.info.state.coord.x][event.info.state.coord.y] = null;
+                self.powerups[event.info.handler.state.position.x][event.info.handler.state.position.y] = null;
                 powerup.player = self.getPlayerById(event.info.player.id);
-                powerup.start();
+                powerup.handler.start();
             }
         // Method for handling spawned blocks by other players
         } else if (event.key === 'blockSpawned') {

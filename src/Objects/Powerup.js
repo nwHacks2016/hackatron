@@ -1,443 +1,333 @@
 class Powerup extends GameObject {
-    toString() { '[Powerup]' }
+    toString() { `[Powerup handler={this.key}]` }
+
+    static get handlers() {
+        return {
+            'SaiyanMode': SaiyanMode,
+            'GhostMode': GhostMode,
+            'InvincibleMode': InvincibleMode,
+            'SpeedBoost': SpeedBoost,
+            'ReverseMode': ReverseMode,
+            'RageMode': RageMode,
+            'Teleport': Teleport,
+            'Portal': Portal
+        }
+    }
 
     init(params) {
         super.init(params);
 
-        // TODO: this guy should move a lot of this logic over to GamePlugin
-
-        this.finished = false;
-        this.claimed = false;
-
-        // Deps
-        // TODO: clean up
-        this.state = params.state;
-        this.game = params.game;
-        this.player = params.player;
-        this.map = params.map;
-        this.handler = params.handler();
-
         // Events
         this.onStarted = params.onStarted;
-        this.onDestroy = params.onDestroy;
+        this.onDestroyed = params.onDestroyed;
 
-        // Plugin methods
-        this.key = this.handler.key;
-        this.update = this.handler.update.bind(this);
-        this.setup = this.handler.setup.bind(this);
-        this.start = this.handler.start.bind(this);
-        this.stop = this.handler.stop.bind(this);
-        this.destroy = this.handler.destroy.bind(this);
-
-        // should return the JSON necessary for networking
-        return this.setup();
+        // TODO: this guy should move a lot of this logic over to GamePlugin
+        this.key = params.key;
+        this.handler = new Powerup.handlers[params.key](params);
+        this.handler.setup();
     }
 }
 
 
-// Plugins
 
-Powerup.plugins = {};
+class PowerupHandler {
+    constructor(params) {
+        this.spriteMode = null;
+        this.finished = false;
+        this.claimed = false;
+        this.state = {};
+        this.fadeTime = 15000;
+        this.durationTime = 4000;
 
-Powerup.plugins.saiyanMode = function() {
-    return {
-        key: 'saiyanMode',
-        setup: function() {
-            if (!this.state) {
-                this.state = {
-                    coord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
-                };
-            }
+        Object.assign(this, params);
+    }
 
-            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, 'saiyanMode');
-            this.sprite.animations.add('buffLoop', [0,1,2,3,4,5,6], 6, true, true);
+    on(type, cb) {
+        this['_on' + type] = this['_on' + type] || [];
+        this['_on' + type].push(cb);
+    }
+
+    emit(type, args) {
+        this['_on' + type] && this['_on' + type].forEach((cb) => { cb(args) });
+    }
+
+    _getRect(x, y) {
+        return new Phaser.Rectangle(16 * (x-1), 16 * (y-1), 16, 16);
+    }
+
+    setup() {
+        if (!this.state.position) {
+            this.state.position = Hackatron.game.state.states.Game.getValidPosition();
+        }
+
+        if (this.spriteMode === 'key') {
+            this.sprite = this.game.add.sprite(this.state.position.x * 16, this.state.position.y * 16, this.spriteKey);
+            this.sprite.animations.add('buffLoop', this.spriteLoop, 6, true, true);
             this.sprite.animations.play('buffLoop');
             this.sprite.scale.x = 0.8;
             this.sprite.scale.y = 0.8;
-            this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
-
-            setTimeout(this.destroy, 15000);
-
-            return this.state;
-        },
-
-        update: function() {
-            this.game.physics.arcade.overlap(this.player.character.sprite, this.sprite, this.start.bind(this), null, this.game);
-        },
-
-        start: function() {
-            if (this.claimed) { return; }
-
-            this.claimed = true;
-            this.destroy();
-            setTimeout(this.stop, 4000);
-
-            this.onStarted && this.onStarted();
-
-            console.log('Powerup START: Phase mode');
-        },
-
-        stop: function() {
-            this.finished = true;
-            console.log('Powerup STOP: Phase mode');
-        },
-        
-        destroy: function() {
-            this.sprite.destroy();
-
-            this.onDestroy && this.onDestroy();
-        }
-    };
-};
-
-Powerup.plugins.ghostMode = function() {
-    return {
-        key: 'ghostMode',
-        setup: function(state) {
-            if (!this.state) {
-                this.state = {
-                    coord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
-                };
-            }
-
-            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, this.game.add.bitmapData(16, 16));
-            this.sprite.key.copyRect('powerups', getRect(1, 1), 0, 0);
+        } else if (this.spriteMode === 'tilemap') {
+            this.sprite = this.game.add.sprite(this.state.position.x * 16, this.state.position.y * 16, this.game.add.bitmapData(16, 16));
+            this.sprite.key.copyRect(this.spriteTilemap, this._getRect(this.spritePosition.row, this.spritePosition.column), 0, 0);
             this.sprite.scale.x = 1.2;
             this.sprite.scale.y = 1.2;
-            this.game.add.tween(this.sprite).to({alpha: 0}, 15000, 'Linear', true, 0, -1);
-            this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
-
-            setTimeout(this.destroy, 15000);
-
-            return this.state;
-        },
-
-        update: function() {
-            this.game.physics.arcade.overlap(this.player.character.sprite, this.sprite, this.start.bind(this), null, this.game);
-        },
-
-        start: function() {
-            if (this.claimed) { return; }
-
-            this.claimed = true;
-            this.destroy();
-            setTimeout(this.stop, 4000);
-
-            this.onStarted && this.onStarted();
-
-            console.log('Powerup START: Ghost mode');
-        },
-
-        stop: function() {
-            this.finished = true;
-            console.log('Powerup STOP: Ghost mode');
-        },
-
-        destroy: function() {
-            this.sprite.destroy();
-
-            this.onDestroy && this.onDestroy();
         }
-    };
-};
 
-Powerup.plugins.invincibleMode = function() {
-    return {
-        key: 'invincibleMode',
-        setup: function(state) {
-            if (!this.state) {
-                this.state = {
-                    coord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
-                };
-            }
+        this.game.add.tween(this.sprite).to({alpha: 0}, this.fadeTime, 'Linear', true, 0, -1);
+        this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
 
-            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, this.game.add.bitmapData(16, 16));
-            this.sprite.key.copyRect('powerups', getRect(1, 2), 0, 0);
-            this.sprite.scale.x = 1.2;
-            this.sprite.scale.y = 1.2;
-            this.game.add.tween(this.sprite).to({alpha: 0}, 15000, 'Linear', true, 0, -1);
-            this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
+        this.onSetup();
 
-            setTimeout(this.destroy, 15000);
+        setTimeout(this.destroy.bind(this), this.fadeTime);
+    }
 
-            return this.state;
-        },
+    update() {
+        this.game.physics.arcade.overlap(this.player.character.sprite, this.sprite, this.start.bind(this), null, this.game);
 
-        update: function() {
-            this.game.physics.arcade.overlap(this.player.character.sprite, this.sprite, this.start.bind(this), null, this.game);
-        },
+        this.onUpdated();
+    }
 
-        start: function() {
-            if (this.claimed) { return; }
+    start() {
+        if (this.claimed) { return; }
 
-            this.claimed = true;
-            this.player.character.invincible = true;
-            this.tween = this.game.add.tween(this.player.character.sprite).to({alpha: 0}, 400, 'Linear', true, 0, -1);
-            this.destroy();
-            setTimeout(this.stop, 4000);
+        this.claimed = true;
+        this.destroy();
 
-            this.onStarted && this.onStarted();
+        this.onStarted();
+        this.emit('started');
 
-            console.log('Powerup START: Invincible mode');
-        },
+        setTimeout(this.stop.bind(this), this.durationTime);
 
-        stop: function() {
-            this.finished = true;
-            this.player.character.invincible = false;
-            this.tween.stop();
-            this.tween = this.game.add.tween(this.player.character.sprite).to({alpha: 1}, 0, 'Linear', true, 0);
-            console.log('Powerup STOP: Invincible mode');
-        },
+        console.log('Powerup START: ' + this.name);
+    }
 
-        destroy: function() {
-            this.sprite.destroy();
+    stop() {
+        this.finished = true;
+        console.log('Powerup STOP: ' + this.name);
+    }
 
-            this.onDestroy && this.onDestroy();
+    destroy() {
+        this.sprite.destroy();
+
+        this.onDestroyed();
+        this.emit('destroyed');
+    }
+
+    onSetup() {}
+    onStarted() {}
+    onStopped() {}
+    onUpdated() {}
+    onDestroyed() {}
+}
+
+// Handlers
+
+class SaiyanMode extends PowerupHandler {
+    constructor(params) {
+        super(params);
+        this.name = 'Saiyan mode';
+        this.spriteMode = 'key';
+        this.spriteKey = 'saiyanMode';
+        this.spriteLoop = [0,1,2,3,4,5,6];
+    }
+}
+
+
+class GhostMode extends PowerupHandler {
+    constructor(params) {
+        super(params);
+        this.name = 'Ghost mode';
+        this.spriteMode = 'tilemap';
+        this.spriteTilemap = 'powerups';
+        this.spritePosition = {row: 1, column: 2};
+    }
+}
+
+
+class InvincibleMode extends PowerupHandler {
+    constructor(params) {
+        super(params);
+        this.name = 'Invincible mode';
+        this.spriteMode = 'tilemap';
+        this.spriteTilemap = 'powerups';
+        this.spritePosition = {row: 1, column: 2};
+    }
+
+    onStarted() {
+        this.tween = this.game.add.tween(this.player.character.sprite).to({alpha: 0}, 400, 'Linear', true, 0, -1);
+    }
+
+    onStopped() {
+        this.tween.stop();
+        this.tween = this.game.add.tween(this.player.character.sprite).to({alpha: 1}, 0, 'Linear', true, 0);
+    }
+}
+
+
+class RageMode extends PowerupHandler {
+    constructor(params) {
+        super(params);
+        this.name = 'Rage mode';
+        this.spriteMode = 'tilemap';
+        this.spriteTilemap = 'powerups';
+        this.spritePosition = {row: 1, column: 1};
+    }
+
+    onStarted() {
+        var width = 32;
+        var height = 32;
+        var padding = 0.75; // 75% padding
+        this.player.character.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
+        this.player.character.sprite.scale.x = 1.5;
+        this.player.character.sprite.scale.y = 1.5;
+    }
+
+    onStopped() {
+        // set back original
+        var width = 32;
+        var height = 32;
+        var padding = 0.35; // 35% padding
+        this.player.character.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
+        this.player.character.sprite.scale.x = 0.8;
+        this.player.character.sprite.scale.y = 0.8;
+    }
+}
+
+
+class SpeedBoost extends PowerupHandler {
+    constructor(params) {
+        super(params);
+        this.name = 'Speed boost';
+        this.spriteMode = 'key';
+        this.spriteTilemap = 'speedBoost';
+        this.spriteLoop = [0,1,2,3,4,5];
+    }
+
+    onStarted() {
+        this.player.character.speed *= 2;
+    }
+
+    onStopped() {
+        this.player.character.speed /= 2;
+    }
+}
+
+
+class ReverseMode extends PowerupHandler {
+    constructor(params) {
+        super(params);
+        this.name = 'Reverse mode';
+        this.spriteMode = 'tilemap';
+        this.spriteTilemap = 'powerups';
+        this.spritePosition = {row: 2, column: 2};
+    }
+
+    onStarted() {
+        this.player.character.speed *= -1;
+    }
+
+    onStopped() {
+        this.player.character.speed *= -1;
+    }
+}
+
+
+class Teleport extends PowerupHandler {
+    constructor(params) {
+        super(params);
+        this.name = 'Teleport';
+        this.spriteMode = 'tilemap';
+        this.spriteTilemap = 'powerups';
+        this.spritePosition = {row: 1, column: 7};
+    }
+
+    onStarted() {
+        this.player.character.teleport(Hackatron.game.state.states.Game.getValidPosition());
+    }
+}
+
+
+class Portal extends PowerupHandler {
+    constructor(params) {
+        super(params);
+        this.name = 'Portal';
+        this.spriteMode = 'custom';
+    }
+
+    setup(state) {
+        if (!this.state.entryPortalPosition) {
+            this.state.entryPortalPosition = Hackatron.game.state.states.Game.getValidPosition();
         }
-    };
-};
 
-Powerup.plugins.rageMode = function() {
-    return {
-        key: 'rageMode',
-        setup: function(state) {
-            if (!this.state) {
-                this.state = {
-                    coord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
-                };
-            }
-
-            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, this.game.add.bitmapData(16, 16));
-            this.sprite.key.copyRect('powerups', getRect(1, 1), 0, 0);
-            this.sprite.scale.x = 1.2;
-            this.sprite.scale.y = 1.2;
-            this.game.add.tween(this.sprite).to({alpha: 0}, 15000, 'Linear', true, 0, -1);
-            this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
-
-            setTimeout(this.destroy, 15000);
-
-            return this.state;
-        },
-
-        update: function() {
-            this.game.physics.arcade.overlap(this.player.character.sprite, this.sprite, this.start.bind(this), null, this.game);
-        },
-
-        start: function() {
-            if (this.claimed) { return; }
-
-            this.claimed = true;
-            var width = 32;
-            var height = 32;
-            var padding = 0.75; // 75% padding
-            this.player.character.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
-            this.player.character.sprite.scale.x = 1.5;
-            this.player.character.sprite.scale.y = 1.5;
-            this.destroy();
-            setTimeout(this.stop, 4000);
-
-            this.onStarted && this.onStarted();
-
-            console.log('Powerup START: Rage mode');
-        },
-
-        stop: function() {
-            this.finished = true;
-            // set back original
-            var width = 32;
-            var height = 32;
-            var padding = 0.35; // 35% padding
-            this.player.character.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
-            this.player.character.sprite.scale.x = 0.8;
-            this.player.character.sprite.scale.y = 0.8;
-            console.log('Powerup STOP: Rage mode');
-        },
-
-        destroy: function() {
-            this.sprite.destroy();
-
-            this.onDestroy && this.onDestroy();
+        if (!this.state.exitPortalPosition) {
+            this.state.exitPortalPosition = Hackatron.game.state.states.Game.getValidPosition();
         }
-    };
-};
 
-var getRect = function(x, y) {
-    var rect = new Phaser.Rectangle(16 * (x-1), 16 * (y-1), 16, 16);
-    return rect;
-};
+        // kind of a hack.. doesn't put exit in the array of powerups :-/
+        // TODO: should have an array of positions the powerup uses in an array in state and use that
+        this.state.position = this.state.entryPortalPosition;
 
-Powerup.plugins.speedBoost = function() {
-    return {
-        key: 'speedBoost',
-        setup: function(state) {
-            if (!this.state) {
-                this.state = {
-                    coord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
-                };
-            }
+        //console.log('entry x: ' + entryPortalPosition.x * 16 + '\ny: ' + entryPortalPosition.y * 16);
+        //console.log('exit x: ' + exitPortalPosition.x * 16 + '\ny: ' + exitPortalPosition.y * 16);
 
-            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, 'speedBoost');
-            this.sprite.animations.add('buffLoop', [0,1,2,3,4,5], 6, true, true);
-            this.sprite.animations.play('buffLoop');
-            this.sprite.scale.x = 0.8;
-            this.sprite.scale.y = 0.8;
-            this.game.add.tween(this.sprite).to({alpha: 0}, 15000, 'Linear', true, 0, -1);
-            this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
+        this.entryPortal = this.game.add.sprite(this.state.entryPortalPosition.x * 16, this.state.entryPortalPosition.y * 16, this.game.add.bitmapData(16, 16));
+        this.entryPortal.key.copyRect('powerups', this._getRect(1, 7), 0, 0);
+        this.entryPortal.scale.x = 1.2;
+        this.entryPortal.scale.y = 1.2;
+        this.game.add.tween(this.entryPortal).to({alpha: 0}, this.fadeTime, 'Linear', true, 0, -1);
 
-            setTimeout(this.destroy, 15000);
+        this.exitPortal = this.game.add.sprite(this.state.exitPortalPosition.x * 16, this.state.exitPortalPosition.y * 16, this.game.add.bitmapData(16, 16));
+        this.exitPortal.key.copyRect('powerups', this._getRect(17, 7), 0, 0);
+        this.exitPortal.scale.x = 1.2;
+        this.exitPortal.scale.y = 1.2;
+        this.game.add.tween(this.exitPortal).to({alpha: 0}, this.fadeTime, 'Linear', true, 0, -1);
 
-            return this.state;
-        },
+        this.game.physics.arcade.enable(this.entryPortal, Phaser.Physics.ARCADE);
+        this.game.physics.arcade.enable(this.exitPortal, Phaser.Physics.ARCADE);
 
-        update: function() {
-            this.game.physics.arcade.overlap(this.player.character.sprite, this.sprite, this.start.bind(this), null, this.game);
-        },
+        this.onSetup();
 
-        start: function() {
-            if (this.claimed) { return; }
+        setTimeout(this.destroy.bind(this), this.fadeTime);
+    }
 
-            this.claimed = true;
-            this.player.character.speed *= 2;
-            this.destroy();
-            setTimeout(this.stop, 4000);
+    start(type) {
+        if (this.claimed) { return; }
 
-            this.onStarted && this.onStarted();
-
-            console.log('Powerup START: Speed boost');
-        },
-
-        stop: function() {
-            this.player.character.speed /= 2;
-            this.finished = true;
-            console.log('Powerup STOP: Speed boost');
-        },
-
-        destroy: function() {
-            this.sprite.destroy();
-
-            this.onDestroy && this.onDestroy();
+        this.claimed = true;
+        if (type === 'entry') {
+            this.player.character.teleport(this.exitPortal);
+        } else if (type === 'exit') {
+            this.player.character.teleport(this.entryPortal);
         }
-    };
-};
 
-Powerup.plugins.reverseMode = function() {
-    return {
-        key: 'reverseMode',
-        setup: function(state) {
-            if (!this.state) {
-                this.state = {
-                    coord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
-                };
-            }
+        this.destroy();
+        setTimeout(this.stop.bind(this), this.durationTime);
 
-            this.sprite = this.game.add.sprite(this.state.coord.x * 16, this.state.coord.y * 16, this.game.add.bitmapData(16, 16));
-            this.sprite.key.copyRect('powerups', getRect(2, 2), 0, 0);
-            this.sprite.scale.x = 1.2;
-            this.sprite.scale.y = 1.2;
-            this.game.add.tween(this.sprite).to({alpha: 0}, 15000, 'Linear', true, 0, -1);
-            this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
+        this.onStarted();
 
-            setTimeout(this.destroy, 15000);
+        console.log('Powerup START: Portal');
+    }
 
-            return this.state;
-        },
+    update() {
+        this.game.physics.arcade.overlap(this.player.character.sprite, this.entryPortal, this.start.bind(this, 'entry'), null, this.game);
+        this.game.physics.arcade.overlap(this.player.character.sprite, this.exitPortal, this.start.bind(this, 'exit'), null, this.game);
 
-        update: function() {
-            this.game.physics.arcade.overlap(this.player.character.sprite, this.sprite, this.start.bind(this), null, this.game);
-        },
+        this.onUpdated();
+    }
 
-        start: function() {
-            if (this.claimed) { return; }
+    stop() {
+        this.finished = true;
+        console.log('Powerup STOP: Portal');
 
-            this.claimed = true;
-            this.player.character.speed *= -1;
-            this.destroy();
-            setTimeout(this.stop, 4000);
+        this.onStopped();
+    }
 
-            console.log('Powerup START: Reverse mode');
-        },
+    destroy() {
+        this.entryPortal.destroy();
+        this.exitPortal.destroy();
 
-        stop: function() {
-            this.player.character.speed *= -1;
-            this.finished = true;
-            console.log('Powerup STOP: Reverse mode');
-        },
+        this.onDestroyed();
+    }
+}
 
-        destroy: function() {
-            this.sprite.destroy();
 
-            this.onDestroy && this.onDestroy();
-        }
-    };
-};
-
-Powerup.plugins.portal = function() {
-    return {
-        key: 'portal',
-        setup: function(state) {
-            if (!this.state) {
-                this.state = {
-                    entryPortalCoord: Hackatron.game.state.states.Game.getValidCoord(0, 0),
-                    exitPortalCoord: Hackatron.game.state.states.Game.getValidCoord(0, 0)
-                };
-
-                this.state.coord = this.state.entryPortalCoord;
-            }
-
-            //console.log('entry x: ' + entryPortalCoord.x * 16 + '\ny: ' + entryPortalCoord.y * 16);
-            //console.log('exit x: ' + exitPortalCoord.x * 16 + '\ny: ' + exitPortalCoord.y * 16);
-
-            this.entryPortal = this.game.add.sprite(this.state.entryPortalCoord.x * 16, this.state.entryPortalCoord.y * 16, this.game.add.bitmapData(16, 16));
-            this.entryPortal.key.copyRect('powerups', getRect(1, 7), 0, 0);
-            this.entryPortal.scale.x = 1.2;
-            this.entryPortal.scale.y = 1.2;
-            this.game.add.tween(this.entryPortal).to({alpha: 0}, 15000, 'Linear', true, 0, -1);
-
-            this.exitPortal = this.game.add.sprite(this.state.exitPortalCoord.x * 16, this.state.exitPortalCoord.y * 16, this.game.add.bitmapData(16, 16));
-            this.exitPortal.key.copyRect('powerups', getRect(17, 7), 0, 0);
-            this.exitPortal.scale.x = 1.2;
-            this.exitPortal.scale.y = 1.2;
-            this.game.add.tween(this.exitPortal).to({alpha: 0}, 15000, 'Linear', true, 0, -1);
-
-            this.game.physics.arcade.enable(this.entryPortal, Phaser.Physics.ARCADE);
-            this.game.physics.arcade.enable(this.exitPortal, Phaser.Physics.ARCADE);
-
-            setTimeout(this.destroy, 15000);
-
-            return this.state;
-        },
-
-        update: function() {
-            this.game.physics.arcade.overlap(this.player.character.sprite, this.entryPortal, this.start.bind(this, 'entry'), null, this.game);
-            this.game.physics.arcade.overlap(this.player.character.sprite, this.exitPortal, this.start.bind(this, 'exit'), null, this.game);
-        },
-
-        start: function(portal) {
-            if (this.claimed) { return; }
-
-            this.claimed = true;
-            if (portal === 'entry') {
-                this.player.character.teleport(this.exitPortal);
-            } else if (portal === 'exit') {
-                this.player.character.teleport(this.entryPortal);
-            }
-
-            this.destroy();
-            setTimeout(this.stop, 4000);
-
-            console.log('Powerup START: Portal');
-        },
-
-        stop: function() {
-            this.finished = true;
-            console.log('Powerup STOP: Portal');
-        },
-
-        destroy: function() {
-            this.entryPortal.destroy();
-            this.exitPortal.destroy();
-
-            this.onDestroy && this.onDestroy();
-        }
-    };
-};
