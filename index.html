@@ -13,6 +13,7 @@
 
   <script src="vendor/easystar-0.1.7.min.js"></script>
   <script src="node_modules/phaser/build/phaser.js"></script>
+  <script src="vendor/phaser-debug.js"></script>
   <script src="src/Core/Utils.js"></script>
   <script src="src/Core/GameObject.js"></script>
   <script src="src/Core/GamePlugin.js"></script>
@@ -47,7 +48,8 @@
 
     <script type="text/javascript">
     window.onload = function () {
-        Hackatron.game = new Phaser.Game(512, 512, Phaser.CANVAS, 'game');
+        Hackatron.debug = window.location.href.indexOf('localhost') !== -1;
+        Hackatron.game = new Phaser.Game(512, 512, Phaser.AUTO, 'game');
         // Zelda
         // Hackatron.mapConfig = {
         //   tilesetMapFilename: 'tileset2',

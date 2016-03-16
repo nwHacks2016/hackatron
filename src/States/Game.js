@@ -51,6 +51,10 @@ Hackatron.Game.prototype = {
     },
 
     create: function() {
+        if (Hackatron.debug) {
+            this.game.add.plugin(Phaser.Plugin.Debug);
+        }
+
         this.players = {};
         this.socket = io.connect();
         this.events = [];
