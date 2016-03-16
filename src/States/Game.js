@@ -18,6 +18,7 @@ var updateTimeout;
 
 Hackatron.Game.prototype = {
     preload: function() {
+
     },
 
     toggleFullscreen: function() {
@@ -223,10 +224,11 @@ Hackatron.Game.prototype = {
         }
 
         setInterval(function() {
-            this.powerups.forEach(function(row) {
-                row.forEach(function(powerup) {
+            self.powerups.forEach(function(_, row) {
+                self.powerups[row].forEach(function(_, column) {
+                    var powerup = self.powerups[row][column];
                     if (powerup && powerup.handler.ended) {
-                        self.powerups[row][powerup] = null;
+                        self.powerups[row][column] = null;
                     }
                 });
             });

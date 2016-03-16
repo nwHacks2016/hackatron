@@ -103,6 +103,10 @@ class PowerupHandler {
 
     stop() {
         this.finished = true;
+
+        this.onStopped();
+        this.emit('stopped');
+
         console.log('Powerup STOP: ' + this.name);
     }
 
