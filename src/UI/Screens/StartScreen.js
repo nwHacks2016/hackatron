@@ -6,7 +6,7 @@ window.StartScreen = React.createClass({
   tick: function() {
     this.setState({instantActionTimer: this.state.instantActionTimer - 1});
 
-    if (instantActionTimer === 0) {
+    if (this.state.instantActionTimer === 0) {
         Hackatron.game.state.start('Game');
     }
   },
@@ -24,9 +24,9 @@ window.StartScreen = React.createClass({
     return (
       <div style={styles.container}>
         <div style={{display: 'none'}}>{this.state.instantActionTimer}</div>
-        <div style={styles.hostButton} onClick={this._clickHostGame}>Host Game</div>
-        <div style={styles.joinButton}>Join Game</div>
-        <div style={styles.instantActionButton}>Instant action in... {this.state.instantActionTimer}</div>
+        <div style={styles.hostButton} onClick={this._clickHostGame}></div>
+        <div style={styles.joinButton}></div>
+        <div style={styles.instantActionButton}><br />Instant action in... {this.state.instantActionTimer}</div>
       </div>
     );
   }
@@ -35,14 +35,16 @@ window.StartScreen = React.createClass({
 var styles = {
     container: {
         position: 'absolute',
-        top: 100,
-        left: 0,
-        width: 300,
+        top: 280,
+        left: 130,
+        width: 255,
         height: 200,
         padding: 20,
+        opacity: 0.9,
         background: '#003595',
         border: '2px solid #fff',
-        borderRadius: '2px'
+        borderRadius: '2px',
+        color: '#fff'
     },
     hostButton: {
         background: 'url(assets/play-button-2.png) no-repeat 0 0',
