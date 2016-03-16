@@ -41,9 +41,9 @@ var styles = {
         height: 200,
         padding: 20,
         opacity: 0.9,
-        background: '#003595',
+        background: '#01242C',
         border: '2px solid #fff',
-        borderRadius: '2px',
+        borderRadius: '4px',
         color: '#fff'
     },
     hostButton: {
