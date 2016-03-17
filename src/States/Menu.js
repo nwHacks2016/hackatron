@@ -14,9 +14,8 @@ Hackatron.Menu.prototype = {
         // this.button = button;
         // button.anchor.setTo(0.5,0.5);
 
-        window.UI_state.screenKey = 'menu';
-        window.UIIII.setState(window.UI_state);
-        
+        window.UI_state.screenKey = 'start';
+        window.UI_controller.setState(window.UI_state);
     },
 
     update: function() {

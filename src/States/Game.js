@@ -51,6 +51,9 @@ Hackatron.Game.prototype = {
     create: function() {
         if (Hackatron.debug) {
             this.game.add.plugin(Phaser.Plugin.Debug);
+
+            this.game.canvas.style['width'] = '100%';
+            this.game.canvas.style['height'] = '100%';
         }
 
         this.players = {};
@@ -74,7 +77,7 @@ Hackatron.Game.prototype = {
 
 
         window.UI_state.screenKey = 'ingame';
-        window.UIIII.setState(window.UI_state);
+        window.UI_controller.setState(window.UI_state);
     },
 
     initEvents: function() {
@@ -356,6 +359,11 @@ Hackatron.Game.prototype = {
             console.log(block);
             self.game.physics.arcade.collide(self.player.character.sprite, block);
         });
+    },
+
+    render: function() {
+        this.game.canvas.style['width'] = '100%';
+        this.game.canvas.style['height'] = '100%';
     },
 
     pelletHelper: function(mapArray){

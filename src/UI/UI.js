@@ -4,13 +4,16 @@ window.UI_state = {
 
 window.UI = React.createClass({
   getInitialState: function() {
-    window.UIIII = this;
+    window.UI_controller = this;
     return window.UI_state;
   },
   render: function() {
     return (
       <div style={styles.container}>
-        {this.state.screenKey === 'menu' && <StartScreen />}
+        {this.state.screenKey === 'start' && <StartScreen />}
+        {this.state.screenKey === 'hostGame' && <HostScreen />}
+        {this.state.screenKey === 'joinGame' && <JoinScreen />}
+        {this.state.screenKey === 'ingame' && <IngameScreen />}
       </div>
     );
   }
