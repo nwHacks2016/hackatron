@@ -51,10 +51,10 @@ Hackatron.Game.prototype = {
     create: function() {
         if (Hackatron.debug) {
             this.game.add.plugin(Phaser.Plugin.Debug);
-
-            this.game.canvas.style['width'] = '100%';
-            this.game.canvas.style['height'] = '100%';
         }
+
+        this.game.canvas.style['width'] = '100%';
+        this.game.canvas.style['height'] = '100%';
 
         this.players = {};
         this.socket = io.connect();

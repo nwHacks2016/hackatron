@@ -16,12 +16,22 @@ Hackatron.Menu.prototype = {
 
         window.UI_state.screenKey = 'start';
         window.UI_controller.setState(window.UI_state);
+
+
+        this.game.canvas.style['width'] = '100%';
+        this.game.canvas.style['height'] = '100%';
     },
 
     update: function() {
         if (this.enterKey.isDown) {
             this.startLobby();
         }
+    },
+
+    render: function() {
+        
+        this.game.canvas.style['width'] = '100%';
+        this.game.canvas.style['height'] = '100%';
     },
 
     startLobby: function() {

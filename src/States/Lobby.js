@@ -45,6 +45,9 @@ Hackatron.Lobby.prototype = {
         };
 
         this.game.add.text(100, this.game.world.centerY - 100, "Please enter your name.", style);
+
+        this.game.canvas.style['width'] = '100%';
+        this.game.canvas.style['height'] = '100%';
     },
 
     update: function() {
@@ -55,4 +58,10 @@ Hackatron.Lobby.prototype = {
             this.game.state.start('Game');
         }
     },
+
+    render: function() {
+        
+        this.game.canvas.style['width'] = '100%';
+        this.game.canvas.style['height'] = '100%';
+    }
 };

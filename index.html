@@ -65,6 +65,13 @@
   </script>
 
   <script type="text/javascript">
+      // Resize UI
+      window.onresize = function() {
+        var ui = document.getElementById('ui');
+        document.getElementById('ui').style.zoom = window.innerWidth / 512;
+      };
+
+      // Load Game
       window.onload = function () {
           Hackatron.debug = window.location.href.indexOf('localhost') !== -1;
           Hackatron.game = new Phaser.Game(512, 512, Phaser.AUTO, document.getElementById('game'));
@@ -89,6 +96,8 @@
           Hackatron.game.state.add('Game', Hackatron.Game);
 
           Hackatron.game.state.start('Preload');
+
+          window.onresize();
       };
   </script>
 </body>
