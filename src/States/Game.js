@@ -632,7 +632,9 @@ Hackatron.Game.prototype = {
 
     render: function() {
         this.fitToWindow();
+    },
 
+    enableCollisionDebugging: function() {
         this.game.debug.bodyInfo(this.player.character.sprite, 32, 32);
 
         this.game.debug.body(this.player.character.sprite);
