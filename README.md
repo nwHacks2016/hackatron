@@ -48,3 +48,4 @@ Within 24 hours, our team was able to familiarize ourselves with the following w
 4. How to set up a web application
 5. How to deploy a project to heroku
 6. **How to stay awake for 24+ hours**
+
