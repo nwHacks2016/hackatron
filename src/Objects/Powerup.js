@@ -11,7 +11,8 @@ class Powerup extends GameObject {
             'Rage': RageHandler,
             'Teleport': TeleportHandler,
             'Portal': PortalHandler,
-            'Freeze': FreezeHandler
+            'Freeze': FreezeHandler,
+            'BlockUp': BlockUpHandler
         }
     }
 
@@ -149,6 +150,21 @@ class GhostHandler extends PowerupHandler {
 }
 
 
+class BlockUpHandler extends PowerupHandler {
+    constructor(params) {
+        super(params);
+        this.name = 'Block up';
+        this.spriteMode = 'tilemap';
+        this.spriteTilemap = 'powerups';
+        this.spritePosition = {row: 5, column: 3};
+    }
+
+    onStarted() {
+        this.player.character.blocks += 10;
+    }
+}
+
+
 class InvincibleHandler extends PowerupHandler {
     constructor(params) {
         super(params);
@@ -255,10 +271,10 @@ class TeleportHandler extends PowerupHandler {
 class FreezeHandler extends PowerupHandler {
     constructor(params) {
         super(params);
-        this.name = 'Lockup';
+        this.name = 'Freeze';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'powerups';
-        this.spritePosition = {row: 1, column: 7};
+        this.spritePosition = {row: 10, column: 3};
     }
 
     // onStarted() {

@@ -300,7 +300,7 @@ Hackatron.Game.prototype = {
     broadcastEvents: function() {
         if (!this.events.length) { return; }
 
-        console.log('Broadcasting events...', JSON.stringify({events: this.events}));
+        //console.log('Broadcasting events...', JSON.stringify({events: this.events}));
 
         this.socket.emit('events', JSON.stringify({events: this.events}));
         this.events = [];
@@ -356,7 +356,7 @@ Hackatron.Game.prototype = {
         });
 
         self.blocks.forEach(function(block) {
-            console.log(block);
+            //console.log(block);
             self.game.physics.arcade.collide(self.player.character.sprite, block);
         });
     },
@@ -416,7 +416,7 @@ Hackatron.Game.prototype = {
 // ============================================================================
     parseEvent: function(event) {
         var self = this;
-        console.log('Receiving.. ' + event.key + ' ' + JSON.stringify(event.info));
+        //console.log('Receiving.. ' + event.key + ' ' + JSON.stringify(event.info));
 
         // Method for updating board local client game state using info
         // broadcasted to all players. The info variable contains the
