@@ -378,7 +378,7 @@ Hackatron.Game.prototype = {
             var worldPosition = self.player.character.worldPosition;
 
             if (self.player.character.direction === 'walkLeft') {
-                if (worldPosition.x === 1) { return; }
+                if (worldPosition.x <= 1) { return; }
 
                 var column2 = getMapColumn(worldPosition.x);
                 var closest2 = null;
@@ -434,7 +434,7 @@ Hackatron.Game.prototype = {
                 }
             }
             else if (self.player.character.direction === 'walkRight') {
-                if (worldPosition.x === 32) { return; }
+                if (worldPosition.x >= 31) { return; }
 
                 var column2 = getMapColumn(worldPosition.x);
                 var closest2 = null;
@@ -490,7 +490,7 @@ Hackatron.Game.prototype = {
                 }
             }
             else if (self.player.character.direction === 'walkUp') {
-                if (worldPosition.y === 1) { return; }
+                if (worldPosition.y <= 2) { return; }
 
                 var column2 = getMapRow(worldPosition.y);
                 var closest2 = null;
@@ -547,7 +547,7 @@ Hackatron.Game.prototype = {
                 }
             }
             else if (self.player.character.direction === 'walkDown') {
-                if (worldPosition.y === 32) { return; }
+                if (worldPosition.y >= 31) { return; }
 
                 var column2 = getMapRow(worldPosition.y);
                 var closest2 = null;
