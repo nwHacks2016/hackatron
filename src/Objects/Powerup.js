@@ -40,6 +40,7 @@ class PowerupHandler {
         this.state = {};
         this.fadeTime = 15000;
         this.durationTime = 4000;
+        this.destroyTimer = null;
 
         Object.assign(this, params);
     }
@@ -80,7 +81,7 @@ class PowerupHandler {
 
         this.onSetup();
 
-        setTimeout(this.destroy.bind(this), this.fadeTime);
+        this.destroyTimer = setTimeout(this.destroy.bind(this), this.fadeTime);
     }
 
     update() {
@@ -113,10 +114,15 @@ class PowerupHandler {
     }
 
     destroy() {
+        if (!this.sprite) { return; }
+
         this.sprite.destroy();
+        this.sprite = null;
+
+        clearTimeout(this.destroyTimer);
 
         this.onDestroyed();
-        this.emit('destroyed');
+        this.emit('destroyed', {positions: [this.state.position]});
     }
 
     onSetup() {}
@@ -327,7 +333,7 @@ class PortalHandler extends PowerupHandler {
 
         this.onSetup();
 
-        setTimeout(this.destroy.bind(this), this.fadeTime);
+        this.destroyTimer = setTimeout(this.destroy.bind(this), this.fadeTime);
     }
 
     start(type) {
@@ -357,10 +363,17 @@ class PortalHandler extends PowerupHandler {
     }
 
     destroy() {
+        if (!this.entryPortal && !this.exitPortal) { return; }
+
         this.entryPortal.destroy();
         this.exitPortal.destroy();
+        this.entryPortal = null;
+        this.exitPortal = null;
+
+        clearTimeout(this.destroyTimer);
 
         this.onDestroyed();
+        this.emit('destroyed', {positions: [this.state.entryPortalPosition, this.state.exitPortalPosition]});
     }
 }
 
