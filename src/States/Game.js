@@ -368,7 +368,7 @@ Hackatron.Game.prototype = {
             return items;
         };
 
-        var SLIDE_SPEED = 100;
+        var SLIDE_SPEED = 200;
         var REPOSITION_DELAY = 200;
         var repositionTimeout = null;
 
