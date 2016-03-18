@@ -2,10 +2,10 @@ function AI() {
 }
 
 AI.prototype.init = function(params) {
-    this.map = map;
-    this.game = game;
-    this.player = player;
-    this.enemy = enemy;
+    this.map = params.map;
+    this.game = params.game;
+    this.player = params.player;
+    this.enemy = params.enemy;
 
     var originalLevel = Utils.transpose(this.map.data);
     var convertedLevel = [];
@@ -25,18 +25,18 @@ AI.prototype.init = function(params) {
     var currentPathIndex = 0;
     var currentPath = null;
     var timeStep = 600;
-    var speed = 1000; // usually 100
+    var speed = 200; // usually 100
 
     // Delayed start to give players a chance
-    setTimeout(function() {
-        this.pathFindingInterval = setInterval( function() {
-            var currentPlayerXtile = Math.floor(this.map.player.character.sprite.x / 16);
-            var currentPlayerYtile = Math.floor(this.map.player.character.sprite.y / 16);
-            var currentGhostXtile = Math.floor(this.map.enemy.character.sprite.x / 16);
-            var currentGhostYtile = Math.floor(this.map.enemy.character.sprite.y / 16);
-
+    setTimeout(() => {
+        this.pathFindingInterval = setInterval(() => {
              if (!currentPath) {
-                this.easystar.findPath(currentGhostXtile, currentGhostYtile, currentPlayerXtile, currentPlayerYtile, function(path) {
+                this.easystar.findPath(
+                    this.enemy.character.worldPosition.x,
+                    this.enemy.character.worldPosition.y,
+                    this.player.character.worldPosition.x,
+                    this.player.character.worldPosition.y,
+                    function(path) {
                     if (!path || path.length < 2) {
                         console.log("The path to the destination point was not found.");
                         return;
@@ -45,20 +45,20 @@ AI.prototype.init = function(params) {
                     currentPath = path;    
 
                     // Periodically reset
-                    setTimeout(function() {
+                    setTimeout(() => {
                         currentPathIndex = 0;
                         currentPath = null;
-                    }, 3000);                     
+                    }, 3000);
                 }.bind(this));
             }
 
             this.easystar.calculate();
 
             if (currentPath && currentPathIndex < currentPath.length) {
-                this.map.enemy.character.sprite.x = Math.floor(currentPath[currentPathIndex].x) * 16;
-                this.map.enemy.character.sprite.y = Math.floor(currentPath[currentPathIndex].y) * 16;
+                this.enemy.character.sprite.x = Math.floor(currentPath[currentPathIndex].x) * 16;
+                this.enemy.character.sprite.y = Math.floor(currentPath[currentPathIndex].y) * 16;
 
-                this.map.enemy.character.dirty = true;
+                this.enemy.character.dirty = true;
 
                 if (currentPathIndex < currentPath.length-1) {
                     ++currentPathIndex;
@@ -67,8 +67,8 @@ AI.prototype.init = function(params) {
                     currentPath = null;
                 }
             }
-        }.bind(this), speed);
-    }.bind(this), 5000);
+        }, speed);
+    }, 5000);
 };
 
 AI.prototype.stopPathFinding = function() {
