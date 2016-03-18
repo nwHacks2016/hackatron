@@ -328,6 +328,7 @@ class PortalHandler extends PowerupHandler {
         this.entryPortal.key.copyRect('powerups', this._getRect(1, 7), 0, 0);
         this.entryPortal.scale.x = 1.2;
         this.entryPortal.scale.y = 1.2;
+        var tween1 = this.game.add.tween(this.entryPortal).to({alpha: 1}, 1000, 'Linear', false, 0, 0);
         var tween2 = this.game.add.tween(this.entryPortal).to({alpha: 0.5}, this.fadeTime - 2000, 'Linear', false, 0, 0);
         var tween3 = this.game.add.tween(this.entryPortal).to({alpha: 0}, 1000, 'Linear', false, 0, 0);
         tween1.chain(tween2);
@@ -338,6 +339,7 @@ class PortalHandler extends PowerupHandler {
         this.exitPortal.key.copyRect('powerups', this._getRect(17, 7), 0, 0);
         this.exitPortal.scale.x = 1.2;
         this.exitPortal.scale.y = 1.2;
+        var tween1 = this.game.add.tween(this.exitPortal).to({alpha: 1}, 1000, 'Linear', false, 0, 0);
         var tween2 = this.game.add.tween(this.exitPortal).to({alpha: 0.5}, this.fadeTime - 2000, 'Linear', false, 0, 0);
         var tween3 = this.game.add.tween(this.exitPortal).to({alpha: 0}, 1000, 'Linear', false, 0, 0);
         tween1.chain(tween2);
