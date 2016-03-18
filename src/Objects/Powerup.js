@@ -76,7 +76,13 @@ class PowerupHandler {
             this.sprite.scale.y = 1.2;
         }
 
-        this.game.add.tween(this.sprite).to({alpha: 0}, this.fadeTime, 'Linear', true, 0, -1);
+        this.sprite.alpha = 0;
+
+        var tween1 = this.game.add.tween(this.sprite).to({alpha: 1}, this.fadeTime * 0.1, 'Linear', false, 0, 0);
+        var tween2 = this.game.add.tween(this.sprite).to({alpha: 0}, this.fadeTime * 0.5, 'Linear', false, 0, 0);
+        tween1.chain(tween2);
+        tween1.start();
+
         this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
 
         this.onSetup();
@@ -320,13 +326,13 @@ class PortalHandler extends PowerupHandler {
         this.entryPortal.key.copyRect('powerups', this._getRect(1, 7), 0, 0);
         this.entryPortal.scale.x = 1.2;
         this.entryPortal.scale.y = 1.2;
-        this.game.add.tween(this.entryPortal).to({alpha: 0}, this.fadeTime, 'Linear', true, 0, -1);
+        this.game.add.tween(this.entryPortal).to({alpha: 0}, this.fadeTime * 0.5, 'Linear', true, 0, -1);
 
         this.exitPortal = this.game.add.sprite(this.state.exitPortalPosition.x * 16, this.state.exitPortalPosition.y * 16, this.game.add.bitmapData(16, 16));
         this.exitPortal.key.copyRect('powerups', this._getRect(17, 7), 0, 0);
         this.exitPortal.scale.x = 1.2;
         this.exitPortal.scale.y = 1.2;
-        this.game.add.tween(this.exitPortal).to({alpha: 0}, this.fadeTime, 'Linear', true, 0, -1);
+        this.game.add.tween(this.exitPortal).to({alpha: 0}, this.fadeTime * 0.5, 'Linear', true, 0, -1);
 
         this.game.physics.arcade.enable(this.entryPortal, Phaser.Physics.ARCADE);
         this.game.physics.arcade.enable(this.exitPortal, Phaser.Physics.ARCADE);
