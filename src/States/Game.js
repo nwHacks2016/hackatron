@@ -53,8 +53,7 @@ Hackatron.Game.prototype = {
             this.game.add.plugin(Phaser.Plugin.Debug);
         }
 
-        this.game.canvas.style['width'] = '100%';
-        this.game.canvas.style['height'] = '100%';
+        this.fitToWindow();
 
         this.players = {};
         this.socket = io.connect();
@@ -190,6 +189,7 @@ Hackatron.Game.prototype = {
 
         this.player = new Player();
         this.player.init(playerParams);
+        //this.player.character.sprite.body.bounce.set(0.1);
     },
 
     initMap: function() {
@@ -308,7 +308,22 @@ Hackatron.Game.prototype = {
     update: function() {
         var self = this;
 
-        var collisionHandler = function() {
+        if (this.game.input.mousePointer.isDown) {
+            //  400 is the speed it will move towards the mouse
+            this.game.physics.arcade.moveToPointer(this.player.character.sprite, PLAYER_SPEED);
+
+            //  if it's overlapping the mouse, don't move any more
+            // if (Phaser.Rectangle.contains(this.player.character.sprite.body, this.game.input.x, this.game.input.y)) {
+            //     this.player.character.sprite.body.velocity.x = 0;
+            //     this.player.character.sprite.body.velocity.y = 0;
+            // }
+        }
+        else {
+            // this.player.character.sprite.body.velocity.x = 0;
+            // this.player.character.sprite.body.velocity.y = 0;
+        }
+
+        var collideEnemyHandler = function() {
             // Scope: this = Phaser.Game
             if (self.player.character.invincible) { return; }
 
@@ -339,10 +354,259 @@ Hackatron.Game.prototype = {
             self.blocks.push(block);
         }
 
-        self.game.physics.arcade.collide(self.player.character.sprite, self.map.layer);
+        var getMapRow = (row) => {
+            return self.map.data[row]; // Map data is already tracked by row
+        };
+
+        var getMapColumn = (column) => {
+            var items = [];
+
+            for (var i = 0; i < self.map.data.length; i++) {
+                items.push(self.map.data[i][column]);
+            }
+
+            return items;
+        };
+
+        var SLIDE_SPEED = 100;
+        var REPOSITION_DELAY = 200;
+        var repositionTimeout = null;
+
+        // TODO: refactor and add amazing commenting
+        var getClosestOpening = (direction) => {
+            clearTimeout(repositionTimeout);
+            var worldPosition = self.player.character.worldPosition;
+
+            if (self.player.character.direction === 'walkLeft') {
+                var column2 = getMapColumn(worldPosition.x);
+                var closest2 = null;
+
+                for(var i = 0; i < column2.length; i++) {
+                    var cell = column2[i].index;
+                    if (cell !== Hackatron.mapConfig.floorTile) {
+                        if (!closest2 || Math.abs(worldPosition.y - i) < Math.abs(worldPosition.y - closest2)) {
+                            closest2 = i;
+                        }
+                    }
+                }
+
+                var column = getMapColumn(worldPosition.x-1);
+                var closest = null;
+
+                for(var i = 0; i < column.length; i++) {
+                    var cell = column[i].index;
+                    if (cell === Hackatron.mapConfig.floorTile) {
+                        if (!closest || Math.abs(worldPosition.y - i) < Math.abs(worldPosition.y - closest)) {
+                            // We also need this position to be closer than the closest wall in the same row as the character
+                            if (Math.abs(worldPosition.y - i) < Math.abs(worldPosition.y - closest2)) {
+                                closest = i;
+                            }
+                        }
+                    }
+                }
+
+                if (closest) {
+                    var diff = worldPosition.y - closest;
+                    var goToPosition = null;
+
+                    if (diff < 0) {
+                        console.log('Sliding down');
+                        // Go down
+                        self.player.character.sprite.body.velocity.y = SLIDE_SPEED;
+                        goToPosition = closest * 16 + 8;
+                    } else if (diff > 0) {
+                        console.log('Sliding up');
+                        // Go up
+                        self.player.character.sprite.body.velocity.y = -SLIDE_SPEED;
+                        goToPosition = closest * 16 - 8;
+                    } else {
+                        // He's probably stuck because a few pixels are touching.
+                        self.player.character.sprite.y = worldPosition.y * 16;
+                    }
+
+                    if (goToPosition) {
+                        //repositionTimeout = setTimeout(() => { self.player.character.sprite.body.velocity.y = 0; self.player.character.sprite.y = goToPosition; }, REPOSITION_DELAY);
+                    }
+                }
+            }
+            else if (self.player.character.direction === 'walkRight') {
+                var column2 = getMapColumn(worldPosition.x);
+                var closest2 = null;
+
+                for(var i = 0; i < column2.length; i++) {
+                    var cell = column2[i].index;
+                    if (cell !== Hackatron.mapConfig.floorTile) {
+                        if (!closest2 || Math.abs(worldPosition.y - i) < Math.abs(worldPosition.y - closest2)) {
+                            closest2 = i;
+                        }
+                    }
+                }
+
+                var column = getMapColumn(worldPosition.x+1);
+                var closest = null;
+
+                for(var i = 0; i < column.length; i++) {
+                    var cell = column[i].index;
+                    if (cell === Hackatron.mapConfig.floorTile) {
+                        if (!closest || Math.abs(worldPosition.y - i) < Math.abs(worldPosition.y - closest)) {
+                            // We also need this position to be closer than the closest wall in the same row as the character
+                            if (Math.abs(worldPosition.y - i) < Math.abs(worldPosition.y - closest2)) {
+                                closest = i;
+                            }
+                        }
+                    }
+                }
+
+                if (closest) {
+                    var diff = worldPosition.y - closest;
+                    var goToPosition = null;
+
+                    if (diff < 0) {
+                        console.log('Sliding down');
+                        // Go down
+                        self.player.character.sprite.body.velocity.y = SLIDE_SPEED;
+                        goToPosition = closest * 16 + 8;
+                    } else if (diff > 0) {
+                        console.log('Sliding up');
+                        // Go up
+                        self.player.character.sprite.body.velocity.y = -SLIDE_SPEED;
+                        goToPosition = closest * 16 - 8;
+                    } else {
+                        // He's probably stuck because a few pixels are touching.
+                        self.player.character.sprite.y = worldPosition.y * 16;
+                    }
+
+                    if (goToPosition) {
+                        //repositionTimeout = setTimeout(() => { self.player.character.sprite.body.velocity.y = 0; self.player.character.sprite.y = goToPosition; }, REPOSITION_DELAY);
+                    }
+                }
+            }
+            else if (self.player.character.direction === 'walkUp') {
+                var column2 = getMapRow(worldPosition.y);
+                var closest2 = null;
+
+                for(var i = 0; i < column2.length; i++) {
+                    var cell = column2[i].index;
+                    if (cell !== Hackatron.mapConfig.floorTile) {
+                        if (!closest2 || Math.abs(worldPosition.x - i) < Math.abs(worldPosition.x - closest2)) {
+                            closest2 = i;
+                        }
+                    }
+                }
+
+                var column = getMapRow(worldPosition.y-1);
+                var closest = null;
+
+                for(var i = 0; i < column.length; i++) {
+                    var cell = column[i].index;
+                    if (cell === Hackatron.mapConfig.floorTile) {
+                        if (!closest || Math.abs(worldPosition.x - i) < Math.abs(worldPosition.x - closest)) {
+                            // We also need this position to be closer than the closest wall in the same row as the character
+                            if (Math.abs(worldPosition.x - i) < Math.abs(worldPosition.x - closest2)) {
+                                closest = i;
+                            }
+                        }
+                    }
+                }
+
+                if (closest) {
+                    var diff = worldPosition.x - closest;
+                    var goToPosition = null;
+
+                    if (diff < 0) {
+                        console.log('Sliding right');
+                        // Go right
+                        self.player.character.sprite.body.velocity.x = SLIDE_SPEED;
+                        goToPosition = closest * 16 + 8;
+                    } else if (diff > 0) {
+                        console.log('Sliding left');
+                        // Go left
+                        self.player.character.sprite.body.velocity.x = -SLIDE_SPEED;
+                        goToPosition = closest * 16 - 8;
+                    } else {
+                        // He's probably stuck because a few pixels are touching.
+                        self.player.character.sprite.x = worldPosition.x * 16;
+                    }
+
+                    if (goToPosition) {
+                        //repositionTimeout = setTimeout(() => { self.player.character.sprite.body.velocity.x = 0; self.player.character.sprite.x = goToPosition; }, REPOSITION_DELAY);
+                    }
+                }
+            }
+            else if (self.player.character.direction === 'walkDown') {
+                var column2 = getMapRow(worldPosition.y);
+                var closest2 = null;
+
+                for(var i = 0; i < column2.length; i++) {
+                    var cell = column2[i].index;
+                    if (cell !== Hackatron.mapConfig.floorTile) {
+                        if (!closest2 || Math.abs(worldPosition.x - i) < Math.abs(worldPosition.x - closest2)) {
+                            closest2 = i;
+                        }
+                    }
+                }
+
+                var column = getMapRow(worldPosition.y+1);
+                var closest = null;
+
+                for(var i = 0; i < column.length; i++) {
+                    var cell = column[i].index;
+                    if (cell === Hackatron.mapConfig.floorTile) {
+                        if (!closest || Math.abs(worldPosition.x - i) < Math.abs(worldPosition.x - closest)) {
+                            // We also need this position to be closer than the closest wall in the same row as the character
+                            if (Math.abs(worldPosition.x - i) < Math.abs(worldPosition.x - closest2)) {
+                                closest = i;
+                            }
+                        }
+                    }
+                }
+
+                if (closest) {
+                    var diff = worldPosition.x - closest;
+                    var goToPosition = null;
+
+                    if (diff < 0) {
+                        console.log('Sliding right');
+                        // Go right
+                        self.player.character.sprite.body.velocity.x = SLIDE_SPEED;
+                        goToPosition = closest * 16 + 8;
+                    } else if (diff > 0) {
+                        console.log('Sliding left');
+                        // Go left
+                        self.player.character.sprite.body.velocity.x = -SLIDE_SPEED;
+                        goToPosition = closest * 16 - 8;
+                    } else {
+                        // He's probably stuck because a few pixels are touching.
+                        self.player.character.sprite.x = worldPosition.x * 16;
+                    }
+
+                    if (goToPosition) {
+                        //repositionTimeout = setTimeout(() => { self.player.character.sprite.body.velocity.x = 0; self.player.character.sprite.x = goToPosition; }, REPOSITION_DELAY);
+                    }
+                }
+            }
+        };
+
+        var collideWallHandler = () => {
+            // Find nearest opening and go that way
+            // Get current world position
+            // Check if direction is up, down, left, or right
+            // If direction is up, 
+            //   check from my position to 0 for the closest opening
+            //   check from my position to mapWidth for the closest opening
+            // If closest is left, set velocity x = -500
+            // If closest is right, set velocity x = 500
+            getClosestOpening(self.player.character.direction);
+
+            // Prototype
+            // self.player.character.sprite.body.velocity.x = 500;
+            // setTimeout(() => { self.player.character.sprite.body.velocity.x = 0; }, 500);
+        };
+
+        self.game.physics.arcade.collide(self.player.character.sprite, self.map.layer, collideWallHandler);
         if (self.enemy) {
             self.game.physics.arcade.collide(self.enemy.character.sprite, self.map.layer);
-            self.game.physics.arcade.overlap(self.enemy.character.sprite, self.player.character.sprite, collisionHandler, null, self.game);
+            self.game.physics.arcade.overlap(self.enemy.character.sprite, self.player.character.sprite, collideEnemyHandler, null, self.game);
         }
 
         self.game.world.bringToTop(self.player.character.sprite);
@@ -361,9 +625,18 @@ Hackatron.Game.prototype = {
         });
     },
 
-    render: function() {
+    fitToWindow: function() {
         this.game.canvas.style['width'] = '100%';
         this.game.canvas.style['height'] = '100%';
+    },
+
+    render: function() {
+        this.fitToWindow();
+
+        this.game.debug.bodyInfo(this.player.character.sprite, 32, 32);
+
+        this.game.debug.body(this.player.character.sprite);
+        this.game.debug.body(this.map.layer);
     },
 
     pelletHelper: function(mapArray){
@@ -615,7 +888,7 @@ Hackatron.Game.prototype = {
                 console.log('Hey now the host, lets do this!');
                 self.runEnemySystem();
                 // self.runAiSystem();
-                self.runPowerUpSystem();
+                //self.runPowerUpSystem();
             }
         }
     },
