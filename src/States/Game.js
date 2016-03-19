@@ -643,8 +643,19 @@ Hackatron.Game.prototype = {
     },
 
     fitToWindow: function() {
-        this.game.canvas.style['width'] = '100%';
-        this.game.canvas.style['height'] = '100%';
+        var width;
+        var height;
+
+        if (window.innerHeight > window.innerWidth) {
+            width = 100;
+            height = Math.round(window.innerWidth / window.innerHeight * 100);
+        } else {
+            width = Math.round(window.innerHeight / window.innerWidth * 100);
+            height = 100;
+        }
+
+        this.game.canvas.style['width'] = width + '%';
+        this.game.canvas.style['height'] = height + '%';
     },
 
     render: function() {
@@ -672,7 +683,7 @@ Hackatron.Game.prototype = {
                 x++;
             }
             if (mapArray[pos] === 0) {
-                var pellet = this.add.sprite(x*16+2, y*16+2, 'pellet');
+                var pellet = this.add.sprite(x*16+2, y*16+2, 'gfx/effects/pellet');
                 pellet.scale.x = 0.005;
                 pellet.scale.y = 0.005;
             }
@@ -880,11 +891,11 @@ Hackatron.Game.prototype = {
             }
         // Method for handling spawned blocks by other players
         } else if (event.key === 'blockSpawned') {
-            var block = self.game.add.sprite(event.info.x, event.info.y, 'glitch');
+            var block = self.game.add.sprite(event.info.x, event.info.y, 'gfx/blocks/glitch');
             // block.key.copyRect('powerups', getRect(5, 4), 0, 0);
             self.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
-            block.animations.add('glitchLoop', [0,1,2], 12, true, true);
-            block.animations.play('glitchLoop');
+            block.animations.add('glitch', [0,1,2], 12, true, true);
+            block.animations.play('glitch');
             block.scale.x = 1.25;
             block.scale.y = 1.25;
             block.body.immovable = true;

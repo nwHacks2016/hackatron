@@ -6,8 +6,6 @@ Player.prototype.toString = function() {
 };
 
 Player.prototype.init = function(params) {
-    params.characterKey = 'tron';
-    params.emitterKey = 'blueball';
     this.character = new Tron(params);
     this.character.init(params);
 

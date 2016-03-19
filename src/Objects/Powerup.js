@@ -147,7 +147,7 @@ class SaiyanHandler extends PowerupHandler {
         super(params);
         this.name = 'Saiyan mode';
         this.spriteMode = 'key';
-        this.spriteKey = 'saiyanMode';
+        this.spriteKey = 'gfx/buffs/saiyan';
         this.spriteLoop = [0,1,2,3,4,5,6];
     }
 }
@@ -158,7 +158,7 @@ class GhostHandler extends PowerupHandler {
         super(params);
         this.name = 'Ghost mode';
         this.spriteMode = 'tilemap';
-        this.spriteTilemap = 'powerups';
+        this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {row: 1, column: 2};
     }
 }
@@ -169,7 +169,7 @@ class BlockUpHandler extends PowerupHandler {
         super(params);
         this.name = 'Block up';
         this.spriteMode = 'tilemap';
-        this.spriteTilemap = 'powerups';
+        this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {row: 5, column: 3};
     }
 
@@ -184,7 +184,7 @@ class InvincibleHandler extends PowerupHandler {
         super(params);
         this.name = 'Invincible mode';
         this.spriteMode = 'tilemap';
-        this.spriteTilemap = 'powerups';
+        this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {row: 1, column: 2};
     }
 
@@ -204,7 +204,7 @@ class RageHandler extends PowerupHandler {
         super(params);
         this.name = 'Rage mode';
         this.spriteMode = 'tilemap';
-        this.spriteTilemap = 'powerups';
+        this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {row: 1, column: 1};
     }
 
@@ -253,7 +253,7 @@ class ReverseHandler extends PowerupHandler {
         super(params);
         this.name = 'ReverseHandler mode';
         this.spriteMode = 'tilemap';
-        this.spriteTilemap = 'powerups';
+        this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {row: 2, column: 2};
     }
 
@@ -272,7 +272,7 @@ class TeleportHandler extends PowerupHandler {
         super(params);
         this.name = 'Teleport';
         this.spriteMode = 'tilemap';
-        this.spriteTilemap = 'powerups';
+        this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {row: 1, column: 7};
     }
 
@@ -287,7 +287,7 @@ class FreezeHandler extends PowerupHandler {
         super(params);
         this.name = 'Freeze';
         this.spriteMode = 'tilemap';
-        this.spriteTilemap = 'powerups';
+        this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {row: 10, column: 3};
     }
 
@@ -325,7 +325,7 @@ class PortalHandler extends PowerupHandler {
         //console.log('exit x: ' + exitPortalPosition.x * 16 + '\ny: ' + exitPortalPosition.y * 16);
 
         this.entryPortal = this.game.add.sprite(this.state.entryPortalPosition.x * 16, this.state.entryPortalPosition.y * 16, this.game.add.bitmapData(16, 16));
-        this.entryPortal.key.copyRect('powerups', this._getRect(1, 7), 0, 0);
+        this.entryPortal.key.copyRect('gfx/buffs/general', this._getRect(1, 7), 0, 0);
         this.entryPortal.scale.x = 1.2;
         this.entryPortal.scale.y = 1.2;
         var tween1 = this.game.add.tween(this.entryPortal).to({alpha: 1}, 1000, 'Linear', false, 0, 0);
@@ -336,7 +336,7 @@ class PortalHandler extends PowerupHandler {
         tween1.start();
 
         this.exitPortal = this.game.add.sprite(this.state.exitPortalPosition.x * 16, this.state.exitPortalPosition.y * 16, this.game.add.bitmapData(16, 16));
-        this.exitPortal.key.copyRect('powerups', this._getRect(17, 7), 0, 0);
+        this.exitPortal.key.copyRect('gfx/buffs/general', this._getRect(17, 7), 0, 0);
         this.exitPortal.scale.x = 1.2;
         this.exitPortal.scale.y = 1.2;
         var tween1 = this.game.add.tween(this.exitPortal).to({alpha: 1}, 1000, 'Linear', false, 0, 0);

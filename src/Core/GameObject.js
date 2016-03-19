@@ -16,27 +16,19 @@ class GameObject {
         this._initSprite(params);
     }
 
-    _initSprite(params) {
+    _initSprite() {
         var padding = 0.5; // 35% padding
 
-        this.sprite = this.game.add.sprite(this.position.x, this.position.y, params.characterKey);
+        if (this.characterKey) {
+            this.sprite = this.game.add.sprite(this.position.x, this.position.y, 'gfx/characters', this.characterKey + '/' + this.defaultFrameKey);
+        } else {
+            this.sprite = this.game.add.sprite(this.position.x, this.position.y, this.characterKey);
+        }
         this.sprite.scale.x = 0.8;
         this.sprite.scale.y = 0.8;
 
         this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
         this.sprite.body.setSize(this.dimensions.width / 2, this.dimensions.height / 2, this.dimensions.width / 4, this.dimensions.height / 4);
-
-        var emitter = this.game.add.emitter(this.sprite.x, this.sprite.y, 50);
-        emitter.width = 5;
-        emitter.makeParticles(params.emitterKey);
-        emitter.setXSpeed();
-        emitter.setYSpeed();
-        emitter.setRotation();
-        emitter.setAlpha(1, 0.4, 800);
-        emitter.setScale(0.2, 0.05, 0.2, 0.05, 2000, Phaser.Easing.Quintic.Out);
-        emitter.start(false, 250, 1);
-
-        this.sprite.emitter = emitter;
     }
 
     set position(position) {

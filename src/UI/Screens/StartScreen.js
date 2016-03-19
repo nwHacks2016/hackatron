@@ -53,7 +53,7 @@ var styles = {
     borderRadius: '4px'
   },
   hostButton: {
-    background: 'url(assets/button-1.png) no-repeat 0 0',
+    background: 'url(assets/ui/buttons/button-1.png) no-repeat 0 0',
     width: 215,
     height: 55,
     'font-family': '"Press Start 2P"',
@@ -63,7 +63,7 @@ var styles = {
     'padding': '18px 15px',
   },
   joinButton: {
-    background: 'url(assets/button-1.png) no-repeat 0 0',
+    background: 'url(assets/ui/buttons/button-1.png) no-repeat 0 0',
     width: 215,
     height: 55,
     'font-family': '"Press Start 2P"',
@@ -73,7 +73,7 @@ var styles = {
     'padding': '18px 15px',
   },
   instantActionButton: {
-    background: 'url(assets/button-1.png) no-repeat 0 0',
+    background: 'url(assets/ui/buttons/button-1.png) no-repeat 0 0',
     width: 215,
     height: 55,
     'font-family': '"Press Start 2P"',

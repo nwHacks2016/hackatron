@@ -8,8 +8,8 @@ Map2D.prototype.toString = function() {
 Map2D.prototype.init = function(params) {
     this.game = params.game;
 
-    this.tilemap = this.game.add.tilemap('tilesetMap');
-    this.tilemap.addTilesetImage(Hackatron.mapConfig.tilesetKey, 'tilesetImage');
+    this.tilemap = this.game.add.tilemap('mapData');
+    this.tilemap.addTilesetImage(Hackatron.mapConfig.tilesetKey, 'mapImage');
 
     this.data = this.tilemap.layers[0].data;
 

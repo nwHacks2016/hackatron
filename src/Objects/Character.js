@@ -9,7 +9,9 @@ class Character extends GameObject {
         this.points = 0;
         this.game = params.game;
         this.speed = params.speed;
+        this.emitterKey = params.emitterKey;
 
+        this._addEmitterToSprite();
         this._addAnimationsToSprite();
     }
 
@@ -33,11 +35,53 @@ class Character extends GameObject {
         this.sprite.destroy();
     }
 
+    _addEmitterToSprite() {
+        var emitter = this.game.add.emitter(this.sprite.x, this.sprite.y, 50);
+        emitter.width = 5;
+        emitter.makeParticles(this.emitterKey);
+        emitter.setXSpeed();
+        emitter.setYSpeed();
+        emitter.setRotation();
+        emitter.setAlpha(1, 0.4, 800);
+        emitter.setScale(0.2, 0.05, 0.2, 0.05, 2000, Phaser.Easing.Quintic.Out);
+        emitter.start(false, 250, 1);
+
+        this.sprite.emitter = emitter;
+
+        this.aura = this.game.add.sprite(this.position.x, this.position.y, 'gfx/buffs/aura-1');
+        this.aura.scale.x = 0.8;
+        this.aura.scale.y = 0.8;
+
+        this.sprite.addChild(this.aura);
+    }
+
+    changeSkin(key) {
+        var oldKey = this.characterKey;
+        var oldFrameName = this.sprite.frameName;
+
+        this.sprite.animations.getAnimation('walkUp').destroy();
+        this.sprite.animations.getAnimation('walkDown').destroy();
+        this.sprite.animations.getAnimation('walkLeft').destroy();
+        this.sprite.animations.getAnimation('walkRight').destroy();
+
+        this.characterKey = key;
+
+        this._addAnimationsToSprite();
+        this.sprite.frameName = oldFrameName.replace(oldKey, key);
+    }
+
     _addAnimationsToSprite() {
-        this.sprite.animations.add('walkUp', [9,10,11], 3, false, true);
-        this.sprite.animations.add('walkDown', [0,1,2], 3, false, true);
-        this.sprite.animations.add('walkLeft', [3,4,5], 3, false, true);
-        this.sprite.animations.add('walkRight', [6,7,8], 3, false, true);
+        // Phaser.Animation.generateFrameNames(this.characterKey + '/walkDown/', 1, 3, '', 2)
+        // is equal to: [
+        // this.characterKey + '/walkDown/0001', 
+        // this.characterKey + '/walkDown/0002', 
+        // this.characterKey + '/walkDown/0003'
+        // ]
+
+        this.sprite.animations.add('walkUp', Phaser.Animation.generateFrameNames(this.characterKey + '/walkUp-', 1, 3, '', 4), 3, false, false);
+        this.sprite.animations.add('walkDown', Phaser.Animation.generateFrameNames(this.characterKey + '/walkDown-', 1, 3, '', 4), 3, false, false);
+        this.sprite.animations.add('walkLeft', Phaser.Animation.generateFrameNames(this.characterKey + '/walkLeft-', 1, 3, '', 4), 3, false, false);
+        this.sprite.animations.add('walkRight', Phaser.Animation.generateFrameNames(this.characterKey + '/walkRight-', 1, 3, '', 4), 3, false, false);
     }
 
     updatePos() {

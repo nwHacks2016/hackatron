@@ -26,7 +26,7 @@ var styles = {
     color: '#fff'
   },
   startButton: {
-    background: 'url(assets/play-button-2.png) no-repeat 0 0',
+    background: 'url(assets/ui/buttons/play-button-2.png) no-repeat 0 0',
     width: 215,
     height: 55,
     fontFamily: 'Press Start 2P'

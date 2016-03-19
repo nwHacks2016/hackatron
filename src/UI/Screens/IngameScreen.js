@@ -11,7 +11,7 @@ window.IngameScreen = React.createClass({
   },
   _changeCharacter: function(key) {
     this.setState({currentCharacter: key});
-    Hackatron.game.state.states.Game.player.character.sprite.loadTexture(key);
+    Hackatron.game.state.states.Game.player.character.changeSkin(key);
   },
   render: function() {
     var otherElements = null;
@@ -23,14 +23,14 @@ window.IngameScreen = React.createClass({
 
         otherElements = <div style={styles.otherCharacterChooser}>
             {otherCharacters.map((key) => {
-                return <div style={{width: 32, height: 32, marginBottom: 10, background: 'transparent url(assets/' + key + '.png) no-repeat 0 0'}} onClick={()=>this._changeCharacter(key)}></div>;
+                return <div style={{width: 32, height: 32, marginBottom: 10, background: 'transparent url(assets/gfx/characters/' + key + '/walkDown-0002.png) no-repeat 0 0'}} onClick={()=>this._changeCharacter(key)}></div>;
             })}
         </div>
     }
 
     return (
       <div style={styles.characterChooser}>
-        <div style={{width: 32, height: 32, background: '#01242C url(assets/' + this.state.currentCharacter + '.png) no-repeat 0 0'}} onClick={this._clickCharacter}></div>
+        <div style={{width: 32, height: 32, background: '#01242C url(assets/gfx/characters/' + this.state.currentCharacter + '/walkDown-0002.png) no-repeat 0 0'}} onClick={this._clickCharacter}></div>
         {this.state.showOthers && otherElements}
       </div>
     );

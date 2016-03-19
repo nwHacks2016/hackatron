@@ -67,8 +67,19 @@
   <script type="text/javascript">
       // Resize UI
       window.onresize = function() {
+        var width;
+        var height;
+
+        if (window.innerHeight > window.innerWidth) {
+            width = 100;
+            height = Math.round(window.innerWidth / window.innerHeight * 100);
+        } else {
+            width = Math.round(window.innerHeight / window.innerWidth * 100);
+            height = 100;
+        }
+
         var ui = document.getElementById('ui');
-        document.getElementById('ui').style.zoom = window.innerWidth / 512;
+        document.getElementById('ui').style.zoom = window.innerWidth * (width / 100) / 512;
       };
 
       // Load Game
@@ -77,16 +88,16 @@
           Hackatron.game = new Phaser.Game(512, 512, Phaser.AUTO, document.getElementById('game'));
           // Zelda
           // Hackatron.mapConfig = {
-          //   tilesetMapFilename: 'tileset2',
-          //   tilesetImageFilename: 'tileset2',
-          //   tilesetKey: 'Top',
+          //   mapDataFilename: 'zelda',
+          //   mapTilesFilename: 'zelda',
+          //   tilesetKey: 'general',
           //   floorTile: 2041
           // };
           // Tron
           Hackatron.mapConfig = {
-            tilesetMapFilename: 'tileset',
-            tilesetImageFilename: 'single-tile',
-            tilesetKey: 'aaaa222',
+            mapDataFilename: 'tron',
+            mapTilesFilename: 'tron',
+            tilesetKey: 'general',
             floorTile: 1081
           };
 

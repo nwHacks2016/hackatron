@@ -11,26 +11,39 @@ Hackatron.Preload.prototype= {
         this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
         // this.load.setPreloadSprite(this.asset);
 
-        var baseURL = 'assets/'; //window.location.hostname === 'localhost' ? 'http://localhost:8080/assets/' : 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/assets/';
+        var assetsPath = 'assets/'; //window.location.hostname === 'localhost' ? 'http://localhost:8080/assets/' : 'https://raw.githubusercontent.com/tony-dinh/hackatron/master/assets/';
 
-        // main menu
-        this.load.image('menu_background', baseURL + 'mainmenu.png');
-        this.load.spritesheet('start_button', baseURL + 'startbutton_spritesheet.png', 155, 80);
+        // Screens
+        this.load.image('ui/screens/launch', assetsPath + 'ui/screens/launch.png');
 
-        // game state
-        this.load.image('powerups', baseURL + 'powerups.png');
-        this.load.image('blueball', baseURL + 'blueball.png');
-        this.load.image('pellet', baseURL + 'pellet.png');
-        this.load.image('poop', baseURL + 'poop.png');
-        this.load.spritesheet('countdown', baseURL + 'countdown.png', 29, 27, 3);
-        this.load.spritesheet('glitch', baseURL + 'glitch-block.png', 32, 32, 3);
-        this.load.spritesheet('speedBoost', baseURL + 'speed-buff.png', 32, 32, 6);
-        this.load.spritesheet('saiyanMode', baseURL + 'saiyan-buff.png', 32, 32, 7);
-        this.load.image('tilesetImage', baseURL + Hackatron.mapConfig.tilesetImageFilename + '.png');
-        this.load.tilemap('tilesetMap', baseURL + Hackatron.mapConfig.tilesetMapFilename + '.json', null, Phaser.Tilemap.TILED_JSON);
-        this.load.spritesheet('ghost', baseURL + 'ghost.png', 32, 32, 12);
-        this.load.spritesheet('tron', baseURL + 'tron.png', 32, 32, 12);
-        this.load.audio('music1', [baseURL + 'music1.mp3']);
+        // Effects
+        this.load.image('gfx/effects/pellet', assetsPath + 'gfx/effects/pellet.png');
+
+        // Emitters
+        this.load.image('gfx/emitters/blueball', assetsPath + 'gfx/emitters/blueball.png');
+        this.load.image('gfx/emitters/brownie', assetsPath + 'gfx/emitters/brownie.png');
+
+        // UI
+        this.load.spritesheet('gfx/overlays/countdown', assetsPath + 'gfx/overlays/countdown.png', 29, 27, 3);
+
+        // Buffs
+        this.load.image('gfx/buffs/general', assetsPath + 'gfx/buffs/general.png');
+        this.load.spritesheet('gfx/buffs/aura-1', assetsPath + 'gfx/buffs/aura-1.png', 1, 2, 3, 4, 5, 6);
+        this.load.spritesheet('gfx/buffs/speed-boost', assetsPath + 'gfx/buffs/speed-boost.png', 32, 32, 6);
+        this.load.spritesheet('gfx/buffs/saiyan', assetsPath + 'gfx/buffs/saiyan.png', 32, 32, 7);
+
+        // Blocks
+        this.load.spritesheet('gfx/blocks/glitch', assetsPath + 'gfx/blocks/glitch.png', 32, 32, 3);
+
+        // Map
+        this.load.image('mapImage', assetsPath + 'gfx/maps/' + Hackatron.mapConfig.mapTilesFilename + '/map.png');
+        this.load.tilemap('mapData', assetsPath + 'gfx/maps/' + Hackatron.mapConfig.mapDataFilename + '/map.json', null, Phaser.Tilemap.TILED_JSON);
+
+        // Characters
+        this.load.atlasJSONHash('gfx/characters', assetsPath + 'gfx/characters/characters.png', assetsPath + 'gfx/characters/characters.json');
+
+        // Audio
+        this.load.audio('sounds/bg-0001', [assetsPath + 'sounds/bg-0001.mp3']);
     },
 
     create: function() {
