@@ -11,7 +11,7 @@ window.IngameScreen = React.createClass({
   },
   _changeCharacter: function(key) {
     this.setState({currentCharacter: key});
-    Hackatron.game.state.states.Game.player.character.changeSkin(key);
+    Hackatron.game.player.character.changeSkin(key);
   },
   render: function() {
     var otherElements = null;

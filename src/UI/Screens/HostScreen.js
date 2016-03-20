@@ -1,6 +1,6 @@
 window.HostScreen = React.createClass({
   _clickStart: function() {
-    Hackatron.game.state.start('Game');
+    Hackatron.loader.state.start('Game');
   },
   render: function() {
     return (

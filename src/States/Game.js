@@ -26,10 +26,12 @@ Hackatron.Game.prototype = {
         }
     },
 
-    getValidPosition: function() {
+    getValidPosition: function() {return {x: 20, y: 20};
         var position = null;
+        var currentPositon = 0;
+        var totalPositions = 32 * 32;
 
-        while (!position) {
+        while (!position && currentPositon < totalPositions) {
             var x = this.game.rnd.integerInRange(0, 31);
             var y = this.game.rnd.integerInRange(0, 31);
             // mapData goes top to down and left to right
@@ -41,6 +43,14 @@ Hackatron.Game.prototype = {
             if (cell === Hackatron.mapConfig.floorTile && !this.powerups[x][y]) {
                 position = {x: x, y: y};
             }
+
+            totalPositions++;
+        }
+
+        // We tried once for each tile on the map, with no success
+        // Lets just put them at 1,1
+        if (!position) {
+            position = {x: 1, y: 1};
         }
 
         //console.log(position);
@@ -49,6 +59,8 @@ Hackatron.Game.prototype = {
     },
 
     create: function() {
+        Hackatron.game = this;
+
         if (Hackatron.debug) {
             this.game.add.plugin(Phaser.Plugin.Debug);
         }
@@ -77,6 +89,11 @@ Hackatron.Game.prototype = {
 
         window.UI_state.screenKey = 'ingame';
         window.UI_controller.setState(window.UI_state);
+
+        this.game.world.setBounds(0, 0, 1400, 1400);
+
+        this.game.camera.follow(this.player.character.sprite, Phaser.Camera.FOLLOW_LOCKON);
+        //this.player.character.sprite.unlock();
     },
 
     initEvents: function() {
@@ -112,7 +129,7 @@ Hackatron.Game.prototype = {
         // If this is the host
         // Send enemy position every 50ms
         setInterval(function() {
-            if (self.player.id === self.hostId) {
+            if (self.enemy && self.player.id === self.hostId) {
                 self.enemy.character.updatePos();
 
                 if (!self.enemy.character.dirty) { return; }
@@ -130,7 +147,10 @@ Hackatron.Game.prototype = {
     },
 
     initPhysics: function() {
-        this.game.physics.startSystem(Phaser.Physics.ARCADE);
+        this.game.physics.startSystem(Phaser.Physics.P2JS);
+        this.game.physics.p2.defaultRestitution = 0.9;
+        this.game.physics.p2.updateBoundsCollisionGroup();
+        //this.game.physics.startSystem(Phaser.Physics.ARCADE);
     },
 
     initHotkeys: function() {
@@ -190,19 +210,48 @@ Hackatron.Game.prototype = {
         this.player = new Player();
         this.player.init(playerParams);
         //this.player.character.sprite.body.bounce.set(0.1);
+
+
+        // var playerCollisionGroup = this.game.physics.p2.createCollisionGroup();
+        // var pandaCollisionGroup = this.game.physics.p2.createCollisionGroup();
+        var playerCollisionGroup = this.game.physics.p2.createCollisionGroup();
+        var tileCollisionGroup = this.game.physics.p2.createCollisionGroup();
+
+        // this.game.physics.p2.enable(this.sprite, false, false);
+        // //  Pandas will collide against themselves and the player
+        // //  If you don't set this they'll not collide with anything.
+        // //  The first parameter is either an array or a single collision group.
+        this.map.bodies.forEach(function(body) {
+            body.setCollisionGroup(tileCollisionGroup);
+            body.collides(playerCollisionGroup);
+        });
+
+        this.game.physics.enable(this.player.character.sprite, Phaser.Physics.P2JS);
+
+        this.player.character.sprite.body.setCollisionGroup(playerCollisionGroup); 
+
+        this.player.character.sprite.body.setZeroDamping();
+        this.player.character.sprite.body.fixedRotation = true;
+
+        //this.player.character.sprite.body.debug = Constants.DEBUG;
+
+        // this.game.physics.p2.enable(this.sprite, false, false);
+        //this.game.physics.p2.addBody(this.player.character.sprite.body);
+        this.player.character.sprite.body.collides(tileCollisionGroup);
+
     },
 
     initMap: function() {
         this.map = new Map2D();
         this.map.init({game: this.game, player: this.player, enemy: this.enemy});
 
-        var start = this.map.tilemap.objects['GameObjects'][0];
-        var end = this.map.tilemap.objects['GameObjects'][1];
+        // var start = this.map.tilemap.objects['GameObjects'][0];
+        // var end = this.map.tilemap.objects['GameObjects'][1];
 
-        var teleStart = new Phaser.Rectangle(start.x, start.y, start.width, start.height);
-        var teleEnd = new Phaser.Rectangle(end.x, end.y, end.width, end.height);
-
+        // var teleStart = new Phaser.Rectangle(start.x, start.y, start.width, start.height);
+        // var teleEnd = new Phaser.Rectangle(end.x, end.y, end.width, end.height);
         // TODO: do stuff with tele points
+
     },
 
     initCountdown: function() {
@@ -310,7 +359,7 @@ Hackatron.Game.prototype = {
 
         if (this.game.input.mousePointer.isDown) {
             //  400 is the speed it will move towards the mouse
-            this.game.physics.arcade.moveToPointer(this.player.character.sprite, PLAYER_SPEED);
+            //this.game.physics.p2.moveToPointer(this.player.character.sprite, PLAYER_SPEED);
 
             //  if it's overlapping the mouse, don't move any more
             // if (Phaser.Rectangle.contains(this.player.character.sprite.body, this.game.input.x, this.game.input.y)) {
@@ -620,11 +669,11 @@ Hackatron.Game.prototype = {
             // setTimeout(() => { self.player.character.sprite.body.velocity.x = 0; }, 500);
         };
 
-        self.game.physics.arcade.collide(self.player.character.sprite, self.map.layer, collideWallHandler);
-        if (self.enemy) {
-            self.game.physics.arcade.collide(self.enemy.character.sprite, self.map.layer);
-            self.game.physics.arcade.overlap(self.enemy.character.sprite, self.player.character.sprite, collideEnemyHandler, null, self.game);
-        }
+        // self.game.physics.p2.collideWallHandler(self.player.character.sprite, self.map.layer, collideWallHandler);
+        // if (self.enemy) {
+        //     self.game.physics.p2.collide(self.enemy.character.sprite, self.map.layer);
+        //     self.game.physics.p2.overlap(self.enemy.character.sprite, self.player.character.sprite, collideEnemyHandler, null, self.game);
+        // }
 
         self.game.world.bringToTop(self.player.character.sprite);
 
@@ -638,11 +687,18 @@ Hackatron.Game.prototype = {
 
         self.blocks.forEach(function(block) {
             //console.log(block);
-            self.game.physics.arcade.collide(self.player.character.sprite, block);
+            //self.game.physics.p2.collide(self.player.character.sprite, block);
         });
     },
 
     fitToWindow: function() {
+        this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+        this.game.scale.setUserScale(window.innerWidth / Hackatron.WIDTH, window.innerWidth / Hackatron.WIDTH);
+
+        // enable crisp rendering
+        this.game.renderer.renderSession.roundPixels = true;
+        Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
+
         var width;
         var height;
 
@@ -708,8 +764,8 @@ Hackatron.Game.prototype = {
 
         this.players[playerId] = player;
 
-        this.game.physics.arcade.collide(player.character.sprite, this.map.layer);
-        this.game.physics.arcade.collide(player.character.sprite, this.player.character.sprite, null, null, this.game);
+        // this.game.physics.p2.collide(player.character.sprite, this.map.layer);
+        // this.game.physics.p2.collide(player.character.sprite, this.player.character.sprite, null, null, this.game);
 
         return player;
     },
@@ -893,7 +949,7 @@ Hackatron.Game.prototype = {
         } else if (event.key === 'blockSpawned') {
             var block = self.game.add.sprite(event.info.x, event.info.y, 'gfx/blocks/glitch');
             // block.key.copyRect('powerups', getRect(5, 4), 0, 0);
-            self.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
+            self.game.physics.p2.enable(block, Phaser.Physics.P2JS);
             block.animations.add('glitch', [0,1,2], 12, true, true);
             block.animations.play('glitch');
             block.scale.x = 1.25;
@@ -917,9 +973,9 @@ Hackatron.Game.prototype = {
             // If this player is the new host, lets set them up
             if (self.hostId === self.player.id) {
                 console.log('Hey now the host, lets do this!');
-                self.runEnemySystem();
-                self.runAiSystem();
-                self.runPowerUpSystem();
+                //self.runEnemySystem();
+                //self.runAiSystem();
+                //self.runPowerUpSystem();
             }
         }
     },

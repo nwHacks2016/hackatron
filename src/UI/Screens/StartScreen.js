@@ -7,7 +7,7 @@ window.StartScreen = React.createClass({
 
     if (this.state.instantActionTimer === 0) {
         clearInterval(this.interval);
-        Hackatron.game.state.start('Game');
+        Hackatron.loader.state.start('Game');
     }
   },
   componentDidMount: function() {
@@ -25,7 +25,7 @@ window.StartScreen = React.createClass({
     window.UI_controller.setState(window.UI_state);
   },
   _clickInstantAction: function() {
-    Hackatron.game.state.start('Game');
+    Hackatron.loader.state.start('Game');
   },
   render: function() {
     return (

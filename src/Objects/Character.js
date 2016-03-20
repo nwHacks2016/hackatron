@@ -11,7 +11,7 @@ class Character extends GameObject {
         this.speed = params.speed;
         this.emitterKey = params.emitterKey;
 
-        this._addEmitterToSprite();
+        //this._addEmitterToSprite();
         this._addAnimationsToSprite();
     }
 
@@ -98,40 +98,53 @@ class Character extends GameObject {
 
         this.sprite.body.velocity.x = 0;
         this.sprite.body.velocity.y = 0;
-        this.sprite.emitter.on = true;
+
+        if (this.sprite.emitter) {
+            this.sprite.emitter.on = true;
+        }
 
         //console.log(this.name + ' ' + this.sprite.x + ',' + this.sprite.y);
 
         if (this.sprite.upKey.isDown) {
             this.sprite.animations.play('walkUp', 3, false);
             this.sprite.body.velocity.y = -this.speed;
-            this.sprite.emitter.x = this.sprite.x + 15;
-            this.sprite.emitter.y = this.sprite.y + 35;
             this.direction = 'walkUp';
             this.dirty = true;
+            if (this.sprite.emitter) {
+                this.sprite.emitter.x = this.sprite.x + 15;
+                this.sprite.emitter.y = this.sprite.y + 35;
+            }
         } else if (this.sprite.downKey.isDown) {
             this.sprite.animations.play('walkDown', 3, false);
             this.sprite.body.velocity.y = this.speed;
-            this.sprite.emitter.x = this.sprite.x + 15;
-            this.sprite.emitter.y = this.sprite.y + -5;
             this.direction = 'walkDown';
             this.dirty = true;
+            if (this.sprite.emitter) {
+                this.sprite.emitter.x = this.sprite.x + 15;
+                this.sprite.emitter.y = this.sprite.y + -5;
+            }
         } else if (this.sprite.leftKey.isDown) {
             this.sprite.animations.play('walkLeft', 3, false);
             this.sprite.body.velocity.x = -this.speed;
-            this.sprite.emitter.x = this.sprite.x + 30;
-            this.sprite.emitter.y = this.sprite.y + 15;
             this.direction = 'walkLeft';
             this.dirty = true;
+            if (this.sprite.emitter) {
+                this.sprite.emitter.x = this.sprite.x + 30;
+                this.sprite.emitter.y = this.sprite.y + 15;
+            }
         } else if (this.sprite.rightKey.isDown) {
             this.sprite.animations.play('walkRight', 3, false);
             this.sprite.body.velocity.x = this.speed;
-            this.sprite.emitter.x = this.sprite.x;
-            this.sprite.emitter.y = this.sprite.y + 15;
             this.direction = 'walkRight';
             this.dirty = true;
+            if (this.sprite.emitter) {
+                this.sprite.emitter.x = this.sprite.x;
+                this.sprite.emitter.y = this.sprite.y + 15;
+            }
         } else {
-            this.sprite.emitter.on = false;
+            if (this.sprite.emitter) {
+                this.sprite.emitter.on = false;
+            }
             this.direction = null;
         }
     }

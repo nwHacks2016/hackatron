@@ -1,0 +1,24 @@
+{
+    "meta": {
+        "generated": "1458436315065",
+        "version": "1.0",
+        "app": "gulp-phaser-tiled-pack",
+        "url": "https://github.com/englercj/gulp-phaser-tiled-pack"
+    },
+    "map": [
+        {
+            "type": "image",
+            "subtype": "tileset",
+            "key": "map_tileset_general",
+            "name": "general",
+            "url": "assets/gfx/maps/tron/map.png",
+            "overwrite": false
+        },
+        {
+            "type": "tiledmap",
+            "key": "map_tiledmap",
+            "url": "assets/gfx/maps/tron/map.json",
+            "format": "TILED_JSON"
+        }
+    ]
+}

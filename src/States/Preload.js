@@ -1,4 +1,9 @@
 Hackatron.Preload = function(game) {
+    this.game = game;
+};
+
+var cacheKey = function (key, type, name) {
+    return key + '_' + type + (name ? '_' + name : '');
 };
 
 Hackatron.Preload.prototype= {
@@ -7,6 +12,10 @@ Hackatron.Preload.prototype= {
         // this.load.image('preloader', 'assets/preloader.gif');
         // this.asset = this.add.sprite(this.width/2,this.height/2, 'preloader');
         // this.asset.anchor.setTo(0.5, 0.5);
+
+        this.game.add.plugin(new Phaser.Plugin.Tiled(this.game, this.game.stage));
+        //this.game.add.plugin(Phaser.Plugin.Tiled);
+
 
         this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
         // this.load.setPreloadSprite(this.asset);
@@ -36,8 +45,12 @@ Hackatron.Preload.prototype= {
         this.load.spritesheet('gfx/blocks/glitch', assetsPath + 'gfx/blocks/glitch.png', 32, 32, 3);
 
         // Map
-        this.load.image('mapImage', assetsPath + 'gfx/maps/' + Hackatron.mapConfig.mapTilesFilename + '/map.png');
-        this.load.tilemap('mapData', assetsPath + 'gfx/maps/' + Hackatron.mapConfig.mapDataFilename + '/map.json', null, Phaser.Tilemap.TILED_JSON);
+        // this.load.tiledmap(cacheKey('map', 'tiledmap'), assetsPath + 'gfx/maps/' + Hackatron.mapConfig.mapTilesFilename + '/map.json', null, Phaser.Tilemap.TILED_JSON);
+        // this.load.image(cacheKey('map', 'tileset', 'general'), assetsPath + 'gfx/maps/' + Hackatron.mapConfig.mapTilesFilename + '/map.png');
+        this.load.pack('map', assetsPath + 'gfx/maps/general.json');
+
+        // this.load.image('mapImage', assetsPath + 'gfx/maps/' + Hackatron.mapConfig.mapTilesFilename + '/map2.png');
+        // this.load.tilemap('mapData', assetsPath + 'gfx/maps/' + Hackatron.mapConfig.mapDataFilename + '/map2.json', null, Phaser.Tilemap.TILED_JSON);
 
         // Characters
         this.load.atlasJSONHash('gfx/characters', assetsPath + 'gfx/characters/characters.png', assetsPath + 'gfx/characters/characters.json');
