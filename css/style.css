@@ -16,3 +16,7 @@ p {
     top: 0px;
     left: 0px;
 }
+
+#game {
+    margin: auto;
+}

@@ -4,8 +4,11 @@ Hackatron.Menu = function(game) {
 
 Hackatron.Menu.prototype = {
     fitToWindow: function() {
-        this.game.canvas.style['width'] = Hackatron.getWidthRatioScale() * 100 + '%';
-        this.game.canvas.style['height'] = Hackatron.getHeightRatioScale() * 100 + '%';
+        this.game.canvas.style['width'] = '100%';
+        this.game.canvas.style['height'] = '100%';
+        document.getElementById('game').style['width'] = Hackatron.getWidthRatioScale() * 100 + '%';
+        document.getElementById('game').style['height'] = Hackatron.getHeightRatioScale() * 100 + '%';
+        window.onresize();
     },
 
     create: function() {

@@ -60,8 +60,5 @@ Hackatron.Lobby.prototype = {
     },
 
     render: function() {
-        
-        this.game.canvas.style['width'] = '100%';
-        this.game.canvas.style['height'] = '100%';
     }
 };

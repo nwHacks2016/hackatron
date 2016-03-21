@@ -67,8 +67,13 @@
   </script>
 
   <script type="text/javascript">
-      Hackatron.GAME_WIDTH = 128;
-      Hackatron.GAME_HEIGHT = 128;
+      Hackatron.GAME_WIDTH = 128; // Game originally designed for 128px
+      Hackatron.GAME_HEIGHT = 128; // Game originally designed for 128px
+      Hackatron.UI_WIDTH = 900; // UI originally designed for 900px
+      Hackatron.UI_HEIGHT = 900; // UI originally designed for 900px
+
+      var gameContainer = document.getElementById('game');
+      var uiContainer = document.getElementById('ui');
 
       Hackatron.getWidthGameScale = function() {
         return (window.innerWidth / Hackatron.GAME_WIDTH).toFixed(2);
@@ -88,16 +93,15 @@
 
       // Resize UI
       window.onresize = function() {
-        var ui = document.getElementById('ui');
-        var smallest = Hackatron.getWidthRatioScale() < Hackatron.getHeightRatioScale() ? Hackatron.getWidthRatioScale() : Hackatron.getHeightRatioScale();
-        document.getElementById('ui').style.width = document.getElementById('game').children[0].style.width;
-        document.getElementById('ui').style.zoom = smallest;
+        var smallest = window.innerHeight > window.innerWidth ? gameContainer.offsetWidth / Hackatron.UI_WIDTH : gameContainer.offsetHeight / Hackatron.UI_HEIGHT;
+        uiContainer.style.left = (100 - parseInt(gameContainer.style.width)) / 2 + '%';
+        uiContainer.style.zoom = smallest;
       };
 
       // Load Game
       window.onload = function () {
           Hackatron.debug = window.location.href.indexOf('localhost') !== -1;
-          Hackatron.loader = new Phaser.Game(Hackatron.GAME_WIDTH, Hackatron.GAME_HEIGHT, Phaser.CANVAS, document.getElementById('game'));
+          Hackatron.loader = new Phaser.Game(Hackatron.GAME_WIDTH, Hackatron.GAME_HEIGHT, Phaser.CANVAS, gameContainer);
           // None of these work now
           // Zelda
           // Hackatron.mapConfig = {
