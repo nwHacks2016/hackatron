@@ -117,9 +117,14 @@ class Character extends GameObject {
             this.sprite.emitter.on = true;
         }
 
+        this.inputDown = this.inputDown || this.sprite.downKey.isDown;
+        this.inputUp = this.inputUp || this.sprite.upKey.isDown;
+        this.inputLeft = this.inputLeft || this.sprite.leftKey.isDown;
+        this.inputRight = this.inputRight || this.sprite.rightKey.isDown;
+
         //console.log(this.name + ' ' + this.sprite.x + ',' + this.sprite.y);
 
-        if (this.sprite.upKey.isDown) {
+        if (this.inputUp) {
             this.sprite.animations.play('walkUp', 3, false);
             this.sprite.body.velocity.y = -this.speed;
             this.direction = 'walkUp';
@@ -128,7 +133,7 @@ class Character extends GameObject {
                 this.sprite.emitter.x = this.sprite.x + 15;
                 this.sprite.emitter.y = this.sprite.y + 35;
             }
-        } else if (this.sprite.downKey.isDown) {
+        } else if (this.inputDown) {
             this.sprite.animations.play('walkDown', 3, false);
             this.sprite.body.velocity.y = this.speed;
             this.direction = 'walkDown';
@@ -137,7 +142,7 @@ class Character extends GameObject {
                 this.sprite.emitter.x = this.sprite.x + 15;
                 this.sprite.emitter.y = this.sprite.y + -5;
             }
-        } else if (this.sprite.leftKey.isDown) {
+        } else if (this.inputLeft) {
             this.sprite.animations.play('walkLeft', 3, false);
             this.sprite.body.velocity.x = -this.speed;
             this.direction = 'walkLeft';
@@ -146,7 +151,7 @@ class Character extends GameObject {
                 this.sprite.emitter.x = this.sprite.x + 30;
                 this.sprite.emitter.y = this.sprite.y + 15;
             }
-        } else if (this.sprite.rightKey.isDown) {
+        } else if (this.inputRight) {
             this.sprite.animations.play('walkRight', 3, false);
             this.sprite.body.velocity.x = this.speed;
             this.direction = 'walkRight';
