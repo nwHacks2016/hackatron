@@ -86,8 +86,6 @@ Hackatron.Game.prototype = {
             this.game.add.plugin(Phaser.Plugin.Debug);
         }
 
-        this.fitToWindow();
-
         this.players = {};
         this.socket = io.connect();
         this.events = [];
@@ -525,7 +523,7 @@ Hackatron.Game.prototype = {
     },
 
     render: function() {
-        //this.fitToWindow();
+        this.fitToWindow();
     },
 
     enableCollisionDebugging: function() {
