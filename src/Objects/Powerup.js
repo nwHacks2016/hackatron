@@ -60,7 +60,7 @@ class PowerupHandler {
 
     setup() {
         if (!this.state.position) {
-            this.state.position = this.game.getValidPosition();
+            this.state.position = Hackatron.game.getValidPosition();
         }
 
         if (this.spriteMode === 'key') {
@@ -277,7 +277,7 @@ class TeleportHandler extends PowerupHandler {
     }
 
     onStarted() {
-        this.player.character.teleport(this.game.getValidPosition());
+        this.player.character.teleport(Hackatron.game.getValidPosition());
     }
 }
 
@@ -310,11 +310,11 @@ class PortalHandler extends PowerupHandler {
 
     setup(state) {
         if (!this.state.entryPortalPosition) {
-            this.state.entryPortalPosition = this.game.getValidPosition();
+            this.state.entryPortalPosition = Hackatron.game.getValidPosition();
         }
 
         if (!this.state.exitPortalPosition) {
-            this.state.exitPortalPosition = this.game.getValidPosition();
+            this.state.exitPortalPosition = Hackatron.game.getValidPosition();
         }
 
         // kind of a hack.. doesn't put exit in the array of powerups :-/

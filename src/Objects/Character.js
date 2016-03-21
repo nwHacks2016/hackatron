@@ -31,7 +31,10 @@ class Character extends GameObject {
         this.isAlive = false;
         this.points = 0;
 
-        this.sprite.emitter.destroy();
+        if (this.sprite.emitter) {
+            this.sprite.emitter.destroy();
+        }
+
         this.sprite.destroy();
     }
 
@@ -84,7 +87,18 @@ class Character extends GameObject {
         this.sprite.animations.add('walkRight', Phaser.Animation.generateFrameNames(this.characterKey + '/walkRight-', 1, 3, '', 4), 3, false, false);
     }
 
+    lock() {
+        this.sprite.body.velocity.x = 0;
+        this.sprite.body.velocity.y = 0;
+        this.locked = true;
+    }
+
+    unlock() {
+        this.locked = false;
+    }
+
     updatePos() {
+        if (this.locked) { return; }
         if (!this.isAlive) { return; }
 
         if (!(this.sprite &&
@@ -145,7 +159,6 @@ class Character extends GameObject {
             if (this.sprite.emitter) {
                 this.sprite.emitter.on = false;
             }
-            this.direction = null;
         }
     }
 }

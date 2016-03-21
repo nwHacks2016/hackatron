@@ -30,9 +30,8 @@
   <script src="vendor/react-dom.js"></script>
 
   <script src="vendor/easystar-0.1.7.min.js"></script>
-  <script src="vendor/p2.js"></script>
   <script src="vendor/pixi.js"></script>
-  <script src="vendor/phaser.js"></script>
+  <script src="vendor/phaser-arcade-physics.js"></script>
   <script src="vendor/phaser-tiled.js"></script>
   <script src="vendor/phaser-debug.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.34/browser.js"></script>
@@ -68,30 +67,38 @@
   </script>
 
   <script type="text/javascript">
-      Hackatron.WIDTH = 128;
-      Hackatron.HEIGHT = 128;
+      Hackatron.GAME_WIDTH = 128;
+      Hackatron.GAME_HEIGHT = 128;
+
+      Hackatron.getWidthGameScale = function() {
+        return (window.innerWidth / Hackatron.GAME_WIDTH).toFixed(2);
+      };
+
+      Hackatron.getHeightGameScale = function() {
+        return (window.innerHeight / Hackatron.GAME_HEIGHT).toFixed(2);
+      };
+
+      Hackatron.getWidthRatioScale = function() {
+        return window.innerHeight > window.innerWidth ? 1 : (window.innerHeight / window.innerWidth).toFixed(2);
+      };
+
+      Hackatron.getHeightRatioScale = function() {
+        return window.innerHeight > window.innerWidth ? (window.innerWidth / window.innerHeight).toFixed(2) : 1;
+      };
 
       // Resize UI
       window.onresize = function() {
-        var width;
-        var height;
-
-        if (window.innerHeight > window.innerWidth) {
-            width = 100;
-            height = Math.round(window.innerWidth / window.innerHeight * 100);
-        } else {
-            width = Math.round(window.innerHeight / window.innerWidth * 100);
-            height = 100;
-        }
-
         var ui = document.getElementById('ui');
-        document.getElementById('ui').style.zoom = width / 100;
+        var smallest = Hackatron.getWidthRatioScale() < Hackatron.getHeightRatioScale() ? Hackatron.getWidthRatioScale() : Hackatron.getHeightRatioScale();
+        document.getElementById('ui').style.width = document.getElementById('game').children[0].style.width;
+        document.getElementById('ui').style.zoom = smallest;
       };
 
       // Load Game
       window.onload = function () {
           Hackatron.debug = window.location.href.indexOf('localhost') !== -1;
-          Hackatron.loader = new Phaser.Game(Hackatron.WIDTH, Hackatron.HEIGHT, Phaser.AUTO, document.getElementById('game'));
+          Hackatron.loader = new Phaser.Game(Hackatron.GAME_WIDTH, Hackatron.GAME_HEIGHT, Phaser.CANVAS, document.getElementById('game'));
+          // None of these work now
           // Zelda
           // Hackatron.mapConfig = {
           //   mapDataFilename: 'zelda',
@@ -114,12 +121,12 @@
           //     floorTile: 1081
           // };
           //Tron
-          Hackatron.mapConfig = {
-              mapDataFilename: 'tron',
-              mapTilesFilename: 'tron',
-              tilesetKey: 'general',
-              floorTile: 1081
-          };
+          // Hackatron.mapConfig = {
+          //     mapDataFilename: 'tron',
+          //     mapTilesFilename: 'tron',
+          //     tilesetKey: 'general',
+          //     floorTile: 1081
+          // };
 
           Hackatron.loader.state.add('Preload', Hackatron.Preload);
           Hackatron.loader.state.add('Menu', Hackatron.Menu);

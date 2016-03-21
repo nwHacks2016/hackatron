@@ -1,51 +1,43 @@
 Hackatron.Menu = function(game) {
+    this.game = game;
 };
 
 Hackatron.Menu.prototype = {
-    preload: function() {
-    },
-
     fitToWindow: function() {
-        var width;
-        var height;
-
-        if (window.innerHeight > window.innerWidth) {
-            width = 100;
-            height = Math.round(window.innerWidth / window.innerHeight * 100);
-        } else {
-            width = Math.round(window.innerHeight / window.innerWidth * 100);
-            height = 100;
-        }
-
-        this.game.canvas.style['width'] = width + '%';
-        this.game.canvas.style['height'] = height + '%';
+        this.game.canvas.style['width'] = Hackatron.getWidthRatioScale() * 100 + '%';
+        this.game.canvas.style['height'] = Hackatron.getHeightRatioScale() * 100 + '%';
     },
 
     create: function() {
         this.stage.setBackgroundColor(0x2d2d2d);
-        this.add.sprite(0, 0, 'ui/screens/launch');
+        var bg = this.add.sprite(0, 0, 'ui/screens/launch');
+        var ratio = bg.height / bg.width;
+        bg.width = Hackatron.GAME_WIDTH;
+        bg.height = bg.width * ratio;
 
-        this.enterKey = this.input.keyboard.addKey(Phaser.Keyboard.ENTER);
-        // this.button = button;
-        // button.anchor.setTo(0.5,0.5);
+        this.startKey = this.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+        this.musicKey = this.input.keyboard.addKey(Phaser.Keyboard.M);
 
         window.UI_state.screenKey = 'start';
         window.UI_controller.setState(window.UI_state);
 
         this.fitToWindow();
+
+        this.game.music = this.game.add.audio('audio/bg-0002', 1, true);
+        this.game.music.play('', 0, 1, true);
     },
 
     update: function() {
-        if (this.enterKey.isDown) {
-            this.startLobby();
+        if (this.startKey.isDown) {
+            this.game.state.start('Game');
+        }
+
+        if (this.musicKey.isDown) {
+            this.game.music.mute = !this.game.music.mute;
         }
     },
 
     render: function() {
         this.fitToWindow();
-    },
-
-    startLobby: function() {
-        this.state.start('Lobby');
     }
 };

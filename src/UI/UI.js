@@ -21,5 +21,8 @@ window.UI = React.createClass({
 
 var styles = {
     container: {
+      position: 'relative',
+      top: 0,
+      left: 0
     }
 };

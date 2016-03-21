@@ -6,15 +6,22 @@ var cacheKey = function (key, type, name) {
     return key + '_' + type + (name ? '_' + name : '');
 };
 
-Hackatron.Preload.prototype= {
+Hackatron.Preload.prototype = {
     preload: function() {
+        this.game.scale.scaleMode = Phaser.ScaleManager.USER_SCALE;
+        this.game.scale.setUserScale(window.innerWidth / Hackatron.GAME_WIDTH, window.innerWidth / Hackatron.GAME_WIDTH);
+
+        // enable crisp rendering
+        this.game.renderer.renderSession.roundPixels = true;
+        Phaser.Canvas.setImageRenderingCrisp(this.game.canvas);
+
         // preload gif not working yet.
         // this.load.image('preloader', 'assets/preloader.gif');
         // this.asset = this.add.sprite(this.width/2,this.height/2, 'preloader');
         // this.asset.anchor.setTo(0.5, 0.5);
 
-        this.game.add.plugin(new Phaser.Plugin.Tiled(this.game, this.game.stage));
-        //this.game.add.plugin(Phaser.Plugin.Tiled);
+        //this.game.add.plugin(new Phaser.Plugin.Tiled(this.game, this.game.stage));
+        this.game.add.plugin(Phaser.Plugin.Tiled);
 
 
         this.load.onLoadComplete.addOnce(this.onLoadComplete, this);
@@ -45,8 +52,6 @@ Hackatron.Preload.prototype= {
         this.load.spritesheet('gfx/blocks/glitch', assetsPath + 'gfx/blocks/glitch.png', 32, 32, 3);
 
         // Map
-        // this.load.tiledmap(cacheKey('map', 'tiledmap'), assetsPath + 'gfx/maps/' + Hackatron.mapConfig.mapTilesFilename + '/map.json', null, Phaser.Tilemap.TILED_JSON);
-        // this.load.image(cacheKey('map', 'tileset', 'general'), assetsPath + 'gfx/maps/' + Hackatron.mapConfig.mapTilesFilename + '/map.png');
         this.load.pack('map', assetsPath + 'gfx/maps/general.json');
 
         // this.load.image('mapImage', assetsPath + 'gfx/maps/' + Hackatron.mapConfig.mapTilesFilename + '/map2.png');
@@ -56,12 +61,7 @@ Hackatron.Preload.prototype= {
         this.load.atlasJSONHash('gfx/characters', assetsPath + 'gfx/characters/characters.png', assetsPath + 'gfx/characters/characters.json');
 
         // Audio
-        this.load.audio('sounds/bg-0001', [assetsPath + 'sounds/bg-0001.mp3']);
-    },
-
-    create: function() {
-        // this.game.music = this.game.add.audio('music1', 1, true);
-        // this.game.music.play('', 0, 1, true);
+        this.load.audio('audio/bg-0002', [assetsPath + 'audio/bg-0002.mp3']);
     },
 
     update: function() {

@@ -1988,6 +1988,9 @@ var originals = {
         processPack: Phaser.Loader.prototype.processPack
     },
     physics: {
+        arcade: {
+            convertTiledmap: Phaser.Physics.Arcade ? Phaser.Physics.Arcade.prototype.convertTiledmap : null,
+        },
         p2: {
             convertTiledmap: Phaser.Physics.P2 ? Phaser.Physics.P2.prototype.convertTiledmap : null,
             convertTiledCollisionObjects: Phaser.Physics.P2 ? Phaser.Physics.P2.prototype.convertTiledCollisionObjects : null
@@ -2005,6 +2008,10 @@ Tiled.prototype.init = function () {
     Phaser.Loader.prototype.jsonLoadComplete = Loader_jsonLoadComplete;
     Phaser.Loader.prototype.xmlLoadComplete = Loader_xmlLoadComplete;
     Phaser.Loader.prototype.processPack = Loader_processPack;
+
+    if (Phaser.Physics.Arcade) {
+        Phaser.Physics.Arcade.prototype.convertTiledmap = physics.arcade.convertTiledmap;
+    }
 
     if (Phaser.Physics.P2) {
         Phaser.Physics.P2.prototype.convertTiledmap = physics.p2.convertTiledmap;
@@ -2025,6 +2032,10 @@ Tiled.prototype.destroy = function () {
     Phaser.Loader.prototype.jsonLoadComplete = originals.loader.jsonLoadComplete;
     Phaser.Loader.prototype.xmlLoadComplete = originals.loader.xmlLoadComplete;
     Phaser.Loader.prototype.processPack = originals.loader.processPack;
+
+    if (originals.physics.arcade.convertTiledmap) {
+        Phaser.Physics.Arcade.prototype.convertTiledmap = originals.physics.arcade.convertTiledmap;
+    }
 
     if (originals.physics.p2.convertTiledmap) {
         Phaser.Physics.P2.prototype.convertTiledmap = originals.physics.p2.convertTiledmap;
@@ -2265,6 +2276,89 @@ function Loader_processPack(pack) {
 
 },{"./physics":10,"./tiled/Objectlayer":11,"./tiled/Tilelayer":13,"./tiled/Tilemap":14,"./tiled/Tileset":16,"./utils":17}],10:[function(require,module,exports){
 module.exports = {
+    arcade: {
+        convertTiledmap: function (map, layer, addToWorld, optimize) {
+        
+            if (typeof addToWorld === 'undefined') { addToWorld = true; }
+            if (typeof optimize === 'undefined') { optimize = true; }
+            if (typeof layer === 'undefined') { layer = map.currentLayer; }
+        
+            layer = map.getTilelayer(layer);
+        
+            if (!layer) {
+                return;
+            }
+
+            var collideArray = [];
+        
+            var width = 0,
+                sx = 0,
+                sy = 0,
+                tile, right;
+        
+            for (var y = 0, h = layer.size.y; y < h; y++)
+            {
+                width = 0;
+        
+                for (var x = 0, w = layer.size.x; x < w; x++)
+                {
+                    if (!layer.tilesOriginal[y]) {
+                        continue;
+                    }
+        
+                    tile = layer.tilesOriginal[y][x];
+        
+                    if (tile && tile.collides)
+                    {
+                        if (optimize)
+                        {
+                            right = map.getTileRight(layer.index, x, y);
+        
+                            if (width === 0)
+                            {
+                                sx = tile.x;
+                                sy = tile.y;
+                                width = tile.width;
+                            }
+        
+                            if (right && right.collides)
+                            {
+                                width += tile.width;
+                            }
+                            else
+                            {
+                                //tile.physicsType = Phaser.TILEMAPLAYER;
+                                tile.physicsType = Phaser.SPRITE;
+                                //layer.addChild(tile);
+                                this.game.physics.arcade.enable(tile, Phaser.Physics.ARCADE);
+                                tile.body.immovable = true;
+                                tile.body.setSize(16, 16, 8, 8);
+                                collideArray.push(tile);
+        
+                                width = 0;
+                            }
+                        }
+                        else
+                        {
+                            //tile.physicsType = Phaser.TILEMAPLAYER;
+                            tile.physicsType = Phaser.SPRITE;
+                            //layer.addChild(tile);
+                            this.game.physics.arcade.enable(tile, Phaser.Physics.ARCADE);
+                                tile.body.immovable = true;
+                            tile.body.setSize(16, 16, 8, 8);
+                            collideArray.push(tile);
+                        }
+                    }
+                }
+            }
+
+            // if (addToWorld) {
+            //     map.setCollision(collideArray);
+            // }
+        
+            return collideArray;
+        },
+    },
     p2: {
         /**
         * Goes through all tiles in the given Tilemap and TilemapLayer and converts those set to collide into physics
@@ -2309,11 +2403,11 @@ module.exports = {
         
                 for (var x = 0, w = layer.size.x; x < w; x++)
                 {
-                    if (!layer.tiles2[y]) {
+                    if (!layer.tilesOriginal[y]) {
                         continue;
                     }
         
-                    tile = layer.tiles2[y][x];
+                    tile = layer.tilesOriginal[y][x];
         
                     if (tile && tile.collides)
                     {
@@ -2930,6 +3024,11 @@ function Tile(game, x, y, tileId, tileset, layer) {
     this.type = Phaser.TILESPRITE;
 
     /**
+    * @property {number} id - The id/index of the tile in the original structure.
+    */
+    this.id = tileId;
+
+    /**
     * @property {object} layer - The layer in the Tilemap data that this tile belongs to.
     */
     this.layer = layer;
@@ -3414,6 +3513,14 @@ function Tilelayer(game, map, layer, index) {
     this.tiles = {};
 
     /**
+     * All the original tiles this layer has
+     *
+     * @property tiles
+     * @type Object
+     */
+    this.tilesOriginal = {};
+
+    /**
      * The scroll speed of the layer relative to the camera
      * (e.g. a scrollFactor of 0.5 scrolls half as quickly as the
      * 'normal' layers do)
@@ -3517,8 +3624,6 @@ function Tilelayer(game, map, layer, index) {
         this.container = this;
     }
 
-    this.tiles2 = {};
-
     for (var i = 0; i < this.tileIds.length; ++i) {
         var x = i % this.size.x;
         var y = (i - x) / this.size.x;
@@ -3528,19 +3633,17 @@ function Tilelayer(game, map, layer, index) {
             this.tiles[y] = {};
         }
 
-        if (!this.tiles2[y]) {
-            this.tiles2[y] = {};
+        if (!this.tilesOriginal[y]) {
+            this.tilesOriginal[y] = {};
         }
 
         if (tileId) {
-            this.tiles2[y][x] = new Tile(this.game, x, y, tileId, this.map.getTileset(tileId), this);
+            this.tilesOriginal[y][x] = new Tile(this.game, x, y, tileId, this.map.getTileset(tileId), this);
         } else {
-            this.tiles2[y][x] = null;
+            this.tilesOriginal[y][x] = null;
         }
-        // else {
-            this.tiles[y][x] = null;
-        //}
-        
+
+        this.tiles[y][x] = null;
     }
 
     this._tilePool = [];
@@ -4903,14 +5006,14 @@ Tilemap.prototype.putTile = function (tile, x, y, layer) {
             this.layers[layer].tiles[y][x] = new Tile(this.game, x, y, tileId, tileset, this.layers[layer]);
         }
 
-        // if (this.collideIndexes.indexOf(index) > -1)
-        // {
-        //     this.layers[layer].tiles[y][x].setCollision(true, true, true, true);
-        // }
-        // else
-        // {
-        //     this.layers[layer].tiles[y][x].resetCollision();
-        // }
+        if (this.collideIndexes.indexOf(index) > -1)
+        {
+            this.layers[layer].tiles[y][x].setCollision(true, true, true, true);
+        }
+        else
+        {
+            this.layers[layer].tiles[y][x].resetCollision();
+        }
 
         this.layers[layer].dirty = true;
 
