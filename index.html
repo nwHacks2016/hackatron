@@ -101,7 +101,7 @@
       // Load Game
       window.onload = function () {
           Hackatron.debug = window.location.href.indexOf('localhost') !== -1;
-          Hackatron.loader = new Phaser.Game(Hackatron.GAME_WIDTH, Hackatron.GAME_HEIGHT, Phaser.CANVAS, gameContainer);
+          Hackatron.loader = new Phaser.Game(Hackatron.GAME_WIDTH, Hackatron.GAME_HEIGHT, Phaser.AUTO, gameContainer);
           // None of these work now
           // Zelda
           // Hackatron.mapConfig = {

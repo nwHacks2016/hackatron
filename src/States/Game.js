@@ -346,6 +346,11 @@ Hackatron.Game.prototype = {
         }
 
         if (this.game.input.mousePointer.isDown) {
+            this.player.character.inputRight = false;
+            this.player.character.inputLeft = false;
+            this.player.character.inputUp = false;
+            this.player.character.inputDown = false;
+
             //  400 is the speed it will move towards the mouse
             //this.game.physics.arcade.moveToPointer(this.player.character.sprite, PLAYER_SPEED);
             
