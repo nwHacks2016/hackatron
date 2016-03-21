@@ -72,8 +72,6 @@ Hackatron.Game.prototype = {
     resizeGame: function (width, height) {
         this.game.width = width;
         this.game.height = height;
-        // this.game.stage.bounds.width = 2000;
-        // this.game.stage.bounds.height = 2000;
 
         if (this.game.renderType === 1) {
             this.game.renderer.resize(width, height);
@@ -113,7 +111,8 @@ Hackatron.Game.prototype = {
         window.UI_state.screenKey = 'ingame';
         window.UI_controller.setState(window.UI_state);
 
-        this.game.world.setBounds(0, 0, 1400, 1400);
+        this.game.world.resize(10000, 10000);
+        this.game.world.setBounds(0, 0, 10000, 10000);
 
         this.game.camera.follow(this.player.character.sprite, Phaser.Camera.FOLLOW_LOCKON);
         //this.player.character.sprite.unlock();
@@ -509,9 +508,12 @@ Hackatron.Game.prototype = {
             });
         });
 
-        self.blocks.forEach(function(block) {
+        self.blocks.forEach((block) => {
             //console.log(block);
             self.game.physics.arcade.collide(self.player.character.sprite, block);
+            if (this.enemy) {
+                self.game.physics.arcade.collide(self.enemy.character.sprite, block);
+            }
         });
 
         self.game.world.bringToTop(self.player.character.sprite);
