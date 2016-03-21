@@ -41,12 +41,12 @@ var findNewHost = function() {
 
 var getClientHost = function() {
     if (!clients.length) { return; }
-    return clients.reduce(function(previousClient, currentClient) { if (previousClient.player.id === host.player.id) { return previousClient; } else if (currentClient.player.id === host.player.id) { return currentClient; }});
+    return clients.reduce(function(previousClient, currentClient) { if (previousClient && previousClient.player.id === host.player.id) { return previousClient; } else if (currentClient.player.id === host.player.id) { return currentClient; }});
 };
 
 var findClientBySocket = function(socket) {
     if (!clients.length) { return; }
-    return clients.reduce(function(previousClient, currentClient) { if (previousClient.socket === socket) { return previousClient; } else if (currentClient.socket === socket) { return currentClient; }});
+    return clients.reduce(function(previousClient, currentClient) { if (previousClient && previousClient.socket === socket) { return previousClient; } else if (currentClient.socket === socket) { return currentClient; }});
 };
 
 var addClient = function(client) {

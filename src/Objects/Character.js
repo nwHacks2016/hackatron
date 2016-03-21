@@ -101,12 +101,13 @@ class Character extends GameObject {
         if (this.locked) { return; }
         if (!this.isAlive) { return; }
 
+        this.inputDown = this.inputDown || (this.sprite.downKey && this.sprite.downKey.isDown);
+        this.inputUp = this.inputUp || (this.sprite.upKey && this.sprite.upKey.isDown);
+        this.inputLeft = this.inputLeft || (this.sprite.leftKey && this.sprite.leftKey.isDown);
+        this.inputRight = this.inputRight || (this.sprite.rightKey && this.sprite.rightKey.isDown);
+
         if (!(this.sprite &&
-            this.sprite.body &&
-            this.sprite.upKey &&
-            this.sprite.downKey &&
-            this.sprite.leftKey &&
-            this.sprite.rightKey)) {
+            this.sprite.body)) {
             return;
         }
 
@@ -116,11 +117,6 @@ class Character extends GameObject {
         if (this.sprite.emitter) {
             this.sprite.emitter.on = true;
         }
-
-        this.inputDown = this.inputDown || this.sprite.downKey.isDown;
-        this.inputUp = this.inputUp || this.sprite.upKey.isDown;
-        this.inputLeft = this.inputLeft || this.sprite.leftKey.isDown;
-        this.inputRight = this.inputRight || this.sprite.rightKey.isDown;
 
         //console.log(this.name + ' ' + this.sprite.x + ',' + this.sprite.y);
 

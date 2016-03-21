@@ -634,39 +634,31 @@ Hackatron.Game.prototype = {
             if (player.character.sprite.body) {
                 clearTimeout(updateTimeout);
 
-                player.character.sprite.animations.play(event.info.direction, 3, false);
-                player.character.sprite.emitter.on = true;
-
                 switch(event.info.direction) {
                     case 'walkUp':
-                        player.character.sprite.body.velocity.x = 0;
-                        player.character.sprite.body.velocity.y = -PLAYER_SPEED;
-                        player.character.sprite.emitter.x = player.character.sprite.x + 15;
-                        player.character.sprite.emitter.y = player.character.sprite.y + 35;
+                        player.character.inputUp = true;
+                        player.character.updatePos();
                         break;
 
                     case 'walkDown':
-                        player.character.sprite.body.velocity.x = 0;
-                        player.character.sprite.body.velocity.y = PLAYER_SPEED;
-                        player.character.sprite.emitter.x = player.character.sprite.x + 15;
-                        player.character.sprite.emitter.y = player.character.sprite.y + -5;
+                        player.character.inputDown = true;
+                        player.character.updatePos();
                         break;
 
                     case 'walkLeft':
-                        player.character.sprite.body.velocity.y = 0;
-                        player.character.sprite.body.velocity.x = -PLAYER_SPEED;
-                        player.character.sprite.emitter.x = player.character.sprite.x + 30;
-                        player.character.sprite.emitter.y = player.character.sprite.y + 15;
+                        player.character.inputLeft = true;
+                        player.character.updatePos();
                         break;
 
                     case 'walkRight':
-                        player.character.sprite.body.velocity.y = 0;
-                        player.character.sprite.body.velocity.x = PLAYER_SPEED;
-                        player.character.sprite.emitter.x = player.character.sprite.x;
-                        player.character.sprite.emitter.y = player.character.sprite.y + 15;
+                        player.character.inputRight = true;
+                        player.character.updatePos();
                         break;
                    default:
-                        player.character.sprite.emitter.on = false;
+                        player.character.inputRight = false;
+                        player.character.inputLeft = false;
+                        player.character.inputUp = false;
+                        player.character.inputDown = false;
                         break;
                 }
 
