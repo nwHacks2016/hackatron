@@ -508,7 +508,7 @@ Hackatron.Game.prototype = {
             } else {
                 // He's probably stuck because a few pixels are touching
                 // Lets him him out
-                self.player.character.sprite.y = position.y * 16;
+                self.player.character.sprite[diff.align] = position[diff.align] * 16;
             }
 
             //if (goToPosition) {
