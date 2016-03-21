@@ -12,6 +12,10 @@ Hackatron.Menu.prototype = {
     },
 
     create: function() {
+        if (Hackatron.debug) {
+            this.game.add.plugin(Phaser.Plugin.Debug);
+        }
+
         this.stage.setBackgroundColor(0x2d2d2d);
         var bg = this.add.sprite(0, 0, 'ui/screens/launch');
         var ratio = bg.height / bg.width;
