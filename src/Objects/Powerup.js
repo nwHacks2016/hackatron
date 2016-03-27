@@ -162,12 +162,19 @@ class SpeedBoostHandler extends PowerupHandler {
     }
 
     onStarted() {
-        // if (this.player.character.speed > )
+        // Allows stacking of max of 3 speed boosts
+        if (this.player.character.speed < DEFAULT_PLAYER_SPEED*Math.pow(1.5,3)) {
             this.player.character.speed *= 1.5;
+        }
     }
 
     onStopped() {
-        this.player.character.speed /= 1.5;
+        var updatedSpeed = this.player.character.speed / 1.5;
+        if (updatedSpeed < DEFAULT_PLAYER_SPEED) {
+            this.player.character.speed = DEFAULT_PLAYER_SPEED;
+        } else {
+            this.player.character.speed = updatedSpeed;
+        }
     }
 }
 

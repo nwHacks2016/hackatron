@@ -10,7 +10,6 @@ Hackatron.Game = function(game) {
     this.players = null;
 };
 
-var PLAYER_SPEED = 200;
 var UPDATE_INTERVAL = 100;
 var POWERUP_SPAWN_INTERVAL = 5000;
 
@@ -185,7 +184,7 @@ Hackatron.Game.prototype = {
             this.enemy = new Enemy();
             this.enemy.init({
                 game: this.game,
-                speed: PLAYER_SPEED,
+                speed: DEFAULT_PLAYER_SPEED,
                 position: {
                     x: position.x * 16,
                     y: position.y * 16
@@ -207,7 +206,7 @@ Hackatron.Game.prototype = {
             id: Utils.generateId(),
             game: this.game,
             name: Hackatron.playerName,
-            speed: PLAYER_SPEED,
+            speed: DEFAULT_PLAYER_SPEED,
             position: {
                 x: position.x * 16,
                 y: position.y * 16
@@ -367,7 +366,7 @@ Hackatron.Game.prototype = {
             this.player.character.inputDown = false;
 
             //  400 is the speed it will move towards the mouse
-            //this.game.physics.arcade.moveToPointer(this.player.character.sprite, PLAYER_SPEED);
+            //this.game.physics.arcade.moveToPointer(this.player.character.sprite, DEFAULT_PLAYER_SPEED);
 
             // top = -1.25
             // bottom = 1
@@ -379,22 +378,22 @@ Hackatron.Game.prototype = {
             // right
             if (Math.abs(angle) > 0 && Math.abs(angle) <= 45) {
                 this.player.character.inputRight = true;
-                //this.player.character.sprite.body.velocity.x = PLAYER_SPEED;
+                //this.player.character.sprite.body.velocity.x = DEFAULT_PLAYER_SPEED;
             }
             // left
             if (Math.abs(angle) > 135 && Math.abs(angle) <= 180) {
                 this.player.character.inputLeft = true;
-                //this.player.character.sprite.body.velocity.x = -PLAYER_SPEED;
+                //this.player.character.sprite.body.velocity.x = -DEFAULT_PLAYER_SPEED;
             }
             // up
             if (Math.abs(angle) > 45 && Math.abs(angle) <= 135 && angle < 0) {
                 this.player.character.inputUp = true;
-                //this.player.character.sprite.body.velocity.y = -PLAYER_SPEED;
+                //this.player.character.sprite.body.velocity.y = -DEFAULT_PLAYER_SPEED;
             }
             // down
             if (Math.abs(angle) > 45 && Math.abs(angle) <= 135 && angle > 0) {
                 this.player.character.inputDown = true;
-                //this.player.character.sprite.body.velocity.y = PLAYER_SPEED;
+                //this.player.character.sprite.body.velocity.y = DEFAULT_PLAYER_SPEED;
             }
 
             //  if it's overlapping the mouse, don't move any more
@@ -623,7 +622,7 @@ Hackatron.Game.prototype = {
             id: playerId,
             name: playerId.substring(0, 2),
             game: this.game,
-            speed: PLAYER_SPEED
+            speed: DEFAULT_PLAYER_SPEED
         });
 
         this.players[playerId] = player;
@@ -757,7 +756,7 @@ Hackatron.Game.prototype = {
 
                 self.enemy.init({
                     game: self.game,
-                    speed: PLAYER_SPEED,
+                    speed: DEFAULT_PLAYER_SPEED,
                     position: event.info.enemy.position
                 });
 
