@@ -72,7 +72,7 @@ class PowerupHandler {
             this.sprite.scale.y = 0.8;
         } else if (this.spriteMode === 'tilemap') {
             this.sprite = this.game.add.sprite(this.state.position.x * 16, this.state.position.y * 16, this.game.add.bitmapData(16, 16));
-            this.sprite.key.copyRect(this.spriteTilemap, this._getRect(this.spritePosition.row, this.spritePosition.column), 0, 0);
+            this.sprite.key.copyRect(this.spriteTilemap, this._getRect(this.spritePosition.column, this.spritePosition.row), 0, 0);
             this.sprite.scale.x = 1.2;
             this.sprite.scale.y = 1.2;
         }
@@ -210,7 +210,7 @@ class GhostHandler extends PowerupHandler {
         this.name = 'Ghost mode';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
-        this.spritePosition = {row: 1, column: 2};
+        this.spritePosition = {column: 5, row: 5};
     }
 }
 
@@ -221,7 +221,7 @@ class BlockUpHandler extends PowerupHandler {
         this.name = 'Block up';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
-        this.spritePosition = {row: 5, column: 3};
+        this.spritePosition = {column: 5, row: 3};
     }
 
     onStarted() {
@@ -236,7 +236,7 @@ class InvincibleHandler extends PowerupHandler {
         this.name = 'Invincible mode';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
-        this.spritePosition = {row: 1, column: 2};
+        this.spritePosition = {column: 1, row: 2};
     }
 
     onStarted() {
@@ -257,7 +257,7 @@ class RageHandler extends PowerupHandler {
         this.name = 'Rage mode';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
-        this.spritePosition = {row: 1, column: 1};
+        this.spritePosition = {column: 1, row: 1};
     }
 
     onStarted() {
@@ -279,7 +279,7 @@ class ReverseHandler extends PowerupHandler {
         this.name = 'ReverseHandler mode';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
-        this.spritePosition = {row: 2, column: 2};
+        this.spritePosition = {column: 2, row: 2};
     }
 
     onStarted() {
@@ -298,7 +298,7 @@ class TeleportHandler extends PowerupHandler {
         this.name = 'Teleport';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
-        this.spritePosition = {row: 1, column: 7};
+        this.spritePosition = {column: 1, row: 7};
     }
 
     onStarted() {
@@ -313,7 +313,7 @@ class FreezeHandler extends PowerupHandler {
         this.name = 'Freeze';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
-        this.spritePosition = {row: 10, column: 3};
+        this.spritePosition = {column: 10, row: 3};
     }
 
     onStarted() {
