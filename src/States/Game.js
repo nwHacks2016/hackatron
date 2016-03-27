@@ -425,6 +425,13 @@ Hackatron.Game.prototype = {
             self.addEvent({key: 'playerKilled', info: {
                 player: {id: self.player.id}
             }});
+            if (self.player.id === self.hostId) {
+                console.log("host dead");
+                console.log("the id is: " + self.player.id);
+                self.addEvent({key: 'findNewHost'});
+                self.hostId = null;
+            }
+            // self.player.id = null;
 
             if (self.ai) {
                 self.ai.stopPathFinding();
@@ -773,7 +780,7 @@ Hackatron.Game.prototype = {
 
         // Method for handling received deaths of other clients
         } else if (event.key === 'playerKilled') {
-            var player = self.getPlayerById(event.info.player.id);
+            var player = self.players[event.info.player.id];
             // self.enemy.addPoints(player.points);
             player.kill();
         // Method for handling player leaves
