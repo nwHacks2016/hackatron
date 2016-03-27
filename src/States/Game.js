@@ -78,6 +78,17 @@ Hackatron.Game.prototype = {
     create: function() {
         Hackatron.game = this;
 
+        this.game.plugins.cameraShake = this.game.plugins.add(Phaser.Plugin.CameraShake);
+
+        this.game.plugins.cameraShake.setup({
+            shakeRange: 40,
+            shakeCount: 35,
+            shakeInterval: 15,
+            randomShake: true,
+            randomizeInterval: true,
+            shakeAxis: 'xy'
+        });
+
         this.players = {};
         this.socket = io.connect();
         this.events = [];
@@ -101,12 +112,6 @@ Hackatron.Game.prototype = {
 
         window.UI_state.screenKey = 'ingame';
         window.UI_controller.setState(window.UI_state);
-
-        this.game.world.resize(10000, 10000);
-        this.game.world.setBounds(0, 0, 10000, 10000);
-
-        this.game.camera.follow(this.player.character.sprite, Phaser.Camera.FOLLOW_LOCKON);
-        //this.player.character.sprite.unlock();
     },
 
     initEvents: function() {
@@ -241,6 +246,8 @@ Hackatron.Game.prototype = {
     },
 
     initGameover: function() {
+        this.game.plugins.cameraShake.shake();
+
         var gameover = new Gameover();
         gameover.init(this.game);
         gameover.start();
