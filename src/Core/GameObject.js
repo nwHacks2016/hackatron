@@ -10,6 +10,7 @@ class GameObject {
         this.rotation = null;
         this.type = null;
         this.visible = false;
+        this.collisionEnabled = true;
 
         Object.assign(this, params); // extends this with the params
 

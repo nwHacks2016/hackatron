@@ -522,14 +522,19 @@ Hackatron.Game.prototype = {
             }
         };
 
-        this.map.collideTiles.forEach((tile) => {
-            // TODO: Throttle collideWallHandler
-            this.game.physics.arcade.collide(this.player.character.sprite, tile, collideWallHandler); // tile is an object of Phaser.Sprite
-        });
+        if (this.player.character.collisionEnabled) {
+            this.map.collideTiles.forEach((tile) => {
+                // TODO: Throttle collideWallHandler
+                this.game.physics.arcade.collide(this.player.character.sprite, tile, collideWallHandler); // tile is an object of Phaser.Sprite
+            });
+        }
 
         if (self.enemy) {
             self.game.physics.arcade.collide(self.enemy.character.sprite, self.map.tilemap.layer);
-            self.game.physics.arcade.overlap(self.enemy.character.sprite, self.player.character.sprite, collideEnemyHandler);
+
+            if (this.player.character.collisionEnabled) {
+                self.game.physics.arcade.overlap(self.enemy.character.sprite, self.player.character.sprite, collideEnemyHandler);
+            }
         }
 
         self.powerups.forEach(function(row) {
@@ -542,7 +547,10 @@ Hackatron.Game.prototype = {
 
         self.blocks.forEach((block) => {
             //console.log(block);
-            self.game.physics.arcade.collide(self.player.character.sprite, block);
+            if (this.player.character.collisionEnabled) {
+                self.game.physics.arcade.collide(self.player.character.sprite, block);
+            }
+
             if (this.enemy) {
                 self.game.physics.arcade.collide(self.enemy.character.sprite, block);
             }

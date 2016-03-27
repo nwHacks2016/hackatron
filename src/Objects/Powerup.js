@@ -213,6 +213,14 @@ class GhostHandler extends PowerupHandler {
         this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {column: 5, row: 5};
     }
+
+    onStarted() {
+        this.player.character.collisionEnabled = false;
+    }
+
+    onStopped() {
+        this.player.character.collisionEnabled = true;
+    }
 }
 
 
