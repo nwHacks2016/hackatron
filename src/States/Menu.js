@@ -33,6 +33,7 @@ Hackatron.Menu.prototype = {
 
         this.game.music = this.game.add.audio('audio/bg-0002', 1, true);
         this.game.music.play('', 0, 1, true);
+        this.game.music.mute = true;
     },
 
     update: function() {
