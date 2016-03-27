@@ -27,7 +27,8 @@ Player.prototype.setupKeys = function(keys) {
 
     // register attack key if it exists
     if (keys.att) {
-        this.character.sprite.attKey = this.game.input.keyboard.addKey(keys.att);
+        var attackKey = this.character.sprite.attKey = this.game.input.keyboard.addKey(keys.att);
+        attackKey.onDown.add(this.character.triggerAttack, this.character);
     }
 };
 
@@ -62,7 +63,7 @@ Object.defineProperty(Player.prototype, 'name', {
 });
 
 // Wow, we may want this for "logic scripts"
-// 
+//
 // function createInterface(name) {
 //   return class {
 //     ['findBy' + name]() {
@@ -70,8 +71,8 @@ Object.defineProperty(Player.prototype, 'name', {
 //     }
 //   }
 // }
- 
+
 // const Interface = createInterface('Email');
 // const instance = new Interface();
- 
-// console.log(instance.findByEmail()); 
+
+// console.log(instance.findByEmail());

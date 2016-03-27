@@ -6,7 +6,7 @@ class Tron extends Character {
 
         super.init(params);
 
-        this.blocks = 1;
+        this.blocks = 3;
         this.frozen = false;
         this.invincible = false;
         this.teleported = false;
@@ -17,22 +17,22 @@ class Tron extends Character {
         pellet.eaten();
     }
 
-    triggerAttack(blockList) {
+    triggerAttack() {
         var self = this;
         if (!self.isAlive) { return null; }
 
-        if (this.sprite.attKey.isDown && this.blocks > 0) {
+        if (this.blocks > 0) {
             self.blocks--;
             if (self.blocks < 0) self.blocks = 0;
-            var offsetY = -10;
-            var block = this.game.add.sprite(this.sprite.x, this.sprite.y + offsetY, 'gfx/blocks/glitch');
+            var block = this.game.add.sprite(this.sprite.x, this.sprite.y, 'gfx/blocks/glitch');
+            block.anchor.setTo(0.5);
             block.animations.add('glitch', [0,1,2], 12, true, true);
             block.animations.play('glitch');
             this.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
             block.body.immovable = true;
-            block.scale.x = 1.25;
-            block.scale.y = 1.25;
-            blockList.push(block);
+            block.scale.x = 1.50;
+            block.scale.y = 1.50;
+            Hackatron.game.blocks.push(block);
 
             // makes block fade away within a 2.0 seconds
             var tween = this.game.add.tween(block).to( { alpha: 0 }, 2000, 'Linear', true);
@@ -43,14 +43,21 @@ class Tron extends Character {
             setTimeout(function() {
                 block.destroy();
                 self.blocks++;
-                blockList.filter(function(b) {
+                Hackatron.game.blocks.filter(function(b) {
                     return (b !== block);
                 });
             }, 2000);
 
+            Hackatron.game.addEvent(
+                {key: 'blockSpawned',
+                info: {
+                    x: block.x,
+                    y: block.y
+                }
+            });
+
             return block;
         }
-
         return null;
     }
 

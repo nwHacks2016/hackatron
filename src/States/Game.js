@@ -433,17 +433,6 @@ Hackatron.Game.prototype = {
             self.initGameover();
         };
 
-        var block = self.player.character.triggerAttack(self.blocks);
-
-        if (block !== null) {
-            this.addEvent({key: 'blockSpawned', info: {
-                x: block.x,
-                y: block.y
-            }})
-
-            self.blocks.push(block);
-        }
-
         var SLIDE_SPEED = self.player.character.speed/4;
         var SLIDE_DISTANCE = 5;
 
