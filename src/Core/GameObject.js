@@ -28,8 +28,7 @@ class GameObject {
         var offset = 0.5;
         this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
         this.sprite.body.setSize(this.dimensions.width * offset, this.dimensions.height * offset, 0, 0);
-        this.sprite.anchor.x = offset;
-        this.sprite.anchor.y = offset;
+        this.sprite.anchor.setTo(0.5);
     }
 
     set position(position) {
