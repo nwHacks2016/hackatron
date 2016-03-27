@@ -88,8 +88,7 @@ class Character extends GameObject {
     }
 
     updatePos() {
-        if (this.frozen) { return; }
-        if (!this.isAlive) { return; }
+        if (!this.isAlive || this.frozen) { return; }
 
         this.inputDown = this.inputDown || (this.sprite.downKey && this.sprite.downKey.isDown);
         this.inputUp = this.inputUp || (this.sprite.upKey && this.sprite.upKey.isDown);

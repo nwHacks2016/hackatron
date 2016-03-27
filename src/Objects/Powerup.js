@@ -150,6 +150,12 @@ class SaiyanHandler extends PowerupHandler {
         this.spriteKey = 'gfx/buffs/saiyan';
         this.spriteLoop = [0,1,2,3,4,5,6];
     }
+
+    onStarted() {
+    }
+
+    onStopped() {
+    }
 }
 
 class SpeedBoostHandler extends PowerupHandler {

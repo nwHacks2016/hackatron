@@ -10,9 +10,6 @@ Hackatron.Game = function(game) {
     this.players = null;
 };
 
-var UPDATE_INTERVAL = 100;
-var POWERUP_SPAWN_INTERVAL = 5000;
-
 var updateTimeout;
 
 Hackatron.Game.prototype = {
