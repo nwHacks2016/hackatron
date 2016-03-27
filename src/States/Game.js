@@ -623,6 +623,9 @@ Hackatron.Game.prototype = {
             return this.players[playerId];
         }
 
+        return null;
+    },
+    createPlayer: function(playerId) {
         var player = new Player();
 
         player.init({
@@ -743,6 +746,11 @@ Hackatron.Game.prototype = {
             }
 
             var player = self.getPlayerById(event.info.player.id);
+
+            if (!player) {
+                self.createPlayer(event.info.player.id);
+            }
+
             player.name = event.info.player.name;
             player.character.position = event.info.player.position;
 
@@ -784,7 +792,7 @@ Hackatron.Game.prototype = {
             // self.enemy.addPoints(player.points);
             player.kill();
         // Method for handling player leaves
-        } else if (event.key === 'removePlayer') {
+      } else if (event.key === 'playerLeave') {
             if (self.players[event.info.player.id]) {
                 var player = self.players[event.info.player.id];
                 player.kill();
@@ -857,7 +865,7 @@ Hackatron.Game.prototype = {
         ['updatePlayer',
          'updateEnemy',
          'newPlayer',
-         'removePlayer',
+         'playerLeave',
          'welcomePlayer',
          'playerKilled',
          'powerupSpawned',

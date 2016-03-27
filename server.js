@@ -132,7 +132,7 @@ io.sockets.on('connection', function(socket) {
             findNewHost();
         }
 
-        io.sockets.emit('removePlayer', {player: client.player});
+        io.sockets.emit('playerLeave', {player: client.player});
     });
 });
 
