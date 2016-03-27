@@ -6,13 +6,14 @@ class Powerup extends GameObject {
             'Saiyan': SaiyanHandler,
             'Ghost': GhostHandler,
             'Invincible': InvincibleHandler,
-            'Reverse': ReverseHandler,
+            //'Reverse': ReverseHandler,
             'Rage': RageHandler,
             'Teleport': TeleportHandler,
             'Portal': PortalHandler,
             'Freeze': FreezeHandler,
             'BlockUp': BlockUpHandler,
             'SpeedBoost': SpeedBoostHandler
+            // TODO: Mode that leaves a train of blocks behind you
         }
     }
 
@@ -93,6 +94,7 @@ class PowerupHandler {
     }
 
     update() {
+        // TODO: this is going to be slow, creating new functions/bindings each frame
         this.game.physics.arcade.overlap(this.player.character.sprite, this.sprite, this.start.bind(this), null, this.game);
 
         this.onUpdated();
@@ -104,6 +106,20 @@ class PowerupHandler {
         this.claimed = true;
         this.destroy();
 
+        // If there's no player assigned, then this powerup was not claimed by a different player
+        // So it must be us who touched it
+        if (!this.player) {
+            this.player = Hackatron.game.player; // TODO: shouldn't use global hackatron
+        }
+
+        // We only want to show the powerup text if it's the current player who got it
+        if (this.player.id === Hackatron.game.player.id) {
+            var text = this.name;
+            var style = { font: '35px "Press Start 2P"', fill: '#ffffff', align: 'center', textTransform: 'uppercase' };
+            this.impactText = this.game.add.text(this.game.world.centerX - 200, this.game.world.centerY - 50, text, style);
+            this.game.add.tween(this.impactText).to({alpha: 0}, 1000, 'Linear', true, 0);
+        }
+
         this.onStarted();
         this.emit('started');
 
@@ -114,6 +130,10 @@ class PowerupHandler {
 
     stop() {
         this.finished = true;
+
+        if (this.player.id === this.game.player.id) {
+            this.impactText.destroy();
+        }
 
         this.onStopped();
         this.emit('stopped');
@@ -296,13 +316,14 @@ class FreezeHandler extends PowerupHandler {
         this.spritePosition = {row: 10, column: 3};
     }
 
-    // onStarted() {
-    //     this.player.character.speed = 0;
-    // }
+    onStarted() {
+        this.player.character.sprite.body.velocity.setTo(0, 0);
+        this.player.character.frozen = true;
+    }
 
-    // onStopped() {
-    //     this.player.character.speed = 1;
-    // }
+    onStopped() {
+        this.player.character.frozen = false;
+    }
 }
 
 

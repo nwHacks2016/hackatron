@@ -672,6 +672,8 @@ Hackatron.Game.prototype = {
 
             var player = self.getPlayerById(id);
 
+            if (!player) { return; }
+
             // disable animations for now - lag?
             if (player.character.sprite.body) {
                 clearTimeout(updateTimeout);
@@ -706,11 +708,15 @@ Hackatron.Game.prototype = {
 
                 updateTimeout = setTimeout(function() {
                     if (player.character.sprite.body) {
-                        player.character.position = position;
                         player.character.sprite.body.velocity.x = 0;
                         player.character.sprite.body.velocity.y = 0;
+                        player.character.position = position;
+                        player.character.inputRight = false;
+                        player.character.inputLeft = false;
+                        player.character.inputUp = false;
+                        player.character.inputDown = false;
                     }
-                }, 200);
+                }, 30);
             }
         } else if (event.key === 'updateEnemy') {
             if (self.player.id !== self.hostId) {
@@ -721,6 +727,7 @@ Hackatron.Game.prototype = {
         // When new player joins, host shall send them data about the 'position'
         } else if (event.key === 'newPlayer') {
             if (self.player.id === self.hostId) {
+                // Add players
                 var players = [];
                 for(playerId in self.players) {
                     var player = self.players[playerId];
@@ -732,6 +739,14 @@ Hackatron.Game.prototype = {
                     });
                 }
 
+                // Add the host
+                players.push({
+                    id: self.player.id,
+                    name: self.player.name,
+                    position: self.player.character.position
+                });
+
+                // Add powerups
                 var powerups = [];
                 for(row in self.powerups) {
                     for(column in self.powerups[row]) {
@@ -743,6 +758,7 @@ Hackatron.Game.prototype = {
                     }
                 }
 
+                // Compile the game data
                 var gameData = {
                     player: {id: event.info.player.id},
                     enemy: {position: self.enemy.character.position},
@@ -756,7 +772,7 @@ Hackatron.Game.prototype = {
             var player = self.getPlayerById(event.info.player.id);
 
             if (!player) {
-                self.createPlayer(event.info.player.id);
+                player = self.createPlayer(event.info.player.id);
             }
 
             player.name = event.info.player.name;
@@ -767,11 +783,14 @@ Hackatron.Game.prototype = {
         } else if (event.key === 'welcomePlayer') {
             if (self.player.id === event.info.player.id) {
                 // Setup players
-                event.info.players.forEach(function() {
-                    var player = self.getPlayerById(event.info.player.id);
-                    player.name = event.info.player.name;
-                    if (event.info.player.position)
-                    player.character.position = event.info.player.position;
+                event.info.players.forEach(function(playerInfo) {
+                    var player = self.createPlayer(playerInfo.id);
+                    player.name = playerInfo.name;
+                    if (playerInfo.position) {
+                        player.character.position = playerInfo.position;
+                    }
+
+                    self.players[player.id] = player;
                 });
 
                 // Setup enemy
@@ -825,7 +844,7 @@ Hackatron.Game.prototype = {
 
             if (powerup) {
                 self.powerups[event.info.state.position.x][event.info.state.position.y] = null;
-                powerup.player = self.getPlayerById(event.info.player.id);
+                powerup.handler.player = self.getPlayerById(event.info.player.id);
                 powerup.handler.start();
             }
         // Method for handling spawned blocks by other players
