@@ -11,7 +11,7 @@ class Character extends GameObject {
         this.speed = params.speed;
         this.emitterKey = params.emitterKey;
 
-        //this._addEmitterToSprite();
+        this._addEmitterToSprite();
         this._addAnimationsToSprite();
     }
 
@@ -51,11 +51,11 @@ class Character extends GameObject {
 
         this.sprite.emitter = emitter;
 
-        this.aura = this.game.add.sprite(this.position.x, this.position.y, 'gfx/buffs/aura-1');
-        this.aura.scale.x = 0.8;
-        this.aura.scale.y = 0.8;
-
-        this.sprite.addChild(this.aura);
+        // this.aura = this.game.add.sprite(this.position.x, this.position.y, 'gfx/buffs/aura-1');
+        // this.aura.scale.x = 0.8;
+        // this.aura.scale.y = 0.8;
+        //
+        // this.sprite.addChild(this.aura);
     }
 
     changeSkin(key) {
@@ -76,8 +76,8 @@ class Character extends GameObject {
     _addAnimationsToSprite() {
         // Phaser.Animation.generateFrameNames(this.characterKey + '/walkDown/', 1, 3, '', 2)
         // is equal to: [
-        // this.characterKey + '/walkDown/0001', 
-        // this.characterKey + '/walkDown/0002', 
+        // this.characterKey + '/walkDown/0001',
+        // this.characterKey + '/walkDown/0002',
         // this.characterKey + '/walkDown/0003'
         // ]
 
@@ -87,18 +87,8 @@ class Character extends GameObject {
         this.sprite.animations.add('walkRight', Phaser.Animation.generateFrameNames(this.characterKey + '/walkRight-', 1, 3, '', 4), 3, false, false);
     }
 
-    lock() {
-        this.sprite.body.velocity.x = 0;
-        this.sprite.body.velocity.y = 0;
-        this.locked = true;
-    }
-
-    unlock() {
-        this.locked = false;
-    }
-
     updatePos() {
-        if (this.locked) { return; }
+        if (this.frozen) { return; }
         if (!this.isAlive) { return; }
 
         this.inputDown = this.inputDown || (this.sprite.downKey && this.sprite.downKey.isDown);
@@ -163,5 +153,3 @@ class Character extends GameObject {
         }
     }
 }
-
-

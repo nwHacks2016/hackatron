@@ -162,11 +162,12 @@ class SpeedBoostHandler extends PowerupHandler {
     }
 
     onStarted() {
-        this.player.character.speed *= 2;
+        // if (this.player.character.speed > )
+            this.player.character.speed *= 1.5;
     }
 
     onStopped() {
-        this.player.character.speed /= 2;
+        this.player.character.speed /= 1.5;
     }
 }
 
@@ -207,6 +208,7 @@ class InvincibleHandler extends PowerupHandler {
 
     onStarted() {
         this.tween = this.game.add.tween(this.player.character.sprite).to({alpha: 0}, 400, 'Linear', true, 0, -1);
+        this.player.character.invincible = true;
     }
 
     onStopped() {

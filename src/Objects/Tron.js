@@ -7,6 +7,8 @@ class Tron extends Character {
         super.init(params);
 
         this.blocks = 1;
+        this.frozen = false;
+        this.invincible = false;
         this.teleported = false;
     }
 

@@ -12,7 +12,7 @@ Hackatron.Game = function(game) {
 
 var PLAYER_SPEED = 200;
 var UPDATE_INTERVAL = 100;
-var POWERUP_SPAWN_INTERVAL = 1500;
+var POWERUP_SPAWN_INTERVAL = 5000;
 
 var updateTimeout;
 
@@ -239,8 +239,8 @@ Hackatron.Game.prototype = {
 
     initCountdown: function() {
         var countdown = new Countdown();
-        countdown.init(this.game);
-        countdown.start(this.player.character.sprite);
+        countdown.init({game: this.game, player: this.player});
+        countdown.start();
     },
 
     initSFX: function() {
@@ -428,7 +428,7 @@ Hackatron.Game.prototype = {
             self.blocks.push(block);
         }
 
-        var SLIDE_SPEED = 25;
+        var SLIDE_SPEED = self.player.character.speed/4;
         var REPOSITION_DELAY = 200;
         var repositionTimeout = null;
 

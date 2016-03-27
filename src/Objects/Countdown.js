@@ -1,8 +1,9 @@
 var Countdown = function() {
 };
 
-Countdown.prototype.init = function(game) {
-    this.game = game;
+Countdown.prototype.init = function(params) {
+    this.game = params.game;
+    this.player = params.player;
 };
 
 Countdown.prototype.start = function() {
@@ -12,6 +13,8 @@ Countdown.prototype.start = function() {
     var tween3 = null;
     var centerX = self.game.camera.width / 2;
     var centerY = self.game.camera.height / 2;
+    self.player.character.invincible = true;
+    self.player.character.frozen = true;
 
     // Countdown #3
     var count3 = self.game.add.sprite(centerX, centerY, 'gfx/overlays/countdown');
@@ -39,6 +42,8 @@ Countdown.prototype.start = function() {
             tween1 = self.game.add.tween(count1.scale).to({ x: 3, y: 3}, 600, Phaser.Easing.Exponential.In, true);
             tween1.onComplete.add(function() {
                 self.game.add.tween(count1).to( { alpha: 0 }, 200, 'Linear', true);
+                self.player.character.invincible = false;
+                self.player.character.frozen = false;
             });
         });
     });
