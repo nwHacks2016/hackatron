@@ -27,7 +27,7 @@ Hackatron.Game.prototype = {
 
         for(var i = 0; i < this.map.collideTiles.length; i++) {
             var tile = this.map.collideTiles[i];
-            if (tile.x === params.x * 16 && tile.y === params.y * 16) {
+            if (tile.tilePosition.x === params.x && tile.tilePosition.y === params.y) {
                 return tile;
             }
         }
@@ -181,16 +181,13 @@ Hackatron.Game.prototype = {
     runEnemySystem: function() {
         // Create enemy for the host
         if (!this.enemy) {
-            var position = this.getValidPosition();
+            var worldPosition = this.getValidPosition();
 
             this.enemy = new Enemy();
             this.enemy.init({
                 game: this.game,
                 speed: DEFAULT_PLAYER_SPEED,
-                position: {
-                    x: position.x * 16,
-                    y: position.y * 16
-                },
+                worldPosition: worldPosition,
                 keys: {
                     up: Phaser.Keyboard.W,
                     down: Phaser.Keyboard.S,
@@ -202,17 +199,14 @@ Hackatron.Game.prototype = {
     },
 
     initPlayer: function() {
-        var position = this.getValidPosition();
+        var worldPosition = this.getValidPosition();
 
         var playerParams = {
             id: Utils.generateId(),
             game: this.game,
             name: Hackatron.playerName,
             speed: DEFAULT_PLAYER_SPEED,
-            position: {
-                x: position.x * 16,
-                y: position.y * 16
-            },
+            worldPosition: worldPosition,
             keys: {
                 up: Phaser.Keyboard.UP,
                 down: Phaser.Keyboard.DOWN,
@@ -450,8 +444,7 @@ Hackatron.Game.prototype = {
         }
 
         var SLIDE_SPEED = self.player.character.speed/4;
-        var REPOSITION_DELAY = 200;
-        var repositionTimeout = null;
+        var SLIDE_DISTANCE = 5;
 
         var closestInRangeOf = (params) => {
             var dir = params.range > 0 ? 1 : -1; // are we going backwards?
@@ -471,8 +464,6 @@ Hackatron.Game.prototype = {
         };
 
         var getNearestOpening = (params) => {
-            clearTimeout(repositionTimeout);
-
             var align;
             var dir;
             var index;
@@ -484,11 +475,15 @@ Hackatron.Game.prototype = {
             if (direction === 'walkUp') { align = 'x'; dir = -1; }
             if (direction === 'walkDown') { align = 'x'; dir = +1; }
 
-            var seekPosition = {x: position.x, y: position.y};
-            seekPosition[align === 'x' ? 'y' : 'x'] += dir; // get the beside row/column
+            var seekPositionLeft = {x: Math.floor(position.x), y: Math.floor(position.y)};
+            seekPositionLeft[align === 'x' ? 'y' : 'x'] += dir; // get the beside row/column
+            seekPositionLeft[align === 'y' ? 'y' : 'x'] -= 1; // get the beside row/column
+            var seekPositionRight = {x: Math.floor(position.x), y: Math.floor(position.y)};
+            seekPositionRight[align === 'x' ? 'y' : 'x'] += dir; // get the beside row/column
+            seekPositionRight[align === 'y' ? 'y' : 'x'] += 1; // get the beside row/column
 
-            var closestLeft = closestInRangeOf({position: seekPosition, align: align, range: -5});
-            var closestRight = closestInRangeOf({position: seekPosition, align: align, range: 5});
+            var closestLeft = closestInRangeOf({position: seekPositionLeft, align: align, range: -SLIDE_DISTANCE});
+            var closestRight = closestInRangeOf({position: seekPositionRight, align: align, range: SLIDE_DISTANCE});
 
             // must be all blocked
             if (!closestLeft && !closestRight) {
@@ -521,8 +516,6 @@ Hackatron.Game.prototype = {
                 return;
             }
 
-            //var goToPosition = null;
-
             if (diff.left < diff.right) {
                 // going left or up
                 self.player.character.sprite.body.velocity[diff.align] = -SLIDE_SPEED; // the -SLIDE_SPEED / 5 * diff.left part lets us base the speed we move with how far it is
@@ -533,13 +526,10 @@ Hackatron.Game.prototype = {
                 //goToPosition = closest * 16 - 8;
             } else {
                 // He's probably stuck because a few pixels are touching
-                // Lets him him out
-                self.player.character.sprite[diff.align] = position[diff.align] * 16;
+                // Lets round his position so he's in alignment
+                self.player.character.sprite.body.velocity.setTo(0, 0);
+                self.player.character.position[diff.align] = position[diff.align];
             }
-
-            //if (goToPosition) {
-                //repositionTimeout = setTimeout(() => { self.player.character.sprite.body.velocity.y = 0; self.player.character.sprite.y = goToPosition; }, REPOSITION_DELAY);
-            //}
         };
 
         this.map.collideTiles.forEach((tile) => {
