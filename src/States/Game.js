@@ -589,6 +589,7 @@ Hackatron.Game.prototype = {
 
     render: function() {
         this.fitToWindow();
+        //this.enableCollisionDebugging();
 
         if (this.player && this.enemy) {
             var distance = this.game.physics.arcade.distanceBetween(this.player.character.sprite, this.enemy.character.sprite);
@@ -610,9 +611,7 @@ Hackatron.Game.prototype = {
 
     enableCollisionDebugging: function() {
         this.game.debug.bodyInfo(this.player.character.sprite, 32, 32);
-
         this.game.debug.body(this.player.character.sprite);
-        //this.game.debug.body(this.map.layer);
     },
 
     pelletHelper: function(mapArray){

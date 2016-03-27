@@ -17,18 +17,19 @@ class GameObject {
     }
 
     _initSprite() {
-        var padding = 0.5; // 35% padding
-
         if (this.characterKey) {
-            this.sprite = this.game.add.sprite(this.position.x - 8, this.position.y - 8, 'gfx/characters', this.characterKey + '/' + this.defaultFrameKey);
+            this.sprite = this.game.add.sprite(this.position.x, this.position.y, 'gfx/characters', this.characterKey + '/' + this.defaultFrameKey);
         } else {
-            this.sprite = this.game.add.sprite(this.position.x - 8, this.position.y - 8, this.characterKey);
+            this.sprite = this.game.add.sprite(this.position.x, this.position.y, this.characterKey);
         }
         this.sprite.scale.x = 0.8;
         this.sprite.scale.y = 0.8;
 
+        var offset = 0.5;
         this.game.physics.arcade.enable(this.sprite, Phaser.Physics.ARCADE);
-        this.sprite.body.setSize(this.dimensions.width / 2, this.dimensions.height / 2, this.dimensions.width / 4, this.dimensions.height / 4);
+        this.sprite.body.setSize(this.dimensions.width * offset, this.dimensions.height * offset, 0, 0);
+        this.sprite.anchor.x = offset;
+        this.sprite.anchor.y = offset;
     }
 
     set position(position) {

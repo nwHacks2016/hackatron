@@ -55,7 +55,7 @@ Object.defineProperty(Player.prototype, 'name', {
         this._name = name;
 
         this.nameText = this.game.add.text(0, 0, name, style);
-        this.nameText.anchor.set(0.5);
+        this.nameText.anchor.set(1.5, 1.5);
 
         this.character.sprite.addChild(this.nameText);
     }

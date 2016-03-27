@@ -241,20 +241,12 @@ class RageHandler extends PowerupHandler {
     }
 
     onStarted() {
-        var width = 32;
-        var height = 32;
-        var padding = 0.75; // 75% padding
-        this.player.character.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
         this.player.character.sprite.scale.x = 1.5;
         this.player.character.sprite.scale.y = 1.5;
     }
 
     onStopped() {
         // set back original
-        var width = 32;
-        var height = 32;
-        var padding = 0.35; // 35% padding
-        this.player.character.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
         this.player.character.sprite.scale.x = 0.8;
         this.player.character.sprite.scale.y = 0.8;
     }
