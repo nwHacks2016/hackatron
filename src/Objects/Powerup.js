@@ -6,13 +6,13 @@ class Powerup extends GameObject {
             'Saiyan': SaiyanHandler,
             'Ghost': GhostHandler,
             'Invincible': InvincibleHandler,
-            'SpeedBoost': SpeedBoostHandler,
             'Reverse': ReverseHandler,
             'Rage': RageHandler,
             'Teleport': TeleportHandler,
             'Portal': PortalHandler,
             'Freeze': FreezeHandler,
-            'BlockUp': BlockUpHandler
+            'BlockUp': BlockUpHandler,
+            'SpeedBoost': SpeedBoostHandler
         }
     }
 
@@ -152,6 +152,23 @@ class SaiyanHandler extends PowerupHandler {
     }
 }
 
+class SpeedBoostHandler extends PowerupHandler {
+    constructor(params) {
+        super(params);
+        this.name = 'Speed mode';
+        this.spriteMode = 'key';
+        this.spriteKey = 'gfx/buffs/speed-boost';
+        this.spriteLoop = [0,1,2,3,4,5];
+    }
+
+    onStarted() {
+        this.player.character.speed *= 2;
+    }
+
+    onStopped() {
+        this.player.character.speed /= 2;
+    }
+}
 
 class GhostHandler extends PowerupHandler {
     constructor(params) {
@@ -225,25 +242,6 @@ class RageHandler extends PowerupHandler {
         this.player.character.sprite.body.setSize(width * (1 - padding), height * (1 - padding), width * padding, height * padding);
         this.player.character.sprite.scale.x = 0.8;
         this.player.character.sprite.scale.y = 0.8;
-    }
-}
-
-
-class SpeedBoostHandler extends PowerupHandler {
-    constructor(params) {
-        super(params);
-        this.name = 'Speed boost';
-        this.spriteMode = 'key';
-        this.spriteTilemap = 'speedBoost';
-        this.spriteLoop = [0,1,2,3,4,5];
-    }
-
-    onStarted() {
-        this.player.character.speed *= 2;
-    }
-
-    onStopped() {
-        this.player.character.speed /= 2;
     }
 }
 
@@ -394,5 +392,3 @@ class PortalHandler extends PowerupHandler {
         this.emit('destroyed', {positions: [this.state.entryPortalPosition, this.state.exitPortalPosition]});
     }
 }
-
-

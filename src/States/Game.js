@@ -240,7 +240,7 @@ Hackatron.Game.prototype = {
     initCountdown: function() {
         var countdown = new Countdown();
         countdown.init(this.game);
-        countdown.start();
+        countdown.start(this.player.character.sprite);
     },
 
     initSFX: function() {
@@ -353,7 +353,7 @@ Hackatron.Game.prototype = {
 
             //  400 is the speed it will move towards the mouse
             //this.game.physics.arcade.moveToPointer(this.player.character.sprite, PLAYER_SPEED);
-            
+
             // top = -1.25
             // bottom = 1
             // left = 2.5
@@ -428,7 +428,7 @@ Hackatron.Game.prototype = {
             self.blocks.push(block);
         }
 
-        var SLIDE_SPEED = 200;
+        var SLIDE_SPEED = 25;
         var REPOSITION_DELAY = 200;
         var repositionTimeout = null;
 
@@ -487,7 +487,7 @@ Hackatron.Game.prototype = {
             // Find nearest opening and go that way
             // Get current world position
             // Check if direction is up, down, left, or right
-            // If direction is up, 
+            // If direction is up,
             //   check from my position to 0 for the closest opening
             //   check from my position to mapWidth for the closest opening
             // If closest is left, set velocity x = -500
@@ -634,7 +634,7 @@ Hackatron.Game.prototype = {
             if (event.info.id === self.player.id) { return; }
 
             var player = self.getPlayerById(id);
-            
+
             // disable animations for now - lag?
             if (player.character.sprite.body) {
                 clearTimeout(updateTimeout);
@@ -730,7 +730,7 @@ Hackatron.Game.prototype = {
                     player.character.position = event.info.player.position;
                 });
 
-                // Setup enemy 
+                // Setup enemy
                 self.enemy = new Enemy();
 
                 self.enemy.init({
