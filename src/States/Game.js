@@ -517,7 +517,7 @@ Hackatron.Game.prototype = {
             } else {
                 // He's probably stuck because a few pixels are touching
                 // Lets round his position so he's in alignment
-                self.player.character.sprite.body.velocity.setTo(0, 0);
+                //self.player.character.sprite.body.velocity.setTo(0, 0);
                 self.player.character.position[diff.align] = position[diff.align];
             }
         };
