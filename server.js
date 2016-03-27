@@ -94,6 +94,7 @@ var parseEvent = function(socket, event) {
         var client = findClientBySocket(socket);
         console.log(client);
         removeClient(client);
+        host = null;
         findNewHost();
     } else {
         //socket.broadcast.emit(event.key, event.info);
