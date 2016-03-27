@@ -140,7 +140,7 @@ Hackatron.Game.prototype = {
                 return;
             }
 
-            self.addEvent({key: 'updatePlayer', info: info});
+            self.fireEvent({key: 'updatePlayer', info: info});
 
             lastUpdateInfo = info;
         }, UPDATE_INTERVAL);
@@ -160,7 +160,7 @@ Hackatron.Game.prototype = {
                     direction: self.enemy.character.direction
                 };
 
-                self.addEvent({key: 'updateEnemy', info: info});
+                self.fireEvent({key: 'updateEnemy', info: info});
             }
         }, UPDATE_INTERVAL);
     },
@@ -289,12 +289,12 @@ Hackatron.Game.prototype = {
             var randomHandler = powerupHandlers[this.game.rnd.integerInRange(0, powerupHandlers.length-1)];
             var powerup = new Powerup();
             powerup.init({key: randomHandler, game: this.game, map: this.map, player: this.player});
-            powerup.handler.on('started', () => { self.addEvent({key: 'foundPowerup', info: {state: powerup.handler.state, player: {id: self.player.id}}}); });
+            powerup.handler.on('started', () => { self.fireEvent({key: 'foundPowerup', info: {state: powerup.handler.state, player: {id: self.player.id}}}); });
             powerup.handler.on('destroyed', (params) => { params.positions.forEach((position) => { self.powerups[position.x][position.y] = null; }); });
 
             this.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = powerup;
 
-            this.addEvent({key: 'powerupSpawned', info: {handler: {key: randomHandler, state: powerup.handler.state}}});
+            this.fireEvent({key: 'powerupSpawned', info: {handler: {key: randomHandler, state: powerup.handler.state}}});
         }.bind(this), POWERUP_SPAWN_INTERVAL);
     },
 
@@ -337,7 +337,7 @@ Hackatron.Game.prototype = {
             }, 10);
         });
     },
-    addEvent: function(event) {
+    fireEvent: function(event) {
         this.events.push(event);
     },
     broadcastEvents: function() {
@@ -418,12 +418,12 @@ Hackatron.Game.prototype = {
                 self.enemy.character.addPoints(self.player.character.points);
             }
 
-            self.addEvent({key: 'playerKilled', info: {
+            self.fireEvent({key: 'playerKilled', info: {
                 player: {id: self.player.id}
             }});
             if (self.player.id === self.hostId) {
                 // console.log("the id is: " + self.player.id);
-                self.addEvent({key: 'findNewHost'});
+                self.fireEvent({key: 'findNewHost'});
             }
 
             if (self.ai) {
@@ -766,7 +766,7 @@ Hackatron.Game.prototype = {
                     players: players
                 };
 
-                self.addEvent({key: 'welcomePlayer', info: gameData});
+                self.fireEvent({key: 'welcomePlayer', info: gameData});
             }
 
             var player = self.getPlayerById(event.info.player.id);
@@ -833,7 +833,7 @@ Hackatron.Game.prototype = {
             // TODO: we already do this above, refactor it out
             var powerup = new Powerup();
             powerup.init({key: event.info.handler.key, game: self.game, map: self.map, player: self.player, state: event.info.handler.state});
-            powerup.handler.on('started', () => { self.addEvent({key: 'foundPowerup', info: {player: {id: self.player.id}, state: powerup.handler.state}}); });
+            powerup.handler.on('started', () => { self.fireEvent({key: 'foundPowerup', info: {player: {id: self.player.id}, state: powerup.handler.state}}); });
             powerup.handler.on('destroyed', (params) => { params.positions.forEach((position) => { self.powerups[position.x][position.y] = null; }); });
 
             self.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = powerup;
@@ -908,7 +908,7 @@ Hackatron.Game.prototype = {
     // Method to broadcast to  other clients (if there are any) that you have
     // joined the game
     joinGame: function () {
-        this.addEvent({key: 'newPlayer', info: {
+        this.fireEvent({key: 'newPlayer', info: {
             player: {
                 id: this.player.id,
                 name: this.player.name,
