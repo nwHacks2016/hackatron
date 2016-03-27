@@ -57,6 +57,8 @@
   <script src='src/States/Lobby.js'></script>
   <script src="src/States/Menu.js"></script>
   <script src='src/States/Preload.js'></script>
+  <script src='src/States/Boot.js'></script>
+
 
   <script src="src/UI/UI.js" type="text/babel"></script>
   <script src="src/UI/Screens/StartScreen.js" type="text/babel"></script>
@@ -141,12 +143,13 @@
           POWERUP_SPAWN_INTERVAL = 5000;
           UPDATE_INTERVAL = 100;
 
+          Hackatron.loader.state.add('Boot', Hackatron.Boot);
           Hackatron.loader.state.add('Preload', Hackatron.Preload);
           Hackatron.loader.state.add('Menu', Hackatron.Menu);
           Hackatron.loader.state.add('Lobby', Hackatron.Lobby);
           Hackatron.loader.state.add('Game', Hackatron.Game);
 
-          Hackatron.loader.state.start('Preload');
+          Hackatron.loader.state.start('Boot');
 
           window.onresize();
       };
