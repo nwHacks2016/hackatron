@@ -151,5 +151,13 @@ class Character extends GameObject {
                 this.sprite.emitter.on = false;
             }
         }
+
+        if (this.sprite.x >= Hackatron.GAME_WIDTH * 32) {
+            this.sprite.x = 0;
+        }
+
+        if (this.sprite.x <= 0) {
+            this.sprite.x = Hackatron.GAME_WIDTH * 31;
+        }
     }
 }

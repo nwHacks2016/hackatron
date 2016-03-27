@@ -16,11 +16,12 @@ Hackatron.Menu.prototype = {
             this.game.add.plugin(Phaser.Plugin.Debug);
         }
 
-        this.stage.setBackgroundColor(0x2d2d2d);
+        this.stage.setBackgroundColor(0x000000);
         var bg = this.add.sprite(0, 0, 'ui/screens/launch');
         var ratio = bg.height / bg.width;
         bg.width = Hackatron.GAME_WIDTH;
         bg.height = bg.width * ratio;
+        //bg.y = (window.innerHeight - bg.height) / 4;
 
         this.startKey = this.input.keyboard.addKey(Phaser.Keyboard.ENTER);
         this.musicKey = this.input.keyboard.addKey(Phaser.Keyboard.M);
