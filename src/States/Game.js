@@ -599,7 +599,8 @@ Hackatron.Game.prototype = {
                     this.tweenRed.stop();
                 }
                 
-                this.tweenRed = this.game.add.tween(this.map.tilemap.layers[2]).to({alpha: alpha}, 50, 'Linear', true, 0, 1);
+                this.map.tilemap.layers[2].alpha = alpha;
+                //this.tweenRed = this.game.add.tween(this.map.tilemap.layers[2]).to({alpha: alpha}, 50, 'Linear', true, 0, 1);
             }
         }
     },
