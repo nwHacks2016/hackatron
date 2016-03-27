@@ -586,6 +586,22 @@ Hackatron.Game.prototype = {
 
     render: function() {
         this.fitToWindow();
+
+        if (this.player && this.enemy) {
+            var distance = this.game.physics.arcade.distanceBetween(this.player.character.sprite, this.enemy.character.sprite);
+            var DANGER_DISTANCE = 300;
+
+            if (distance > DANGER_DISTANCE) {
+                alpha = 0;
+            } else {
+                alpha = (DANGER_DISTANCE - distance) / DANGER_DISTANCE;
+                if (this.tweenRed) {
+                    this.tweenRed.stop();
+                }
+                
+                this.tweenRed = this.game.add.tween(this.map.tilemap.layers[2]).to({alpha: alpha}, 50, 'Linear', true, 0, 1);
+            }
+        }
     },
 
     enableCollisionDebugging: function() {

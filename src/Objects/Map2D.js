@@ -205,7 +205,12 @@ Map2D.prototype.init = function(params) {
     //this.tilemap = this.game.add.tilemap('mapData');
     //this.tilemap.addTilesetImage(Hackatron.mapConfig.tilesetKey, cacheKey('my-tiledmap', 'tileset', 'general'));
 
-    this.tween = this.game.add.tween(this.tilemap.layers[1]).to({alpha: 0}, 250, 'Linear', true, 0, -1, true);
+
+
+    this.tweenFlash = this.game.add.tween(this.tilemap.layers[1]).to({alpha: 0}, 250, 'Linear', true, 0, -1, true);
+    this.tilemap.layers[2].alpha = 0;
+    this.tilemap.layers[2].visible = 1;
+    
     this.data = this.tilemap.layers[0].tiles;
 
     // this.layer = this.tilemap.createLayer('Background');
