@@ -244,6 +244,20 @@ Hackatron.Game.prototype = {
         countdown.start();
     },
 
+    initGameover: function() {
+        var gameover = new Gameover();
+        gameover.init(this.game);
+        gameover.start();
+
+        if (this.powerupInterval) {
+            clearInterval(this.powerupInterval);
+        }
+        this.newGameKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+        this.newGameKey.onDown.add(function() {
+            this.game.state.start('Menu');
+        }, this);
+    },
+
     initSFX: function() {
         this.musicKey = this.input.keyboard.addKey(Phaser.Keyboard.M);
         // var fx = this.game.add.audio('sfx');
@@ -275,7 +289,7 @@ Hackatron.Game.prototype = {
 
     runPowerUpSystem: function() {
         var self = this;
-        setInterval(function() {
+        self.powerupInterval = setInterval(function() {
             var powerupHandlers = Object.keys(Powerup.handlers);
             var randomHandler = powerupHandlers[this.game.rnd.integerInRange(0, powerupHandlers.length-1)];
             var powerup = new Powerup();
@@ -416,6 +430,8 @@ Hackatron.Game.prototype = {
             if (self.ai) {
                 self.ai.stopPathFinding();
             }
+
+            self.initGameover();
         };
 
         var block = self.player.character.triggerAttack(self.blocks);
@@ -558,6 +574,9 @@ Hackatron.Game.prototype = {
         document.getElementById('game').style['height'] = Hackatron.getHeightRatioScale() * 100 + '%';
         //window.onresize();
     },
+    shutdown: function() {
+        console.log("it went to the shut down");
+    },
 
     render: function() {
         this.fitToWindow();
@@ -669,9 +688,11 @@ Hackatron.Game.prototype = {
                 }
 
                 updateTimeout = setTimeout(function() {
-                    player.character.position = position;
-                    player.character.sprite.body.velocity.x = 0;
-                    player.character.sprite.body.velocity.y = 0;
+                    if (player.character.sprite.body) {
+                        player.character.position = position;
+                        player.character.sprite.body.velocity.x = 0;
+                        player.character.sprite.body.velocity.y = 0;
+                    }
                 }, 200);
             }
         } else if (event.key === 'updateEnemy') {
@@ -754,7 +775,7 @@ Hackatron.Game.prototype = {
         // Method for handling received deaths of other clients
         } else if (event.key === 'playerKilled') {
             var player = self.getPlayerById(event.info.player.id);
-            self.enemy.addPoints(player.points);
+            // self.enemy.addPoints(player.points);
             player.kill();
         // Method for handling player leaves
         } else if (event.key === 'removePlayer') {

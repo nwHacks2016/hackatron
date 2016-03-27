@@ -41,6 +41,7 @@ Hackatron.Preload.prototype = {
 
         // UI
         this.load.spritesheet('gfx/overlays/countdown', assetsPath + 'gfx/overlays/countdown.png', 29, 27, 3);
+        this.load.image('gfx/overlays/gameover', assetsPath + 'gfx/overlays/gameover.png');
 
         // Buffs
         this.load.image('gfx/buffs/general', assetsPath + 'gfx/buffs/general.png');
