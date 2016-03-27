@@ -125,6 +125,7 @@ Hackatron.Game.prototype = {
         this.updatePosInterval = setInterval(function() {
             self.player.character.updatePos();
 
+            if (!self.player.character.sprite.body) { return;}
             if (!self.player.character.dirty) { return; }
 
             var info = {
@@ -600,7 +601,7 @@ Hackatron.Game.prototype = {
                 if (this.tweenRed) {
                     this.tweenRed.stop();
                 }
-                
+
                 this.map.tilemap.layers[2].alpha = alpha;
                 //this.tweenRed = this.game.add.tween(this.map.tilemap.layers[2]).to({alpha: alpha}, 50, 'Linear', true, 0, 1);
             }
