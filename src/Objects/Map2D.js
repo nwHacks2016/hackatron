@@ -207,7 +207,7 @@ Map2D.prototype.init = function(params) {
 
 
 
-    this.tweenFlash = this.game.add.tween(this.tilemap.layers[1]).to({alpha: 0}, 250, 'Linear', true, 0, -1, true);
+    this.tweenFlash = this.game.add.tween(this.tilemap.layers[1]).to({alpha: 0.1}, 450, 'Linear', true, 0, -1, true);
     this.tilemap.layers[2].alpha = 0;
     this.tilemap.layers[2].visible = 1;
     
