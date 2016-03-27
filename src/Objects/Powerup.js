@@ -131,7 +131,7 @@ class PowerupHandler {
     stop() {
         this.finished = true;
 
-        if (this.player.id === this.game.player.id) {
+        if (this.player.id === Hackatron.game.player.id) {
             this.impactText.destroy();
         }
 
