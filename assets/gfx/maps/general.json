@@ -9,6 +9,14 @@
         {
             "type": "image",
             "subtype": "tileset",
+            "key": "map_tileset_redmap",
+            "name": "redmap",
+            "url": "assets/gfx/maps/tron/redmap.png",
+            "overwrite": false
+        },
+        {
+            "type": "image",
+            "subtype": "tileset",
             "key": "map_tileset_general",
             "name": "general",
             "url": "assets/gfx/maps/tron/map.png",

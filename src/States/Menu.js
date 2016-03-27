@@ -13,7 +13,7 @@ Hackatron.Menu.prototype = {
 
     create: function() {
         if (Hackatron.debug) {
-            this.game.add.plugin(Phaser.Plugin.Debug);
+            //this.game.add.plugin(Phaser.Plugin.Debug);
         }
 
         this.stage.setBackgroundColor(0x000000);

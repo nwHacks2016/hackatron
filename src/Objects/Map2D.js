@@ -46,7 +46,7 @@ function extendTilemap(tilemap) {
 
         if (collides === undefined) { collides = true; }
         if (recalculate === undefined) { recalculate = true; }
-        
+
         layer = this.getLayer(layer);
 
         if (typeof indexes === 'number')
@@ -86,7 +86,7 @@ function extendTilemap(tilemap) {
 
         if (collides === undefined) { collides = true; }
         if (recalculate === undefined) { recalculate = true; }
-        
+
         layer = this.getLayer(layer);
 
         if (start > stop)
@@ -205,6 +205,12 @@ Map2D.prototype.init = function(params) {
     //this.tilemap = this.game.add.tilemap('mapData');
     //this.tilemap.addTilesetImage(Hackatron.mapConfig.tilesetKey, cacheKey('my-tiledmap', 'tileset', 'general'));
 
+
+
+    this.tweenFlash = this.game.add.tween(this.tilemap.layers[1]).to({alpha: 0.1}, 450, 'Linear', true, 0, -1, true);
+    this.tilemap.layers[2].alpha = 0;
+    this.tilemap.layers[2].visible = 1;
+    
     this.data = this.tilemap.layers[0].tiles;
 
     // this.layer = this.tilemap.createLayer('Background');
@@ -236,5 +242,5 @@ Map2D.prototype.init = function(params) {
 };
 
 Map2D.prototype.enablePowerups = function(params) {
-    
+
 };

@@ -26,6 +26,8 @@ var setHost = function(client) {
 
 var findNewHost = function() {
     if (clients.length > 0) {
+        console.log("clinets inside the find new host");
+        console.log(clients);
         var i = getRandomInt(0, clients.length-1);
         var client = clients[i];
 
@@ -86,6 +88,14 @@ var parseEvent = function(socket, event) {
         }
 
         socket.emit('setHost', {player: host.player});
+    } else if (event.key === 'findNewHost') {
+
+        console.log("finding new host....");
+        var client = findClientBySocket(socket);
+        console.log(client);
+        removeClient(client);
+        host = null;
+        findNewHost();
     } else {
         //socket.broadcast.emit(event.key, event.info);
     }
@@ -123,7 +133,7 @@ io.sockets.on('connection', function(socket) {
             findNewHost();
         }
 
-        io.sockets.emit('removePlayer', {player: client.player});
+        io.sockets.emit('playerLeave', {player: client.player});
     });
 });
 

@@ -112,12 +112,12 @@ Hackatron.Game.prototype = {
     initEvents: function() {
         var self = this;
 
-        setInterval(this.broadcastEvents.bind(this), 100);
+        this.eventsInterval = setInterval(this.broadcastEvents.bind(this), 100);
 
         var lastUpdateInfo = null;
 
         // Send player position every 50ms
-        setInterval(function() {
+        this.updatePosInterval = setInterval(function() {
             self.player.character.updatePos();
 
             if (!self.player.character.dirty) { return; }
@@ -245,9 +245,6 @@ Hackatron.Game.prototype = {
         gameover.init(this.game);
         gameover.start();
 
-        if (this.powerupInterval) {
-            clearInterval(this.powerupInterval);
-        }
         this.newGameKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
         this.newGameKey.onDown.add(function() {
             this.game.state.start('Menu');
@@ -422,6 +419,10 @@ Hackatron.Game.prototype = {
             self.addEvent({key: 'playerKilled', info: {
                 player: {id: self.player.id}
             }});
+            if (self.player.id === self.hostId) {
+                // console.log("the id is: " + self.player.id);
+                self.addEvent({key: 'findNewHost'});
+            }
 
             if (self.ai) {
                 self.ai.stopPathFinding();
@@ -560,7 +561,9 @@ Hackatron.Game.prototype = {
             }
         });
 
-        self.game.world.bringToTop(self.player.character.sprite);
+        if (self.player) {
+            self.game.world.bringToTop(self.player.character.sprite);
+        }
     },
 
     fitToWindow: function() {
@@ -571,11 +574,40 @@ Hackatron.Game.prototype = {
         //window.onresize();
     },
     shutdown: function() {
-        console.log("it went to the shut down");
+        if (this.powerupInterval) {
+            clearInterval(this.powerupInterval);
+        }
+        if (this.updatePosInterval) {
+            clearInterval(this.updatePosInterval);
+        }
+        if (this.eventsInterval) {
+            clearInterval(this.eventsInterval);
+        }
+        this.player = null;
+        this.enemy = null;
+        this.hostId = null;
+        this.events = [];
     },
 
     render: function() {
         this.fitToWindow();
+
+        if (this.player && this.enemy) {
+            var distance = this.game.physics.arcade.distanceBetween(this.player.character.sprite, this.enemy.character.sprite);
+            var DANGER_DISTANCE = 300;
+
+            if (distance > DANGER_DISTANCE) {
+                alpha = 0;
+            } else {
+                alpha = (DANGER_DISTANCE - distance) / DANGER_DISTANCE;
+                if (this.tweenRed) {
+                    this.tweenRed.stop();
+                }
+                
+                this.map.tilemap.layers[2].alpha = alpha;
+                //this.tweenRed = this.game.add.tween(this.map.tilemap.layers[2]).to({alpha: alpha}, 50, 'Linear', true, 0, 1);
+            }
+        }
     },
 
     enableCollisionDebugging: function() {
@@ -613,6 +645,9 @@ Hackatron.Game.prototype = {
             return this.players[playerId];
         }
 
+        return null;
+    },
+    createPlayer: function(playerId) {
         var player = new Player();
 
         player.init({
@@ -733,6 +768,11 @@ Hackatron.Game.prototype = {
             }
 
             var player = self.getPlayerById(event.info.player.id);
+
+            if (!player) {
+                self.createPlayer(event.info.player.id);
+            }
+
             player.name = event.info.player.name;
             player.character.position = event.info.player.position;
 
@@ -770,11 +810,13 @@ Hackatron.Game.prototype = {
 
         // Method for handling received deaths of other clients
         } else if (event.key === 'playerKilled') {
-            var player = self.getPlayerById(event.info.player.id);
+            var player = self.players[event.info.player.id];
             // self.enemy.addPoints(player.points);
-            player.kill();
+            if (player) {
+                player.kill();
+            }
         // Method for handling player leaves
-        } else if (event.key === 'removePlayer') {
+      } else if (event.key === 'playerLeave') {
             if (self.players[event.info.player.id]) {
                 var player = self.players[event.info.player.id];
                 player.kill();
@@ -827,7 +869,7 @@ Hackatron.Game.prototype = {
 
             // If this player is the new host, lets set them up
             if (self.hostId === self.player.id) {
-                console.log('Hey now the host, lets do this!');
+                console.log('Hey now the host, lets do this!\n' + self.hostId);
                 self.runEnemySystem();
                 //self.runAiSystem();
                 self.runPowerUpSystem();
@@ -847,7 +889,7 @@ Hackatron.Game.prototype = {
         ['updatePlayer',
          'updateEnemy',
          'newPlayer',
-         'removePlayer',
+         'playerLeave',
          'welcomePlayer',
          'playerKilled',
          'powerupSpawned',
