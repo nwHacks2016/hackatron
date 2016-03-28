@@ -280,7 +280,7 @@ Hackatron.Game.prototype = {
     },
 
     runPowerUpSystem: function() {
-        this.powerupInterval = setInterval(() => {
+        var run = () => {
             var powerupHandlers = Object.keys(Powerup.handlers);
             var randomHandler = powerupHandlers[this.game.rnd.integerInRange(0, powerupHandlers.length-1)];
             var powerup = new Powerup();
@@ -291,7 +291,11 @@ Hackatron.Game.prototype = {
             this.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = powerup;
 
             this.fireEvent({key: 'powerupSpawned', info: {handler: {key: randomHandler, state: powerup.handler.state}}});
-        }, POWERUP_SPAWN_INTERVAL);
+        };
+
+        this.powerupInterval = setInterval(run, POWERUP_SPAWN_INTERVAL);
+
+        run();
     },
     fireEvent: function(event) {
         this.events.push(event);
@@ -477,7 +481,11 @@ Hackatron.Game.prototype = {
         }
 
         if (this.enemy) {
-            this.game.physics.arcade.collide(this.enemy.character.sprite, this.map.tilemap.layer);
+            // this.game.physics.arcade.collide(this.enemy.character.sprite, this.map.tilemap.layer);
+
+            // this.map.collideTiles.forEach((tile) => {
+            //     this.game.physics.arcade.collide(this.enemy.character.sprite, tile);
+            // });
 
             if (this.player.character.collisionEnabled) {
                 this.game.physics.arcade.overlap(this.enemy.character.sprite, this.player.character.sprite, collideEnemyHandler);
@@ -859,9 +867,13 @@ Hackatron.Game.prototype = {
             // If this player is the new host, lets set them up
             if (this.hostId === this.player.id) {
                 console.log('Hey now the host, lets do this!\n' + this.hostId);
+
                 this.runEnemySystem();
-                //this.runAiSystem();
-                this.runPowerUpSystem();
+
+                setTimeout(() => {
+                    this.runAiSystem();
+                    this.runPowerUpSystem();
+                }, 3000);
             }
         }
     },

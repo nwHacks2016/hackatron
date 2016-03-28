@@ -10,6 +10,8 @@ class Character extends GameObject {
         this.game = params.game;
         this.speed = params.speed;
         this.emitterKey = params.emitterKey;
+        this.path = [];
+        this.pathStep = -1;
 
         this._addEmitterToSprite();
         this._addAnimationsToSprite();
@@ -84,6 +86,72 @@ class Character extends GameObject {
         this.sprite.animations.add('walkDown', Phaser.Animation.generateFrameNames(this.characterKey + '/walkDown-', 1, 3, '', 4), 3, false, false);
         this.sprite.animations.add('walkLeft', Phaser.Animation.generateFrameNames(this.characterKey + '/walkLeft-', 1, 3, '', 4), 3, false, false);
         this.sprite.animations.add('walkRight', Phaser.Animation.generateFrameNames(this.characterKey + '/walkRight-', 1, 3, '', 4), 3, false, false);
+    }
+
+    resetPath() {
+        this.path = [];
+        this.pathStep = 0;
+    }
+
+    reachedTargetPosition(targetPosition) {
+        var distance = Phaser.Point.distance(this.position, targetPosition);
+        return distance <= 16;
+    }
+
+    moveThroughPath(path) {
+        if (path !== null) {
+            this.path = path;
+            this.pathStep = 0;
+        } else {
+            this.path = [];
+        }
+    }
+
+    pathFind() {
+        if (this.path.length > 0) {
+            var nextPosition = this.path[this.pathStep];
+            var accuracy = 16; // within 16px
+
+            // If we're on the last step, lets make sure we get to the exact spot
+            // Set more accuracy, 2px
+            if (this.pathStep === this.path.length - 1) {
+                accuracy = 2;
+            }
+
+            if (!this.reachedTargetPosition(nextPosition, accuracy)) {
+                var velocity = new Phaser.Point(nextPosition.x - this.position.x, nextPosition.y - this.position.y);
+                velocity.normalize();
+                velocity.x = Math.round(velocity.x);
+                velocity.y = Math.round(velocity.y);
+
+                if (velocity.x === 1) {
+                    this.sprite.animations.play('walkRight', 3, false);
+                } else if (velocity.x === -1) {
+                    this.sprite.animations.play('walkLeft', 3, false);
+                } else if (velocity.y === 1) {
+                    this.sprite.animations.play('walkDown', 3, false);
+                } else if (velocity.y === -1) {
+                    this.sprite.animations.play('walkUp', 3, false);
+                }
+
+                this.sprite.body.velocity.x = velocity.x * 100;
+                this.sprite.body.velocity.y = velocity.y * 100;
+            } else {
+                this.position.x = nextPosition.x;
+                this.position.y = nextPosition.y;
+
+                if (this.pathStep < this.path.length - 1) {
+                    this.pathStep += 1;
+                } else {
+                    this.path = [];
+                    this.pathStep = -1;
+                    this.sprite.body.velocity.x = 0;
+                    this.sprite.body.velocity.y = 0;
+                }
+            }
+
+            this.dirty = true;
+        }
     }
 
     updatePos() {

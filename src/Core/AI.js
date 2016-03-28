@@ -1,103 +1,138 @@
-function AI() {
-}
-
-AI.prototype.init = function(params) {
-    this.map = params.map;
-    this.game = params.game;
-    this.player = params.player;
-    this.enemy = params.enemy;
-
-    var originalLevel = Utils.transpose(this.map.data);
-    var convertedLevel = [];
-
-    // EasyStar expects a multidimensional array of the rows and columns
-    for(var i = 0; i < 32; i++) {
-        convertedLevel[i] = [];
-        for (var j = 0; j < 32; j++) {
-            convertedLevel[i][j] = 0;
-        }
+class AI {
+    constructor() {
+        this.pathToPosition = null;
     }
 
-    this.map.collideTiles.forEach(function(tile) {
-        convertedLevel[Math.floor(tile.y / 16)][Math.floor(tile.x / 16)] = 1;
-    });
+    findPath(origin, target, cb) {
+        var originCoord = this.getCoordFromPoint(origin);
+        var targetCoord = this.getCoordFromPoint(target);
 
-    this.easystar = new EasyStar.js();
-    this.easystar.setGrid(convertedLevel);
-    this.easystar.setAcceptableTiles([0]);
-    // easystar.enableDiagonals();
-    // easystar.disableCornerCutting();
-    // easystar.enableCornerCutting();
+        if (!this.outsideGrid(originCoord) && !this.outsideGrid(targetCoord)) {
+            console.log('Pathing from ', originCoord.x + ',' + originCoord.y + ' to ' + targetCoord.x + ',' + targetCoord.y);
 
-    var currentPathIndex = 0;
-    var currentPath = null;
-    var timeStep = 600;
-    var speed = 200; // usually 100
+            this.easyStar.findPath(originCoord.x, originCoord.y, targetCoord.x, targetCoord.y, cb);
+            this.easyStar.calculate();
+            return true;
+        }
 
-    // Delayed start to give players a chance
-    setTimeout(() => {
-        this.pathFindingInterval = setInterval(() => {
-             if (!currentPath) {
-                try {
-                    this.easystar.findPath(
-                        this.enemy.character.worldPosition.x,
-                        this.enemy.character.worldPosition.y,
-                        this.player.character.worldPosition.x,
-                        this.player.character.worldPosition.y,
-                        function(path) {
-                        if (!path || path.length < 2) {
-                            console.log("The path to the destination point was not found.");
-                            return;
-                        }
+        return false;
+    }
 
-                        currentPath = path;
+    outsideGrid(coord) {
+        return coord.y < 0 || coord.y > this.gridDimensions.y - 1 || coord.x < 0 || coord.x > this.gridDimensions.x - 1;
+    }
 
-                        // Periodically reset
-                        setTimeout(() => {
-                            currentPathIndex = 0;
-                            currentPath = null;
-                        }, 3000);
-                    }.bind(this));
-                } catch(e) {
-                    var position = Hackatron.game.getValidPosition();
-                    this.enemy.character.sprite.x = position.x;
-                    this.enemy.character.sprite.y = position.y;
-                }
+    getCoordFromPoint(point) {
+        var y = Math.floor(point.y / this.tileDimensions.y);
+        var x = Math.floor(point.x / this.tileDimensions.x);
+        return {y: y, x: x};
+    }
+
+    getPointFromCoord(coord) {
+        var x = (coord.x * this.tileDimensions.x);
+        var y = (coord.y * this.tileDimensions.y);
+        return new Phaser.Point(x, y);
+    }
+
+    tracePath(path) {
+        path.forEach((pathItem) => {
+            if (!this.pathTraceSprite) {
+                this.pathTraceSprite = this.game.add.graphics(pathItem.x, pathItem.y);
+                this.pathTraceSprite.lineStyle(4, 0xffd900, 1);
+            } else {
+                this.pathTraceSprite.lineTo(pathItem.x - this.pathTraceSprite.x, pathItem.y - this.pathTraceSprite.y);
             }
+        });
 
-            this.easystar.calculate();
+        this.pathTraceSprite.endFill();
+    }
 
-            if (currentPath && currentPathIndex < currentPath.length) {
-                var xDiff = currentPath[currentPathIndex].x * 16 - this.enemy.character.sprite.x;
-                var yDiff = currentPath[currentPathIndex].y * 16 - this.enemy.character.sprite.y;
-                var toX = Math.abs(xDiff);
-                var toY = Math.abs(yDiff);
+    findTarget() {
+        var targets = [Hackatron.game.player.character];
 
-                if (toX > toY) {
-                    this.enemy.character.sprite.body.velocity.x = xDiff > 0 ? 100 : -100;
-                } else {
-                    this.enemy.character.sprite.body.velocity.y = yDiff > 0 ? 100 : -100;
-                }
-                // this.enemy.character.sprite.x = Math.floor(currentPath[currentPathIndex].x) * 16;
-                // this.enemy.character.sprite.y = Math.floor(currentPath[currentPathIndex].y) * 16;
+        for (var id in Hackatron.game.players) {
+            targets.push(Hackatron.game.players[id].character);
+        }
 
-                // if (goToPosition) {
-                //     repositionTimeout = setTimeout(() => { self.player.character.sprite.body.velocity.y = 0; self.player.character.sprite.y = goToPosition; }, REPOSITION_DELAY);
-                // }
+        return targets[Math.floor(Math.random() * (targets.length - 1))];
+    }
 
-                this.enemy.character.dirty = true;
+    init(params) {
+        this.map = params.map;
+        this.game = params.game;
+        this.player = params.player;
+        this.enemy = params.enemy;
 
-                if (currentPathIndex < currentPath.length-1) {
-                    ++currentPathIndex;
-                } else {
-                    currentPathIndex = 0;
-                    currentPath = null;
-                }
+        var originalLevel = Utils.transpose(this.map.data);
+        var convertedLevel = [];
+
+        // EasyStar expects a multidimensional array of the rows and columns
+        for(var i = 0; i < 32; i++) {
+            convertedLevel[i] = [];
+            for (var j = 0; j < 32; j++) {
+                convertedLevel[i][j] = 0;
             }
-        }, speed);
-    }, 5000);
-};
+        }
 
-AI.prototype.stopPathFinding = function() {
-    clearInterval(this.pathFindingInterval);
-};
+        this.map.collideTiles.forEach((tile) => {
+            if (!tile || !tile.collides) { return; }
+
+            convertedLevel[tile.tilePosition.y][tile.tilePosition.x] = 1;
+        });
+
+        console.log('AI converted level: ', convertedLevel);
+
+        this.easyStar = new EasyStar.js();
+        this.easyStar.setGrid(convertedLevel);
+        this.easyStar.setAcceptableTiles([0]);
+        // Unfortunately I dont think these are helping
+        this.easyStar.disableDiagonals();
+        this.easyStar.setIterationsPerCalculation(1000);
+        // this.easyStar.enableDiagonals();
+        // this.easyStar.disableCornerCutting();
+        // this.easyStar.enableCornerCutting();
+
+        this.tileDimensions = {x: 16, y: 16};
+        this.gridDimensions = {y: 32, x: 32};
+
+        var sourceCharacter = this.enemy.character;
+        var targetCharacter = this.player.character;
+
+        this.followInterval = setInterval(() => {
+            sourceCharacter.sprite.body.velocity.x = 0;
+            sourceCharacter.sprite.body.velocity.y = 0;
+
+            if (this.pathToPosition) {
+                // Check if what we're targetting has changed positions
+                if (this.pathToPosition.x !== targetCharacter.position.x || this.pathToPosition.y !== targetCharacter.position.y) {
+                    console.log('[AI] Repathing...');
+                    sourceCharacter.resetPath();
+                    this.pathToPosition = null;
+                    this.pathTraceSprite.destroy();
+                    this.pathTraceSprite = null;
+                    targetCharacter = this.findTarget();
+                } else {
+                    // If nothing has changed, we just need to keep updating
+                    sourceCharacter.pathFind();
+                }
+            } else {
+                this.findPath(sourceCharacter.position, targetCharacter.position, (pathCoords) => {
+                    if (!pathCoords) { return; }
+
+                    var path = pathCoords.map((pathCoord) => {
+                        return this.getPointFromCoord({y: pathCoord.y, x: pathCoord.x});
+                    });
+
+                    this.tracePath(path);
+                    sourceCharacter.moveThroughPath(path);
+
+                    this.pathToPosition = targetCharacter.position;
+                });
+            }
+        }, 20);
+    }
+
+    stopPathFinding() {
+        clearInterval(this.pathFindingInterval);
+    }
+}
