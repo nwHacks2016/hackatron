@@ -102,6 +102,7 @@
         var smallest = window.innerHeight > window.innerWidth ? gameContainer.offsetWidth / Hackatron.UI_WIDTH : gameContainer.offsetHeight / Hackatron.UI_HEIGHT;
         uiContainer.style.left = (100 - parseInt(gameContainer.style.width)) / 2 + '%';
         uiContainer.style.zoom = smallest;
+        uiContainer.style['transform'] = 'perspective(1000px) rotateX(10deg) rotate(-2deg)';
       };
 
       // Load Game

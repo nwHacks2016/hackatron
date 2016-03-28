@@ -244,6 +244,7 @@ Hackatron.Game.prototype = {
         var gameover = new Gameover();
         gameover.init(this.game);
         gameover.start();
+        this.isGameOver = true;
 
         this.newGameKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
         this.newGameKey.onDown.add(() => {
@@ -508,10 +509,37 @@ Hackatron.Game.prototype = {
     },
 
     fitToWindow: function() {
-        this.game.canvas.style['width'] = '90%';
-        this.game.canvas.style['height'] = '90%';
         this.game.canvas.style['margin'] = 'auto';
-        this.game.canvas.style['transform'] = 'perspective(900px) rotateX(15deg) rotate(-3deg)';
+
+        if (this.isGameOver) {
+            if (!this.gameOverInterval) {
+                this.gameOverInterval = setTimeout(() => {
+                    this.deg = 0;
+                    this.gameOverInterval = setInterval(() => {
+                        this.deg += 1;
+                        var rotate = (this.deg * 30) % 359;
+                        this.game.canvas.style['width'] = (91 - this.deg) + '%';
+                        this.game.canvas.style['height'] = (91 - this.deg) + '%';
+                        this.game.canvas.style['transform'] = 'perspective(900px) rotateX(15deg) rotate(-' + (rotate) + 'deg)';
+
+                        if (this.deg >= 90) {
+                            clearInterval(this.gameOverInterval);
+                            this.isGameOver = false;
+                            this.gameOverInterval = null;
+                            this.game.canvas.style['width'] = '90%';
+                            this.game.canvas.style['height'] = '90%';
+                            this.game.canvas.style['transform'] = 'perspective(900px) rotateX(15deg) rotate(-3deg)';
+                            this.game.state.clearCurrentState();
+                            this.game.state.start('Menu');
+                        }
+                    }, 10);
+                }, 2000);
+            }
+        } else {
+            this.game.canvas.style['width'] = '90%';
+            this.game.canvas.style['height'] = '90%';
+            this.game.canvas.style['transform'] = 'perspective(900px) rotateX(15deg) rotate(-3deg)';
+        }
 
         document.getElementById('game').style['width'] = Hackatron.getWidthRatioScale() * 100 + '%';
         document.getElementById('game').style['height'] = Hackatron.getHeightRatioScale() * 100 + '%';
