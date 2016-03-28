@@ -734,7 +734,7 @@ Hackatron.Game.prototype = {
             player.name = event.info.player.name;
             player.character.position = event.info.player.position;
 
-            console.log(event.info.player.id + ' has joined the game!');
+            console.log('New player ' + event.info.player.id + ' has joined the game!');
         // Set up game state as a new player receiving game data from host
         } else if (event.key === 'welcomePlayer') {
             if (this.player.id === event.info.player.id) {

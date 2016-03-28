@@ -48,8 +48,8 @@ class Tron extends Character {
                 });
             }, 2000);
 
-            Hackatron.game.addEvent(
-                {key: 'blockSpawned',
+            Hackatron.game.fireEvent({
+                key: 'blockSpawned',
                 info: {
                     x: block.x,
                     y: block.y
