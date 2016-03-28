@@ -91,11 +91,14 @@ class Character extends GameObject {
     resetPath() {
         this.path = [];
         this.pathStep = 0;
+
+        this.sprite.body.velocity.x = 0;
+        this.sprite.body.velocity.y = 0;
     }
 
     reachedTargetPosition(targetPosition) {
         var distance = Phaser.Point.distance(this.position, targetPosition);
-        return distance <= 16;
+        return distance <= 2;
     }
 
     moveThroughPath(path) {
@@ -107,7 +110,7 @@ class Character extends GameObject {
         }
     }
 
-    pathFind() {
+    pathFind(onFinished) {
         if (this.path.length > 0) {
             var nextPosition = this.path[this.pathStep];
             var accuracy = 16; // within 16px
@@ -137,8 +140,7 @@ class Character extends GameObject {
                 this.sprite.body.velocity.x = velocity.x * 100;
                 this.sprite.body.velocity.y = velocity.y * 100;
             } else {
-                this.position.x = nextPosition.x;
-                this.position.y = nextPosition.y;
+                this.position = nextPosition;
 
                 if (this.pathStep < this.path.length - 1) {
                     this.pathStep += 1;
@@ -147,10 +149,12 @@ class Character extends GameObject {
                     this.pathStep = -1;
                     this.sprite.body.velocity.x = 0;
                     this.sprite.body.velocity.y = 0;
+                    return true;
                 }
             }
 
             this.dirty = true;
+            return false;
         }
     }
 

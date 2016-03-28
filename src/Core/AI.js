@@ -8,7 +8,7 @@ class AI {
         var targetCoord = this.getCoordFromPoint(target);
 
         if (!this.outsideGrid(originCoord) && !this.outsideGrid(targetCoord)) {
-            console.log('Pathing from ', originCoord.x + ',' + originCoord.y + ' to ' + targetCoord.x + ',' + targetCoord.y);
+            this.debug && console.log('Pathing from ', originCoord.x + ',' + originCoord.y + ' to ' + targetCoord.x + ',' + targetCoord.y);
 
             this.easyStar.findPath(originCoord.x, originCoord.y, targetCoord.x, targetCoord.y, cb);
             this.easyStar.calculate();
@@ -35,6 +35,8 @@ class AI {
     }
 
     tracePath(path) {
+        if (!this.debug) { return; }
+
         path.forEach((pathItem) => {
             if (!this.pathTraceSprite) {
                 this.pathTraceSprite = this.game.add.graphics(pathItem.x, pathItem.y);
@@ -45,6 +47,13 @@ class AI {
         });
 
         this.pathTraceSprite.endFill();
+    }
+
+    resetTrace() {
+        if (!this.debug) { return; }
+
+        this.pathTraceSprite.destroy();
+        this.pathTraceSprite = null;
     }
 
     findTarget() {
@@ -58,6 +67,7 @@ class AI {
     }
 
     init(params) {
+        this.debug = false;
         this.map = params.map;
         this.game = params.game;
         this.player = params.player;
@@ -80,7 +90,7 @@ class AI {
             convertedLevel[tile.tilePosition.y][tile.tilePosition.x] = 1;
         });
 
-        console.log('AI converted level: ', convertedLevel);
+        this.debug && console.log('AI converted level: ', convertedLevel);
 
         this.easyStar = new EasyStar.js();
         this.easyStar.setGrid(convertedLevel);
@@ -98,22 +108,61 @@ class AI {
         var sourceCharacter = this.enemy.character;
         var targetCharacter = this.player.character;
 
-        this.followInterval = setInterval(() => {
-            sourceCharacter.sprite.body.velocity.x = 0;
-            sourceCharacter.sprite.body.velocity.y = 0;
+        var MODES = [
+            'PERSISTENT',
+            'CONFUSED',
+            'SWITCHER'
+        ];
 
+        var currentMode = MODES[Math.floor(Math.random() * (MODES.length - 1))];
+
+        this.followInterval = setInterval(() => {
             if (this.pathToPosition) {
+                this.debug && console.log(currentMode);
                 // Check if what we're targetting has changed positions
-                if (this.pathToPosition.x !== targetCharacter.position.x || this.pathToPosition.y !== targetCharacter.position.y) {
-                    console.log('[AI] Repathing...');
-                    sourceCharacter.resetPath();
-                    this.pathToPosition = null;
-                    this.pathTraceSprite.destroy();
-                    this.pathTraceSprite = null;
-                    targetCharacter = this.findTarget();
+                if (currentMode === 'PERSISTENT') {
+                    this.debug && console.log('[AI] Sticking with it...');
+                    // Keep chasing this mother down...
+                    var finished = sourceCharacter.pathFind();
+
+                    if (finished) {
+                        this.debug && console.log('[AI] Finding new target...');
+                        sourceCharacter.resetPath();
+                        this.pathToPosition = null;
+                        this.resetTrace();
+                        currentMode = MODES[Math.floor(Math.random() * (MODES.length - 1))];
+                        targetCharacter = this.findTarget();
+                    }
                 } else {
-                    // If nothing has changed, we just need to keep updating
-                    sourceCharacter.pathFind();
+                    if (this.pathToPosition.x !== targetCharacter.position.x || this.pathToPosition.y !== targetCharacter.position.y) {
+                        if (currentMode === 'SWITCHER') {
+                            this.debug && console.log('[AI] Switching to new target...');
+                            sourceCharacter.resetPath();
+                            this.pathToPosition = null;
+                            this.resetTrace();
+                            currentMode = MODES[Math.floor(Math.random() * (MODES.length - 1))];
+                            targetCharacter = this.findTarget();
+                        } else if (currentMode === 'CONFUSED') {
+                            this.debug && console.log('[AI] Pretending confusion...');
+                            sourceCharacter.resetPath();
+                            this.pathToPosition = null;
+                            this.resetTrace();
+                            var pos = Hackatron.game.getValidPosition();
+                            targetCharacter = {position: {x: pos.x * 16, y: pos.y * 16}};
+                        }
+                    } else {
+                        // If nothing has changed, we just need to keep updating
+                        var finished = sourceCharacter.pathFind();
+
+                        if (finished) {
+                            this.debug && console.log('[AI] Finding new target...');
+                            sourceCharacter.resetPath();
+                            this.pathToPosition = null;
+                            this.resetTrace();
+                            currentMode = MODES[Math.floor(Math.random() * (MODES.length - 1))];
+                            targetCharacter = this.findTarget();
+                        }
+                    }
                 }
             } else {
                 this.findPath(sourceCharacter.position, targetCharacter.position, (pathCoords) => {
