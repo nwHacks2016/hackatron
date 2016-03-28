@@ -349,8 +349,6 @@ Hackatron.Game.prototype = {
         this.events = [];
     },
     update: function() {
-        var self = this;
-
         if (this.musicKey.isDown) {
             this.game.music.mute = !this.game.music.mute;
         }
@@ -374,22 +372,18 @@ Hackatron.Game.prototype = {
             // right
             if (Math.abs(angle) > 0 && Math.abs(angle) <= 45) {
                 this.player.character.inputRight = true;
-                //this.player.character.sprite.body.velocity.x = DEFAULT_PLAYER_SPEED;
             }
             // left
             if (Math.abs(angle) > 135 && Math.abs(angle) <= 180) {
                 this.player.character.inputLeft = true;
-                //this.player.character.sprite.body.velocity.x = -DEFAULT_PLAYER_SPEED;
             }
             // up
             if (Math.abs(angle) > 45 && Math.abs(angle) <= 135 && angle < 0) {
                 this.player.character.inputUp = true;
-                //this.player.character.sprite.body.velocity.y = -DEFAULT_PLAYER_SPEED;
             }
             // down
             if (Math.abs(angle) > 45 && Math.abs(angle) <= 135 && angle > 0) {
                 this.player.character.inputDown = true;
-                //this.player.character.sprite.body.velocity.y = DEFAULT_PLAYER_SPEED;
             }
 
             //  if it's overlapping the mouse, don't move any more
@@ -403,37 +397,34 @@ Hackatron.Game.prototype = {
             this.player.character.inputLeft = false;
             this.player.character.inputUp = false;
             this.player.character.inputDown = false;
-            // this.player.character.sprite.body.velocity.x = 0;
-            // this.player.character.sprite.body.velocity.y = 0;
         }
 
-        var collideEnemyHandler = function() {
-            // Scope: this = Phaser.Game
-            if (self.player.character.invincible) { return; }
+        var collideEnemyHandler = () => {
+            if (this.player.character.invincible) { return; }
 
-            //self.game.fx.play('monsterRoar');
-            self.player.kill();
+            this.player.kill();
 
-            if (self.enemy) {
-                self.enemy.character.addPoints(self.player.character.points);
+            if (this.enemy) {
+                this.enemy.character.addPoints(this.player.character.points);
             }
 
-            self.fireEvent({key: 'playerKilled', info: {
-                player: {id: self.player.id}
+            this.fireEvent({key: 'playerKilled', info: {
+                player: {id: this.player.id}
             }});
-            if (self.player.id === self.hostId) {
-                // console.log("the id is: " + self.player.id);
-                self.fireEvent({key: 'findNewHost'});
+
+            if (this.player.id === this.hostId) {
+                // console.log("the id is: " + this.player.id);
+                this.fireEvent({key: 'findNewHost'});
             }
 
-            if (self.ai) {
-                self.ai.stopPathFinding();
+            if (this.ai) {
+                this.ai.stopPathFinding();
             }
 
-            self.initGameover();
+            this.initGameover();
         };
 
-        var SLIDE_SPEED = self.player.character.speed/4;
+        var SLIDE_SPEED = this.player.character.speed/4;
         var SLIDE_DISTANCE = 5;
 
         var closestInRangeOf = (params) => {
@@ -487,7 +478,7 @@ Hackatron.Game.prototype = {
         };
 
         var collideWallHandler = () => {
-            if (!self.player.character.direction) {
+            if (!this.player.character.direction) {
                 return;
             }
             // Find nearest opening and go that way
@@ -498,8 +489,8 @@ Hackatron.Game.prototype = {
             //   check from my position to mapWidth for the closest opening
             // If closest is left, set velocity x = -500
             // If closest is right, set velocity x = 500
-            var position = self.player.character.worldPosition;
-            var direction = self.player.character.direction;
+            var position = this.player.character.worldPosition;
+            var direction = this.player.character.direction;
             var diff = getNearestOpening({position: position, direction: direction});
 
             if (!diff) {
@@ -508,17 +499,17 @@ Hackatron.Game.prototype = {
 
             if (diff.left < diff.right) {
                 // going left or up
-                self.player.character.sprite.body.velocity[diff.align] = -SLIDE_SPEED; // the -SLIDE_SPEED / 5 * diff.left part lets us base the speed we move with how far it is
+                this.player.character.sprite.body.velocity[diff.align] = -SLIDE_SPEED; // the -SLIDE_SPEED / 5 * diff.left part lets us base the speed we move with how far it is
                 //goToPosition = closest * 16 + 8;
             } else if (diff.right < diff.left) {
                 // going right or down
-                self.player.character.sprite.body.velocity[diff.align] = SLIDE_SPEED;
+                this.player.character.sprite.body.velocity[diff.align] = SLIDE_SPEED;
                 //goToPosition = closest * 16 - 8;
             } else {
                 // He's probably stuck because a few pixels are touching
                 // Lets round his position so he's in alignment
-                //self.player.character.sprite.body.velocity.setTo(0, 0);
-                self.player.character.position[diff.align] = position[diff.align];
+                //this.player.character.sprite.body.velocity.setTo(0, 0);
+                this.player.character.position[diff.align] = position[diff.align];
             }
         };
 
@@ -529,15 +520,15 @@ Hackatron.Game.prototype = {
             });
         }
 
-        if (self.enemy) {
-            self.game.physics.arcade.collide(self.enemy.character.sprite, self.map.tilemap.layer);
+        if (this.enemy) {
+            this.game.physics.arcade.collide(this.enemy.character.sprite, this.map.tilemap.layer);
 
             if (this.player.character.collisionEnabled) {
-                self.game.physics.arcade.overlap(self.enemy.character.sprite, self.player.character.sprite, collideEnemyHandler);
+                this.game.physics.arcade.overlap(this.enemy.character.sprite, this.player.character.sprite, collideEnemyHandler);
             }
         }
 
-        self.powerups.forEach(function(row) {
+        this.powerups.forEach(function(row) {
             row.forEach(function(powerup) {
                 if (powerup) {
                     powerup.handler.update();
@@ -545,19 +536,19 @@ Hackatron.Game.prototype = {
             });
         });
 
-        self.blocks.forEach((block) => {
+        this.blocks.forEach((block) => {
             //console.log(block);
             if (this.player.character.collisionEnabled) {
-                self.game.physics.arcade.collide(self.player.character.sprite, block);
+                this.game.physics.arcade.collide(this.player.character.sprite, block);
             }
 
             if (this.enemy) {
-                self.game.physics.arcade.collide(self.enemy.character.sprite, block);
+                this.game.physics.arcade.collide(this.enemy.character.sprite, block);
             }
         });
 
-        if (self.player) {
-            self.game.world.bringToTop(self.player.character.sprite);
+        if (this.player) {
+            this.game.world.bringToTop(this.player.character.sprite);
         }
     },
 
