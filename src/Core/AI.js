@@ -38,7 +38,7 @@ class AI {
         path.forEach((pathItem) => {
             if (!this.pathTraceSprite) {
                 this.pathTraceSprite = this.game.add.graphics(pathItem.x, pathItem.y);
-                this.pathTraceSprite.lineStyle(4, 0xffd900, 1);
+                this.pathTraceSprite.lineStyle(1, 0xffd900, 0.5);
             } else {
                 this.pathTraceSprite.lineTo(pathItem.x - this.pathTraceSprite.x, pathItem.y - this.pathTraceSprite.y);
             }
