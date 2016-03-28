@@ -35,8 +35,8 @@ class GameObject {
     set position(position) {
         if (!this.sprite) { return this._position = position; }
 
-        this.sprite.x = Math.floor(position.x - this.sprite.body.offset.x);
-        this.sprite.y = Math.floor(position.y - this.sprite.body.offset.y);
+        this.sprite.x = Math.floor(position.x);
+        this.sprite.y = Math.floor(position.y);
     }
 
     get position() {

@@ -38,7 +38,7 @@ Hackatron.Game.prototype = {
     getValidPosition: function() {
         var position = null;
         var currentPosition = 0;
-        var totalPositions = Hackatron.TILE_WIDTH * Hackatron.TILE_HEIGHT;
+        var totalPositions = Hackatron.TILE_WIDTH * Hackatron.TILE_HEIGHT * 2;
 
         while (!position && currentPosition < totalPositions) {
             var x = this.game.rnd.integerInRange(1, Hackatron.TILE_WIDTH - 1);
@@ -54,7 +54,7 @@ Hackatron.Game.prototype = {
             totalPositions++;
         }
 
-        // We tried once for each tile on the map, with no success
+        // We tried once for each tile on the map, twice, with no success
         // Lets just put them at 1,1
         if (!position) {
             position = {x: 1, y: 1};

@@ -64,8 +64,7 @@ class Tron extends Character {
     teleport(destination) {
         if (this.teleported) { return; }
 
-        this.sprite.x = destination.x;
-        this.sprite.y = destination.y;
+        this.worldPosition = destination;
 
         this.teleported = true;
 

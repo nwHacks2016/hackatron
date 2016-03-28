@@ -259,25 +259,36 @@ class InvincibleHandler extends PowerupHandler {
     }
 }
 
-
 class RageHandler extends PowerupHandler {
     constructor(params) {
         super(params);
         this.name = 'Rage mode';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
-        this.spritePosition = {column: 1, row: 1};
+        this.spritePosition = {column: 17, row: 3};
     }
 
     onStarted() {
         this.player.character.sprite.scale.x = 1.5;
         this.player.character.sprite.scale.y = 1.5;
+
+        // Allows stacking of max of 3 speed boosts
+        if (this.player.character.speed < DEFAULT_PLAYER_SPEED*Math.pow(1.5,3)) {
+            this.player.character.speed *= 1.5;
+        }
     }
 
     onStopped() {
         // set back original
         this.player.character.sprite.scale.x = 0.8;
         this.player.character.sprite.scale.y = 0.8;
+
+        var updatedSpeed = this.player.character.speed / 1.5;
+        if (updatedSpeed < DEFAULT_PLAYER_SPEED) {
+            this.player.character.speed = DEFAULT_PLAYER_SPEED;
+        } else {
+            this.player.character.speed = updatedSpeed;
+        }
     }
 }
 
@@ -322,7 +333,7 @@ class FreezeHandler extends PowerupHandler {
         this.name = 'Freeze';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
-        this.spritePosition = {column: 10, row: 3};
+        this.spritePosition = {column: 16, row: 4};
     }
 
     onStarted() {
