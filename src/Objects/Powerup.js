@@ -256,6 +256,7 @@ class InvincibleHandler extends PowerupHandler {
     onStopped() {
         this.tween.stop();
         this.tween = this.game.add.tween(this.player.character.sprite).to({alpha: 1}, 0, 'Linear', true, 0);
+        this.player.character.invincible = false;
     }
 }
 
