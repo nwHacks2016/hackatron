@@ -128,6 +128,10 @@ io.sockets.on('connection', function(socket) {
             findNewHost();
         }
 
+        if (clients.length === 0) {
+            host = null;
+        }
+
         io.sockets.emit('playerLeave', {player: client.player});
     });
 });
