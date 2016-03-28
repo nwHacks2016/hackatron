@@ -4,7 +4,7 @@ class Powerup extends GameObject {
     static get handlers() {
         return {
             'Saiyan': SaiyanHandler,
-            'Ghost': GhostHandler,
+            //'Ghost': GhostHandler,
             'Invincible': InvincibleHandler,
             //'Reverse': ReverseHandler,
             'Rage': RageHandler,
