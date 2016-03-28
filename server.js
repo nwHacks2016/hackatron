@@ -26,8 +26,6 @@ var setHost = function(client) {
 
 var findNewHost = function() {
     if (clients.length > 0) {
-        console.log("clinets inside the find new host");
-        console.log(clients);
         var i = getRandomInt(0, clients.length-1);
         var client = clients[i];
 

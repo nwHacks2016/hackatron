@@ -402,9 +402,9 @@ class PortalHandler extends PowerupHandler {
 
     start(type) {
         if (type === 'entry') {
-            this.player.character.teleport(this.exitPortal);
+            this.player.character.teleport(this.state.exitPortalPosition);
         } else if (type === 'exit') {
-            this.player.character.teleport(this.entryPortal);
+            this.player.character.teleport(this.state.entryPortalPosition);
         }
 
         this.onStarted();
