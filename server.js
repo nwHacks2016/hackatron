@@ -90,9 +90,8 @@ var parseEvent = function(socket, event) {
         socket.emit('setHost', {player: host.player});
     } else if (event.key === 'findNewHost') {
 
-        console.log("finding new host....");
+        console.log("Finding new host....");
         var client = findClientBySocket(socket);
-        console.log(client);
         removeClient(client);
         host = null;
         findNewHost();
@@ -121,8 +120,6 @@ io.sockets.on('connection', function(socket) {
         if (!client) { return; }
 
         removeClient(client);
-
-        console.log('player left', client.player.id);
 
         // If this client was the host,
         // and there's at least one more client connected,
