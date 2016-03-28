@@ -65,7 +65,7 @@ Hackatron.Game.prototype = {
         return position;
     },
 
-    resizeGame: function (width, height) {
+    resizeGame: function(width, height) {
         this.game.width = width;
         this.game.height = height;
 
@@ -115,23 +115,21 @@ Hackatron.Game.prototype = {
     },
 
     initEvents: function() {
-        var self = this;
-
         this.eventsInterval = setInterval(this.broadcastEvents.bind(this), 100);
 
         var lastUpdateInfo = null;
 
         // Send player position every 50ms
-        this.updatePosInterval = setInterval(function() {
-            self.player.character.updatePos();
+        this.updatePosInterval = setInterval(() => {
+            this.player.character.updatePos();
 
-            if (!self.player.character.sprite.body) { return;}
-            if (!self.player.character.dirty) { return; }
+            if (!this.player.character.sprite.body) { return;}
+            if (!this.player.character.dirty) { return; }
 
             var info = {
-                id: self.player.id,
-                position: self.player.character.position,
-                direction: self.player.character.direction
+                id: this.player.id,
+                position: this.player.character.position,
+                direction: this.player.character.direction
             };
 
             // Don't send an event if its the same as last time
@@ -140,27 +138,27 @@ Hackatron.Game.prototype = {
                 return;
             }
 
-            self.fireEvent({key: 'updatePlayer', info: info});
+            this.fireEvent({key: 'updatePlayer', info: info});
 
             lastUpdateInfo = info;
         }, UPDATE_INTERVAL);
 
         // If this is the host
         // Send enemy position every 50ms
-        setInterval(function() {
-            if (self.enemy && self.player.id === self.hostId) {
-                //self.enemy.character.updatePos();
+        setInterval(() => {
+            if (this.enemy && this.player.id === this.hostId) {
+                //this.enemy.character.updatePos();
 
-                if (!self.enemy.character.dirty) { return; }
+                if (!this.enemy.character.dirty) { return; }
 
-                self.enemy.character.dirty = false;
+                this.enemy.character.dirty = false;
 
                 var info = {
-                    position: self.enemy.character.position,
-                    direction: self.enemy.character.direction
+                    position: this.enemy.character.position,
+                    direction: this.enemy.character.direction
                 };
 
-                self.fireEvent({key: 'updateEnemy', info: info});
+                this.fireEvent({key: 'updateEnemy', info: info});
             }
         }, UPDATE_INTERVAL);
     },
@@ -248,9 +246,9 @@ Hackatron.Game.prototype = {
         gameover.start();
 
         this.newGameKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
-        this.newGameKey.onDown.add(function() {
+        this.newGameKey.onDown.add(() => {
             this.game.state.start('Menu');
-        }, this);
+        });
     },
 
     initSFX: function() {
@@ -263,79 +261,36 @@ Hackatron.Game.prototype = {
     },
 
     initPowerUps: function() {
-        var self = this;
-
         this.powerups = [];
         for (var i = 0; i <= Hackatron.TILE_HEIGHT; i++) {
             this.powerups.push([]);
         }
 
-        setInterval(function() {
-            self.powerups.forEach(function(_, row) {
-                self.powerups[row].forEach(function(_, column) {
-                    var powerup = self.powerups[row][column];
+        setInterval(() => {
+            this.powerups.forEach((_, row) => {
+                this.powerups[row].forEach((_, column) => {
+                    var powerup = this.powerups[row][column];
                     if (powerup && powerup.handler.ended) {
-                        self.powerups[row][column] = null;
+                        this.powerups[row][column] = null;
                     }
                 });
             });
-        }.bind(this), 1000);
+        }, 1000);
     },
 
     runPowerUpSystem: function() {
-        var self = this;
-        self.powerupInterval = setInterval(function() {
+        this.powerupInterval = setInterval(() => {
             var powerupHandlers = Object.keys(Powerup.handlers);
             var randomHandler = powerupHandlers[this.game.rnd.integerInRange(0, powerupHandlers.length-1)];
             var powerup = new Powerup();
             powerup.init({key: randomHandler, game: this.game, map: this.map, player: this.player});
-            powerup.handler.on('started', () => { self.fireEvent({key: 'foundPowerup', info: {state: powerup.handler.state, player: {id: self.player.id}}}); });
-            powerup.handler.on('destroyed', (params) => { params.positions.forEach((position) => { self.powerups[position.x][position.y] = null; }); });
+            powerup.handler.on('started', () => { this.fireEvent({key: 'foundPowerup', info: {state: powerup.handler.state, player: {id: this.player.id}}}); });
+            powerup.handler.on('destroyed', (params) => { params.positions.forEach((position) => { this.powerups[position.x][position.y] = null; }); });
 
             this.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = powerup;
 
             this.fireEvent({key: 'powerupSpawned', info: {handler: {key: randomHandler, state: powerup.handler.state}}});
-        }.bind(this), POWERUP_SPAWN_INTERVAL);
-    },
-
-    // TODO: causing some errors, not sure why
-    createExplodingParticles: function(sprite, cb) {
-        var self = this;
-
-        // create a Phaser.Group for all the particles of the explosion
-        self.explodingGroup = self.game.add.group();
-        self.explodingGroup.enableBody = true;
-        self.explodingGroup.physicsBodyType = Phaser.Physics.ARCADE;
-        var colors = ['#77DD77', '#B39EB5', '#C23B22', '#FFB347', '#FDFD96', '#836953', '#779ECB', '#FFD1DC'];
-
-        // create a black square as gfx for the particles
-        var explodingRect = self.game.make.bitmapData(5, 5);
-        explodingRect.ctx.fillStyle = colors[self.game.rnd.integerInRange(0, colors.length-1)];
-        explodingRect.ctx.fillRect(0, 0, 5, 5);
-
-        var explodingSprite = new Phaser.Sprite(self.game, sprite.x, sprite.y, explodingRect);
-        self.explodingGroup.add(explodingSprite);
-
-        explodingSprite = new Phaser.Sprite(self.game, sprite.x, sprite.y, explodingRect);
-        self.explodingGroup.add(explodingSprite);
-
-        // setup the animation for the particles. make them "jump" by setting a negative velocity
-        // and set timeout to make the blink before being finally destroyed
-        self.explodingGroup.forEach(function (sprite) {
-            sprite.body.gravity.y = 35;
-            sprite.body.velocity.setTo(self.game.rnd.integerInRange(-20, 20), self.game.rnd.integerInRange(-35, -50));
-
-            setTimeout(function () {
-                sprite.visible = false;
-                setTimeout(function () {
-                    sprite.visible = true;
-                    setTimeout(function () {
-                        sprite.destroy();
-                        cb && cb();
-                    }, 100);
-                }, 100);
-            }, 10);
-        });
+        }, POWERUP_SPAWN_INTERVAL);
     },
     fireEvent: function(event) {
         this.events.push(event);
@@ -528,8 +483,8 @@ Hackatron.Game.prototype = {
             }
         }
 
-        this.powerups.forEach(function(row) {
-            row.forEach(function(powerup) {
+        this.powerups.forEach((row) => {
+            row.forEach((powerup) => {
                 if (powerup) {
                     powerup.handler.update();
                 }
@@ -658,7 +613,6 @@ Hackatron.Game.prototype = {
 //                          Socket Event Handlers
 // ============================================================================
     parseEvent: function(event) {
-        var self = this;
         //console.log('Receiving.. ' + event.key + ' ' + JSON.stringify(event.info));
 
         // Method for updating board local client game state using info
@@ -670,9 +624,9 @@ Hackatron.Game.prototype = {
             var position = event.info.position;
 
             // Don't update ourself (bug?)
-            if (event.info.id === self.player.id) { return; }
+            if (event.info.id === this.player.id) { return; }
 
-            var player = self.getPlayerById(id);
+            var player = this.getPlayerById(id);
 
             if (!player) { return; }
 
@@ -708,7 +662,7 @@ Hackatron.Game.prototype = {
                         break;
                 }
 
-                updateTimeout = setTimeout(function() {
+                updateTimeout = setTimeout(() => {
                     if (player.character.sprite.body) {
                         player.character.sprite.body.velocity.x = 0;
                         player.character.sprite.body.velocity.y = 0;
@@ -721,18 +675,18 @@ Hackatron.Game.prototype = {
                 }, 30);
             }
         } else if (event.key === 'updateEnemy') {
-            if (self.player.id !== self.hostId) {
-                if (self.enemy) {
-                    self.enemy.character.position = event.info.position;
+            if (this.player.id !== this.hostId) {
+                if (this.enemy) {
+                    this.enemy.character.position = event.info.position;
                 }
             }
         // When new player joins, host shall send them data about the 'position'
         } else if (event.key === 'newPlayer') {
-            if (self.player.id === self.hostId) {
+            if (this.player.id === this.hostId) {
                 // Add players
                 var players = [];
-                for(playerId in self.players) {
-                    var player = self.players[playerId];
+                for(playerId in this.players) {
+                    var player = this.players[playerId];
 
                     players.push({
                         id: player.id,
@@ -743,16 +697,16 @@ Hackatron.Game.prototype = {
 
                 // Add the host
                 players.push({
-                    id: self.player.id,
-                    name: self.player.name,
-                    position: self.player.character.position
+                    id: this.player.id,
+                    name: this.player.name,
+                    position: this.player.character.position
                 });
 
                 // Add powerups
                 var powerups = [];
-                for(row in self.powerups) {
-                    for(column in self.powerups[row]) {
-                        var powerup = self.powerups[row][column];
+                for(row in this.powerups) {
+                    for(column in this.powerups[row]) {
+                        var powerup = this.powerups[row][column];
 
                         if (!powerup) { continue; }
 
@@ -763,18 +717,18 @@ Hackatron.Game.prototype = {
                 // Compile the game data
                 var gameData = {
                     player: {id: event.info.player.id},
-                    enemy: {position: self.enemy.character.position},
+                    enemy: {position: this.enemy.character.position},
                     powerups: powerups,
                     players: players
                 };
 
-                self.fireEvent({key: 'welcomePlayer', info: gameData});
+                this.fireEvent({key: 'welcomePlayer', info: gameData});
             }
 
-            var player = self.getPlayerById(event.info.player.id);
+            var player = this.getPlayerById(event.info.player.id);
 
             if (!player) {
-                player = self.createPlayer(event.info.player.id);
+                player = this.createPlayer(event.info.player.id);
             }
 
             player.name = event.info.player.name;
@@ -783,77 +737,77 @@ Hackatron.Game.prototype = {
             console.log(event.info.player.id + ' has joined the game!');
         // Set up game state as a new player receiving game data from host
         } else if (event.key === 'welcomePlayer') {
-            if (self.player.id === event.info.player.id) {
+            if (this.player.id === event.info.player.id) {
                 // Setup players
-                event.info.players.forEach(function(playerInfo) {
-                    var player = self.createPlayer(playerInfo.id);
+                event.info.players.forEach((playerInfo) => {
+                    var player = this.createPlayer(playerInfo.id);
                     player.name = playerInfo.name;
                     if (playerInfo.position) {
                         player.character.position = playerInfo.position;
                     }
 
-                    self.players[player.id] = player;
+                    this.players[player.id] = player;
                 });
 
                 // Setup enemy
-                self.enemy = new Enemy();
+                this.enemy = new Enemy();
 
-                self.enemy.init({
-                    game: self.game,
+                this.enemy.init({
+                    game: this.game,
                     speed: DEFAULT_PLAYER_SPEED,
                     position: event.info.enemy.position
                 });
 
                 // Setup powerups
-                event.info.powerups.forEach(function(powerupInfo) {
+                event.info.powerups.forEach((powerupInfo) => {
                     var powerup = new Powerup();
-                    powerup.init({key: powerupInfo.handler.key, game: self.game, map: self.map, player: self.player, state: powerupInfo.handler.state});
-                    powerup.handler.on('destroyed', (params) => { params.positions.forEach((position) => { self.powerups[position.x][position.y] = null; }); });
+                    powerup.init({key: powerupInfo.handler.key, game: this.game, map: this.map, player: this.player, state: powerupInfo.handler.state});
+                    powerup.handler.on('destroyed', (params) => { params.positions.forEach((position) => { this.powerups[position.x][position.y] = null; }); });
 
-                    self.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = powerup;
+                    this.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = powerup;
                 });
             }
 
 
         // Method for handling received deaths of other clients
         } else if (event.key === 'playerKilled') {
-            var player = self.players[event.info.player.id];
-            // self.enemy.addPoints(player.points);
+            var player = this.players[event.info.player.id];
+            // this.enemy.addPoints(player.points);
             if (player) {
                 player.kill();
             }
         // Method for handling player leaves
       } else if (event.key === 'playerLeave') {
-            if (self.players[event.info.player.id]) {
-                var player = self.players[event.info.player.id];
+            if (this.players[event.info.player.id]) {
+                var player = this.players[event.info.player.id];
                 player.kill();
 
-                delete self.players[event.info.player.id];
+                delete this.players[event.info.player.id];
             }
         // Method for handling spawned power ups by the host
         } else if (event.key === 'powerupSpawned') {
             // TODO: we already do this above, refactor it out
             var powerup = new Powerup();
-            powerup.init({key: event.info.handler.key, game: self.game, map: self.map, player: self.player, state: event.info.handler.state});
-            powerup.handler.on('started', () => { self.fireEvent({key: 'foundPowerup', info: {player: {id: self.player.id}, state: powerup.handler.state}}); });
-            powerup.handler.on('destroyed', (params) => { params.positions.forEach((position) => { self.powerups[position.x][position.y] = null; }); });
+            powerup.init({key: event.info.handler.key, game: this.game, map: this.map, player: this.player, state: event.info.handler.state});
+            powerup.handler.on('started', () => { this.fireEvent({key: 'foundPowerup', info: {player: {id: this.player.id}, state: powerup.handler.state}}); });
+            powerup.handler.on('destroyed', (params) => { params.positions.forEach((position) => { this.powerups[position.x][position.y] = null; }); });
 
-            self.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = powerup;
+            this.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = powerup;
         // Method for handling spawned blocks by other players
         } else if (event.key === 'foundPowerup') {
             // TODO: we already do this above, refactor it out
-            var powerup = self.powerups[event.info.state.position.x][event.info.state.position.y];
+            var powerup = this.powerups[event.info.state.position.x][event.info.state.position.y];
 
             if (powerup) {
-                self.powerups[event.info.state.position.x][event.info.state.position.y] = null;
-                powerup.handler.player = self.getPlayerById(event.info.player.id);
+                this.powerups[event.info.state.position.x][event.info.state.position.y] = null;
+                powerup.handler.player = this.getPlayerById(event.info.player.id);
                 powerup.handler.start();
             }
         // Method for handling spawned blocks by other players
         } else if (event.key === 'blockSpawned') {
-            var block = self.game.add.sprite(event.info.x, event.info.y, 'gfx/blocks/glitch');
+            var block = this.game.add.sprite(event.info.x, event.info.y, 'gfx/blocks/glitch');
             // block.key.copyRect('powerups', getRect(5, 4), 0, 0);
-            self.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
+            this.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
             block.animations.add('glitch', [0,1,2], 12, true, true);
             block.animations.play('glitch');
             block.scale.x = 1.25;
@@ -861,35 +815,33 @@ Hackatron.Game.prototype = {
             block.body.immovable = true;
 
             // Make block fade in 2.0 seconds
-            self.game.add.tween(block).to({ alpha: 0 }, 2000, 'Linear', true, 0, -1);
+            this.game.add.tween(block).to({ alpha: 0 }, 2000, 'Linear', true, 0, -1);
 
-            self.blocks.push(block);
-            setTimeout(function() {
-                self.blocks = self.blocks.filter(function(b) {
+            this.blocks.push(block);
+            setTimeout(() => {
+                this.blocks = this.blocks.filter((b) => {
                     return (b !== block);
                 });
 
                 block.destroy();
             }, 2000);
         } else if (event.key === 'setHost') {
-            self.hostId = event.info.player.id;
+            this.hostId = event.info.player.id;
 
             // If this player is the new host, lets set them up
-            if (self.hostId === self.player.id) {
-                console.log('Hey now the host, lets do this!\n' + self.hostId);
-                self.runEnemySystem();
-                //self.runAiSystem();
-                self.runPowerUpSystem();
+            if (this.hostId === this.player.id) {
+                console.log('Hey now the host, lets do this!\n' + this.hostId);
+                this.runEnemySystem();
+                //this.runAiSystem();
+                this.runPowerUpSystem();
             }
         }
     },
     registerToEvents: function () {
-        var self = this;
-
         // Method for receiving multiple events at once
         // {events: [{key: 'eventName', info: {...data here...}]}
-        self.socket.on('events', function(data) {
-            data.events.forEach(function(event) { self.parseEvent(event); });
+        this.socket.on('events', (data) => {
+            data.events.forEach((event) => { this.parseEvent(event); });
         });
 
         // Route all the events to the event parser
@@ -902,8 +854,8 @@ Hackatron.Game.prototype = {
          'powerupSpawned',
          'blockSpawned',
          'foundPowerup',
-         'setHost'].forEach(function(key) {
-            self.socket.on(key, function(info) { self.parseEvent({key: key, info: info}); });
+         'setHost'].forEach((key) => {
+            this.socket.on(key, (info) => { this.parseEvent({key: key, info: info}); });
         });
     },
 
