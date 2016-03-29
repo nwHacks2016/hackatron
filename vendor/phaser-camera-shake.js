@@ -76,8 +76,6 @@ Phaser.Plugin.CameraShake = function(game, parent) {
     }, this);
  
     shake_timer.start();
- 
-    console.log(this._settings.shakeCount);
   };
 };
  

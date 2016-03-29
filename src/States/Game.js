@@ -145,7 +145,7 @@ Hackatron.Game.prototype = {
 
         // If this is the host
         // Send enemy position every 50ms
-        setInterval(() => {
+        this.enemyInterval = setInterval(() => {
             if (this.enemy && this.player.id === this.hostId) {
                 //this.enemy.character.updatePos();
 
@@ -250,6 +250,8 @@ Hackatron.Game.prototype = {
         this.newGameKey.onDown.add(() => {
             this.game.state.start('Menu');
         });
+
+        //this.shutdown();
     },
 
     initSFX: function() {
@@ -267,7 +269,7 @@ Hackatron.Game.prototype = {
             this.powerups.push([]);
         }
 
-        setInterval(() => {
+        this.powerupCheckInterval = setInterval(() => {
             this.powerups.forEach((_, row) => {
                 this.powerups[row].forEach((_, column) => {
                     var powerup = this.powerups[row][column];
@@ -377,11 +379,11 @@ Hackatron.Game.prototype = {
                 this.fireEvent({key: 'findNewHost'});
             }
 
+            this.initGameover();
+
             if (this.ai) {
                 this.ai.stopPathFinding();
             }
-
-            this.initGameover();
         };
 
         var SLIDE_SPEED = this.player.character.speed/4;
@@ -554,15 +556,12 @@ Hackatron.Game.prototype = {
         //window.onresize();
     },
     shutdown: function() {
-        if (this.powerupInterval) {
-            clearInterval(this.powerupInterval);
-        }
-        if (this.updatePosInterval) {
-            clearInterval(this.updatePosInterval);
-        }
-        if (this.eventsInterval) {
-            clearInterval(this.eventsInterval);
-        }
+        this.powerupInterval && clearInterval(this.powerupInterval);
+        this.updatePosInterval && clearInterval(this.updatePosInterval);
+        this.eventsInterval && clearInterval(this.eventsInterval);
+        this.enemyInterval && clearInterval(this.enemyInterval);
+        this.powerupCheckInterval && clearInterval(this.powerupCheckInterval);
+        this.gameOverInterval && clearInterval(this.gameOverInterval);
         this.player = null;
         this.enemy = null;
         this.hostId = null;
@@ -718,6 +717,9 @@ Hackatron.Game.prototype = {
             }
         // When new player joins, host shall send them data about the 'position'
         } else if (event.key === 'newPlayer') {
+            // If we're this player, we don't need to do anything
+            if (this.player.id === event.info.player.id) { return; }
+
             if (this.player.id === this.hostId) {
                 // Add players
                 var players = [];
@@ -862,6 +864,10 @@ Hackatron.Game.prototype = {
                 block.destroy();
             }, 2000);
         } else if (event.key === 'setHost') {
+            // Check if we already know this is the host,
+            // And if it's this player, we don't need to set ourselves up again
+            if (this.hostId === event.info.player.id) { return; }
+
             this.hostId = event.info.player.id;
 
             // If this player is the new host, lets set them up

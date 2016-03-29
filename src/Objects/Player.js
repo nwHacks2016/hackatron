@@ -12,22 +12,23 @@ Player.prototype.init = function(params) {
     this.id = params.id;
     this.game = params.game;
     this.name = params.name;
+    this.keys = params.keys;
 
-    if (params.keys) {
-        this.setupKeys(params.keys);
-    }
+    this.setupKeys();
 };
 
 // Method for registering hardware keys to a given sprite
-Player.prototype.setupKeys = function(keys) {
-    this.character.sprite.upKey = this.game.input.keyboard.addKey(keys.up);
-    this.character.sprite.downKey = this.game.input.keyboard.addKey(keys.down);
-    this.character.sprite.leftKey = this.game.input.keyboard.addKey(keys.left);
-    this.character.sprite.rightKey = this.game.input.keyboard.addKey(keys.right);
+Player.prototype.setupKeys = function() {
+    if (!this.keys) { return; }
+
+    if (this.keys.up) { this.character.sprite.upKey = this.game.input.keyboard.addKey(this.keys.up); }
+    if (this.keys.down) { this.character.sprite.downKey = this.game.input.keyboard.addKey(this.keys.down); }
+    if (this.keys.left) { this.character.sprite.leftKey = this.game.input.keyboard.addKey(this.keys.left); }
+    if (this.keys.right) { this.character.sprite.rightKey = this.game.input.keyboard.addKey(this.keys.right); }
 
     // register attack key if it exists
-    if (keys.att) {
-        var attackKey = this.character.sprite.attKey = this.game.input.keyboard.addKey(keys.att);
+    if (this.keys.att) {
+        var attackKey = this.character.sprite.attKey = this.game.input.keyboard.addKey(this.keys.att);
         attackKey.onDown.add(this.character.triggerAttack, this.character);
     }
 };
@@ -35,6 +36,15 @@ Player.prototype.setupKeys = function(keys) {
 Player.prototype.kill = function() {
     this.nameText.destroy();
     this.character.kill();
+
+    if (this.keys) {
+        this.keys.up && this.game.input.keyboard.removeKey(this.keys.up);
+        this.keys.down && this.game.input.keyboard.removeKey(this.keys.down);
+        this.keys.left && this.game.input.keyboard.removeKey(this.keys.left);
+        this.keys.right && this.game.input.keyboard.removeKey(this.keys.right);
+
+        this.keys.att && this.game.input.keyboard.removeKey(this.keys.att);
+    }
 };
 
 Object.defineProperty(Player.prototype, 'name', {

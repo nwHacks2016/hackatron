@@ -178,6 +178,6 @@ class AI {
     }
 
     stopPathFinding() {
-        clearInterval(this.pathFindingInterval);
+        clearInterval(this.followInterval);
     }
 }
