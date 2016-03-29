@@ -166,7 +166,7 @@ class PowerupHandler {
 class SaiyanHandler extends PowerupHandler {
     constructor(params) {
         super(params);
-        this.name = 'Saiyan mode';
+        this.name = 'Super Saiyan!';
         this.spriteMode = 'key';
         this.spriteKey = 'gfx/buffs/saiyan';
         this.spriteLoop = [0,1,2,3,4,5,6];
@@ -182,7 +182,7 @@ class SaiyanHandler extends PowerupHandler {
 class SpeedBoostHandler extends PowerupHandler {
     constructor(params) {
         super(params);
-        this.name = 'Speed mode';
+        this.name = 'Madness!';
         this.spriteMode = 'key';
         this.spriteKey = 'gfx/buffs/speed-boost';
         this.spriteLoop = [0,1,2,3,4,5];
@@ -208,7 +208,7 @@ class SpeedBoostHandler extends PowerupHandler {
 class GhostHandler extends PowerupHandler {
     constructor(params) {
         super(params);
-        this.name = 'Ghost mode';
+        this.name = 'G-G-Ghost!';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {column: 5, row: 5};
@@ -242,7 +242,7 @@ class BlockUpHandler extends PowerupHandler {
 class InvincibleHandler extends PowerupHandler {
     constructor(params) {
         super(params);
-        this.name = 'Invincible mode';
+        this.name = 'Invincible!';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {column: 1, row: 2};
@@ -263,7 +263,7 @@ class InvincibleHandler extends PowerupHandler {
 class RageHandler extends PowerupHandler {
     constructor(params) {
         super(params);
-        this.name = 'Rage mode';
+        this.name = 'Rage!';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {column: 17, row: 3};
@@ -297,7 +297,7 @@ class RageHandler extends PowerupHandler {
 class ReverseHandler extends PowerupHandler {
     constructor(params) {
         super(params);
-        this.name = 'ReverseHandler mode';
+        this.name = 'Confused!';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {column: 2, row: 2};
@@ -316,7 +316,7 @@ class ReverseHandler extends PowerupHandler {
 class TeleportHandler extends PowerupHandler {
     constructor(params) {
         super(params);
-        this.name = 'Teleport';
+        this.name = 'Blackhole!';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {column: 1, row: 7};
@@ -331,7 +331,7 @@ class TeleportHandler extends PowerupHandler {
 class FreezeHandler extends PowerupHandler {
     constructor(params) {
         super(params);
-        this.name = 'Freeze';
+        this.name = 'Freeze!';
         this.spriteMode = 'tilemap';
         this.spriteTilemap = 'gfx/buffs/general';
         this.spritePosition = {column: 16, row: 4};
