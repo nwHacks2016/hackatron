@@ -98,7 +98,7 @@ class Character extends GameObject {
 
     reachedTargetPosition(targetPosition) {
         var distance = Phaser.Point.distance(this.position, targetPosition);
-        return distance <= 2;
+        return distance <= 8;
     }
 
     moveThroughPath(path) {
@@ -114,6 +114,7 @@ class Character extends GameObject {
         if (this.path.length > 0) {
             var nextPosition = this.path[this.pathStep];
             var accuracy = 16; // within 16px
+            var speed = 50;
 
             // If we're on the last step, lets make sure we get to the exact spot
             // Set more accuracy, 2px
@@ -137,8 +138,8 @@ class Character extends GameObject {
                     this.sprite.animations.play('walkUp', 3, false);
                 }
 
-                this.sprite.body.velocity.x = velocity.x * 100;
-                this.sprite.body.velocity.y = velocity.y * 100;
+                this.sprite.body.velocity.x = velocity.x * speed;
+                this.sprite.body.velocity.y = velocity.y * speed;
             } else {
                 this.position = nextPosition;
 

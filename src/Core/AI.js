@@ -35,8 +35,6 @@ class AI {
     }
 
     tracePath(path) {
-        if (!this.debug) { return; }
-
         path.forEach((pathItem) => {
             if (!this.pathTraceSprite) {
                 this.pathTraceSprite = this.game.add.graphics(pathItem.x, pathItem.y);
@@ -50,8 +48,6 @@ class AI {
     }
 
     resetTrace() {
-        if (!this.debug) { return; }
-
         this.pathTraceSprite.destroy();
         this.pathTraceSprite = null;
     }
