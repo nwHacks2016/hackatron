@@ -246,11 +246,14 @@ Hackatron.Game.prototype = {
         gameover.start();
         this.isGameOver = true;
 
-        this.newGameKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
-        this.newGameKey.onDown.add(() => {
-            this.game.state.start('Menu');
-        });
+        // this.newGameKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+        // this.newGameKey.onDown.add(() => {
+        //     this.game.state.start('Menu');
+        // });
 
+        setTimeout(function() {
+            window.location.reload();
+        }, 2000);
         //this.shutdown();
     },
 
@@ -522,29 +525,6 @@ Hackatron.Game.prototype = {
         this.game.canvas.style['margin'] = 'auto';
 
         if (this.isGameOver) {
-            if (!this.gameOverInterval) {
-                this.gameOverInterval = setTimeout(() => {
-                    this.deg = 0;
-                    this.gameOverInterval = setInterval(() => {
-                        this.deg += 1;
-                        var rotate = (this.deg * 30) % 359;
-                        this.game.canvas.style['width'] = (91 - this.deg) + '%';
-                        this.game.canvas.style['height'] = (91 - this.deg) + '%';
-                        this.game.canvas.style['transform'] = 'perspective(900px) rotateX(15deg) rotate(-' + (rotate) + 'deg)';
-
-                        if (this.deg >= 90) {
-                            clearInterval(this.gameOverInterval);
-                            this.isGameOver = false;
-                            this.gameOverInterval = null;
-                            this.game.canvas.style['width'] = '90%';
-                            this.game.canvas.style['height'] = '90%';
-                            this.game.canvas.style['transform'] = 'perspective(900px) rotateX(15deg) rotate(-3deg)';
-                            this.game.state.clearCurrentState();
-                            this.game.state.start('Menu');
-                        }
-                    }, 10);
-                }, 2000);
-            }
         } else {
             this.game.canvas.style['width'] = '90%';
             this.game.canvas.style['height'] = '90%';
