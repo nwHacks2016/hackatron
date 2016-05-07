@@ -1,6 +1,7 @@
 class AI {
     constructor() {
         this.pathToPosition = null;
+        this.enabled = true;
     }
 
     findPath(origin, target, cb) {
@@ -63,11 +64,14 @@ class AI {
     }
 
     init(params) {
+        if (!this.enabled) { return; }
+
         this.debug = false;
         this.map = params.map;
         this.game = params.game;
         this.player = params.player;
         this.enemy = params.enemy;
+        this.enabled = true;
 
         var originalLevel = Utils.transpose(this.map.data);
         var convertedLevel = [];

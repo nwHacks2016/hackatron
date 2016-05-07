@@ -170,6 +170,12 @@ Hackatron.Game.prototype = {
     initHotkeys: function() {
         this.fullscreenKey = this.game.input.keyboard.addKey(Phaser.Keyboard.F);
         this.fullscreenKey.onDown.add(this.toggleFullscreen, this);
+        this.aiKey = this.game.input.keyboard.addKey(Phaser.Keyboard.I);
+        this.aiKey.onDown.add(this.toggleAI, this);
+    },
+
+    toggleAI: function() {
+        this.ai.enabled = !this.ai.enabled;
     },
 
     runAiSystem: function() {
