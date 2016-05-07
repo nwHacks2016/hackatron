@@ -108,13 +108,35 @@ class AI {
         var sourceCharacter = this.enemy.character;
         var targetCharacter = this.player.character;
 
-        var MODES = [
-            'PERSISTENT',
-            'CONFUSED',
-            'SWITCHER'
-        ];
+        var MODES = {
+            'PERSISTENT': 0.7,
+            'CONFUSED': 0.1,
+            'SWITCHER': 0.2
+        };
 
-        var currentMode = MODES[Math.floor(Math.random() * (MODES.length - 1))];
+        const findMode = (values) => {
+            var choices = [];
+            var probabilities = [];
+            var total = 0;
+
+            for (var value in values) {
+                if (values.hasOwnProperty(value)) {
+                    total += values[value];
+                    choices.push(value);
+                    probabilities.push(total);
+                }
+            }
+
+            var pick = Math.random() * total;
+            for (var i = 0; i < choices.length; i++) {
+                var p = probabilities[i];
+                if (p > pick) {
+                    return choices[i];
+                }
+            }
+        };
+
+        var currentMode = findMode(MODES);
 
         this.followInterval = setInterval(() => {
             if (this.pathToPosition) {
@@ -130,7 +152,7 @@ class AI {
                         sourceCharacter.resetPath();
                         this.pathToPosition = null;
                         this.resetTrace();
-                        currentMode = MODES[Math.floor(Math.random() * (MODES.length - 1))];
+                        currentMode = findMode(MODES);
                         targetCharacter = this.findTarget();
                     }
                 } else {
@@ -140,7 +162,7 @@ class AI {
                             sourceCharacter.resetPath();
                             this.pathToPosition = null;
                             this.resetTrace();
-                            currentMode = MODES[Math.floor(Math.random() * (MODES.length - 1))];
+                            currentMode = findMode(MODES);
                             targetCharacter = this.findTarget();
                         } else if (currentMode === 'CONFUSED') {
                             this.debug && console.log('[AI] Pretending confusion...');
@@ -159,7 +181,7 @@ class AI {
                             sourceCharacter.resetPath();
                             this.pathToPosition = null;
                             this.resetTrace();
-                            currentMode = MODES[Math.floor(Math.random() * (MODES.length - 1))];
+                            currentMode = findMode(MODES);
                             targetCharacter = this.findTarget();
                         }
                     }
