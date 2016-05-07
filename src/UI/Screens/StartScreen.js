@@ -30,8 +30,6 @@ window.StartScreen = React.createClass({
   render: function() {
     return (
       <div style={styles.container}>
-        <div style={styles.hostButton} onClick={this._clickHost}>HOST GAME</div>
-        <div style={styles.joinButton} onClick={this._clickJoin}>JOIN GAME</div>
         <div style={styles.instantActionButton} onClick={this._clickInstantAction}>INSTANT ACTION</div>
         <div style={styles.countdown}><br />Instant action in... {this.state.instantActionTimer}</div>
       </div>
@@ -45,7 +43,7 @@ var styles = {
     top: 320,
     left: 570,
     width: 235,
-    height: 200,
+    height: 150,
     padding: '20px 0px 0px 10px',
     opacity: 0.9,
     background: '#01242C',
@@ -53,31 +51,11 @@ var styles = {
     //boxShadow: '3px 3px 0 #1DFFFE',
     borderRadius: '0px'
   },
-  hostButton: {
-    width: 185,
-    height: 55,
-    'font-family': '"Press Start 2P"',
-    'font-size': '17px',
-    'text-align': 'center',
-    'color': '#fff',
-    //'color': '#FE0313',
-    'padding': '18px 15px',
-  },
-  joinButton: {
-    width: 185,
-    height: 55,
-    'font-family': '"Press Start 2P"',
-    'font-size': '17px',
-    'text-align': 'center',
-    'color': '#fff',
-    //'color': '#FF9C2C',
-    'padding': '18px 15px',
-  },
   instantActionButton: {
     width: 215,
     height: 55,
     'font-family': '"Press Start 2P"',
-    'font-size': '14px',
+    'font-size': '13px',
     'text-align': 'center',
     'color': '#fff',
     //'color': '#FFFFD5',
