@@ -73,6 +73,21 @@ var monitorHost = function() {
 
 setTimeout(monitorHost, 100);
 
+var Hackatron = function() {
+    this.events = [];
+};
+
+Hackatron.prototype = {
+    fireEvent: function(socket, event) {
+        socket.emit('events', {events: [event]});
+    },
+    fireAllPlayers: function() {
+        io.sockets.emit('events', {events: [event]});
+    }
+};
+
+var hackatron = new Hackatron();
+
 var parseEvent = function(socket, event) {
     if (event.key === 'newPlayer') {
         console.log('Handshaking...');
@@ -85,7 +100,7 @@ var parseEvent = function(socket, event) {
             console.log('New host: ' + host.player.id);
         }
 
-        socket.emit('setHost', {player: host.player});
+        hackatron.fireEvent(socket, {key: 'setHost', info: {player: host.player}});
     } else if (event.key === 'findNewHost') {
 
         console.log("Finding new host....");
@@ -132,7 +147,7 @@ io.sockets.on('connection', function(socket) {
             host = null;
         }
 
-        io.sockets.emit('playerLeave', {player: client.player});
+        hackatron.fireAllPlayers({key: 'playerLeave', info: {player: client.player}});
     });
 });
 

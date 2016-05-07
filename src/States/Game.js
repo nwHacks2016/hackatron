@@ -533,9 +533,9 @@ Hackatron.Game.prototype = {
 
         document.getElementById('game').style['width'] = Hackatron.getWidthRatioScale() * 100 + '%';
         document.getElementById('game').style['height'] = Hackatron.getHeightRatioScale() * 100 + '%';
-        //window.onresize();
     },
     shutdown: function() {
+        this.socket.removeAllListeners('events');
         this.powerupInterval && clearInterval(this.powerupInterval);
         this.updatePosInterval && clearInterval(this.updatePosInterval);
         this.eventsInterval && clearInterval(this.eventsInterval);
@@ -624,11 +624,54 @@ Hackatron.Game.prototype = {
         return player;
     },
 
+    welcomePlayer: function(playerId) {
+        // Add players
+        var players = [];
+        for(playerId in this.players) {
+            var player = this.players[playerId];
+
+            players.push({
+                id: player.id,
+                name: player.name,
+                position: player.character.position
+            });
+        }
+
+        // Add the host
+        players.push({
+            id: this.player.id,
+            name: this.player.name,
+            position: this.player.character.position
+        });
+
+        // Add powerups
+        var powerups = [];
+        for(row in this.powerups) {
+            for(column in this.powerups[row]) {
+                var powerup = this.powerups[row][column];
+
+                if (!powerup) { continue; }
+
+                powerups.push({handler: {key: powerup.handler.key, state: powerup.handler.state}});
+            }
+        }
+
+        // Compile the game data
+        var gameData = {
+            player: {id: playerId},
+            enemy: {position: this.enemy.character.position},
+            powerups: powerups,
+            players: players
+        };
+
+        this.fireEvent({key: 'welcomePlayer', info: gameData});
+    },
+
 // ============================================================================
 //                          Socket Event Handlers
 // ============================================================================
     parseEvent: function(event) {
-        //console.log('Receiving.. ' + event.key + ' ' + JSON.stringify(event.info));
+        console.log('Got event: ' + event.key, event.info);
 
         // Method for updating board local client game state using info
         // broadcasted to all players. The info variable contains the
@@ -701,46 +744,7 @@ Hackatron.Game.prototype = {
             if (this.player.id === event.info.player.id) { return; }
 
             if (this.player.id === this.hostId) {
-                // Add players
-                var players = [];
-                for(playerId in this.players) {
-                    var player = this.players[playerId];
-
-                    players.push({
-                        id: player.id,
-                        name: player.name,
-                        position: player.character.position
-                    });
-                }
-
-                // Add the host
-                players.push({
-                    id: this.player.id,
-                    name: this.player.name,
-                    position: this.player.character.position
-                });
-
-                // Add powerups
-                var powerups = [];
-                for(row in this.powerups) {
-                    for(column in this.powerups[row]) {
-                        var powerup = this.powerups[row][column];
-
-                        if (!powerup) { continue; }
-
-                        powerups.push({handler: {key: powerup.handler.key, state: powerup.handler.state}});
-                    }
-                }
-
-                // Compile the game data
-                var gameData = {
-                    player: {id: event.info.player.id},
-                    enemy: {position: this.enemy.character.position},
-                    powerups: powerups,
-                    players: players
-                };
-
-                this.fireEvent({key: 'welcomePlayer', info: gameData});
+                this.welcomePlayer(event.info.player.id);
             }
 
             var player = this.getPlayerById(event.info.player.id);
@@ -785,8 +789,6 @@ Hackatron.Game.prototype = {
                     this.powerups[powerup.handler.state.position.x][powerup.handler.state.position.y] = powerup;
                 });
             }
-
-
         // Method for handling received deaths of other clients
         } else if (event.key === 'playerKilled') {
             var player = this.players[event.info.player.id];
@@ -868,20 +870,6 @@ Hackatron.Game.prototype = {
         // {events: [{key: 'eventName', info: {...data here...}]}
         this.socket.on('events', (data) => {
             data.events.forEach((event) => { this.parseEvent(event); });
-        });
-
-        // Route all the events to the event parser
-        ['updatePlayer',
-         'updateEnemy',
-         'newPlayer',
-         'playerLeave',
-         'welcomePlayer',
-         'playerKilled',
-         'powerupSpawned',
-         'blockSpawned',
-         'foundPowerup',
-         'setHost'].forEach((key) => {
-            this.socket.on(key, (info) => { this.parseEvent({key: key, info: info}); });
         });
     },
 
