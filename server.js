@@ -81,7 +81,7 @@ Hackatron.prototype = {
     fireEvent: function(socket, event) {
         socket.emit('events', {events: [event]});
     },
-    fireAllPlayers: function() {
+    fireAllPlayers: function(event) {
         io.sockets.emit('events', {events: [event]});
     }
 };
