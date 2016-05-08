@@ -5,14 +5,14 @@ class Powerup extends GameObject {
         return {
             'Saiyan': SaiyanHandler,
             //'Ghost': GhostHandler,
-            'Invincible': InvincibleHandler,
+            // 'Invincible': InvincibleHandler,
             //'Reverse': ReverseHandler,
-            'Rage': RageHandler,
-            'Teleport': TeleportHandler,
-            'Portal': PortalHandler,
-            'Freeze': FreezeHandler,
-            'BlockUp': BlockUpHandler,
-            'SpeedBoost': SpeedBoostHandler
+            // 'Rage': RageHandler,
+            // 'Teleport': TeleportHandler,
+            // 'Portal': PortalHandler,
+            // 'Freeze': FreezeHandler,
+            // 'BlockUp': BlockUpHandler,
+            // 'SpeedBoost': SpeedBoostHandler
             // TODO: Mode that leaves a train of blocks behind you
         }
     }
@@ -182,8 +182,8 @@ class SaiyanHandler extends PowerupHandler {
     }
 
     onStopped() {
-        this.player.character.characterKey = this.oldSkinKey;
         this.player.character.changeSkin(this.oldSkinKey);
+        this.player.character.characterKey = this.oldSkinKey;
         this.oldSkinKey = undefined;
 
         window.IngameState.show = true;

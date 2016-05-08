@@ -29,8 +29,8 @@ Player.prototype.setupKeys = function() {
 
     // register attack key if it exists
     if (this.keys.att) {
-        var attackKey = this.character.sprite.attKey = this.game.input.keyboard.addKey(this.keys.att);
-        attackKey.onDown.add(this.character.triggerAttack, this.character);
+        this.character.sprite.attKey = this.game.input.keyboard.addKey(this.keys.att);
+        this.character.sprite.attKey.onDown.add(this.character.triggerAttack, this.character);
     }
 };
 

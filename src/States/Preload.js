@@ -59,6 +59,8 @@ Hackatron.Preload.prototype = {
 
         // Characters
         this.load.atlasJSONHash('gfx/characters', assetsPath + 'gfx/characters/characters.png', assetsPath + 'gfx/characters/characters.json');
+        this.load.atlasJSONHash('gfx/buffs', assetsPath + 'gfx/buffs.png', assetsPath + 'gfx/buffs.json');
+
         this.load.spritesheet('gfx/characters/super-saiyan', assetsPath + 'gfx/characters/super-saiyan.png', 32, 32, 12);
 
         // Audio

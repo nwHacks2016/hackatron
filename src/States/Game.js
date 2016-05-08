@@ -502,6 +502,13 @@ Hackatron.Game.prototype = {
             });
         }
 
+
+        var collideFireballHandler = function() {
+            this.fireball.destroy();
+            // TODO: dedect pts here
+        }
+
+
         if (this.enemy) {
             // this.game.physics.arcade.collide(this.enemy.character.sprite, this.map.tilemap.layer);
 
@@ -511,6 +518,10 @@ Hackatron.Game.prototype = {
 
             if (this.player.character.collisionEnabled) {
                 this.game.physics.arcade.overlap(this.enemy.character.sprite, this.player.character.sprite, collideEnemyHandler);
+            }
+
+            if (this.fireball) {
+                this.game.physics.arcade.overlap(this.enemy.character.sprite, this.player.character.sprite, collideFireballHandler);
             }
         }
 
@@ -532,6 +543,15 @@ Hackatron.Game.prototype = {
                 this.game.physics.arcade.collide(this.enemy.character.sprite, block);
             }
         });
+
+        if (this.fireball) {
+            if (this.player.character.collisionEnabled) {
+                this.game.physics.arcade.collide(this.player.character.sprite, this.fireball);
+            }
+            if (this.enemy) {
+                this.game.physics.arcade.collide(this.enemy.character.sprite, this.fireball);
+            }
+        }
 
         if (this.player) {
             this.game.world.bringToTop(this.player.character.sprite);
