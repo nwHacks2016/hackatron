@@ -14,7 +14,6 @@ Player.prototype.init = function(params) {
     this.name = params.name;
     this.keys = params.keys;
     this.points = 0;
-
     this.setupKeys();
 };
 

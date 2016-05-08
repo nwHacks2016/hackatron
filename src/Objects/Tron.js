@@ -23,6 +23,7 @@ class Tron extends Character {
 
         if (self.characterKey == "super-saiyan") {
             var fireball = self.game.add.sprite(self.sprite.x, self.sprite.y, 'gfx/buffs');
+            fireball.owner = self.id;
             fireball.anchor.setTo(0.5);
             fireball.animations.add('fireball', ['42'], 1, true, true);
             fireball.animations.play('fireball');
@@ -75,6 +76,7 @@ class Tron extends Character {
             Hackatron.game.fireEvent({
                 key: 'fireballFired',
                 info: {
+                    owner: self.id,
                     x: self.sprite.x,
                     y: self.sprite.y,
                     speed: FIREBALL_SPEED,

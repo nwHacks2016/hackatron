@@ -176,9 +176,11 @@ class SaiyanHandler extends PowerupHandler {
 
     onStarted() {
         this.player.character.invincible = true;
-        this.player.character.speed = this.player.character.speed * 1.5 > 200 ? 200 : this.player.character.speed * 1.5;
         this.oldSkinKey = this.player.character.characterKey;
         this.player.character.changeSkin("super-saiyan");
+        if (this.player.character.speed < DEFAULT_PLAYER_SPEED*Math.pow(1.5,3)) {
+            this.player.character.speed *= 1.5;
+        }
 
         window.IngameState.show = false;
         window.UI_IngameController.setState(window.IngameState);
@@ -186,10 +188,15 @@ class SaiyanHandler extends PowerupHandler {
 
     onStopped() {
         this.player.character.invincible = false;
-        this.player.character.speed /= 1.5;
         this.player.character.changeSkin(this.oldSkinKey);
         this.player.character.characterKey = this.oldSkinKey;
         this.oldSkinKey = undefined;
+        var updatedSpeed = this.player.character.speed / 1.5;
+        if (updatedSpeed < DEFAULT_PLAYER_SPEED) {
+            this.player.character.speed = DEFAULT_PLAYER_SPEED;
+        } else {
+            this.player.character.speed = updatedSpeed;
+        }
 
         window.IngameState.show = true;
         window.UI_IngameController.setState(window.IngameState);

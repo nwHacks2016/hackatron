@@ -527,6 +527,7 @@ Hackatron.Game.prototype = {
 
         var collideFireballHandler = (index) => {
             // We don't want to destroy fireballs on contact
+            this.player.character.dirty = true;
             // TODO: dedect pts here
         }
 
@@ -542,10 +543,13 @@ Hackatron.Game.prototype = {
         });
 
         this.fireballs.forEach((fireball, index) => {
-            if (this.enemy) {
-                this.game.physics.arcade.collide(this.enemy.character.sprite, fireball, function() {
+            if (fireball.owner !== this.player.id) {
+                this.game.physics.arcade.collide(this.player.character.sprite, fireball, function() {
                     collideFireballHandler(index);
                 });
+            }
+            if (this.enemy) {
+                this.game.physics.arcade.collide(this.enemy.character.sprite, fireball);
             }
         });
 
@@ -828,13 +832,18 @@ Hackatron.Game.prototype = {
             },  BLOCK_DURATION);
         } else if (event.key === 'fireballFired') {
             var fireball = this.game.add.sprite(event.info.x, event.info.y, 'gfx/buffs');
+            fireball.owner = event.info.id;
             fireball.anchor.setTo(0.5);
-            fireball.animations.add('fireball', ['42'], 5, true, true);
+            fireball.animations.add('fireball', ['42'], 1, true, true);
             fireball.animations.play('fireball');
+
             this.game.physics.arcade.enable(fireball, Phaser.Physics.ARCADE);
+            fireball.body.collideWorldBounds = false;
+            fireball.body.mass = 1;
             fireball.scale.x = 0.6;
             fireball.scale.y = 0.6;
-            var FIREBALL_SPEED = speed;
+            Hackatron.game.fireballs.push(fireball);
+            var FIREBALL_SPEED = event.info.speed;
             switch (event.info.direction) {
             case "walkUp":
                 fireball.body.velocity.y = -FIREBALL_SPEED;
@@ -858,13 +867,17 @@ Hackatron.Game.prototype = {
             // fade out in 200ms
             var FIRE_BALL_DURATION = 200;
             var tween = this.game.add.tween(fireball).to( { alpha: 0 }, FIRE_BALL_DURATION, 'Linear', true);
-            this.fireballs.push(fireball);
-            setTimeout(() => {
-                this.fireballs = this.fireballs.filter((fb) => {
-                    return (fb !== fireball);
-                });
+            tween.onComplete.add(function() {
+                tween.stop();
+            });
 
-                fireball.destroy();
+            setTimeout(function() {
+                if (fireball) {
+                    this.fireballs = this.fireballs.filter(function(fb) {
+                        return (fb !== fireball);
+                    });
+                    fireball.destroy();
+                }
             }, FIRE_BALL_DURATION + 100);
         } else if (event.key === 'setHost') {
             // Check if we already know this is the host,
