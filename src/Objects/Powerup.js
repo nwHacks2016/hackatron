@@ -176,7 +176,7 @@ class SaiyanHandler extends PowerupHandler {
 
     onStarted() {
         this.player.character.invincible = true;
-        this.player.character.speed *= 1.5;
+        this.player.character.speed = this.player.character.speed * 1.5 > 200 ? 200 : this.player.character.speed * 1.5;
         this.oldSkinKey = this.player.character.characterKey;
         this.player.character.changeSkin("super-saiyan");
 

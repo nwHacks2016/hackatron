@@ -23,7 +23,6 @@ class Tron extends Character {
 
         if (this.characterKey == "super-saiyan") {
             var fireball = this.game.add.sprite(this.sprite.x, this.sprite.y, 'gfx/buffs');
-            //this.sprite.animations.add('walkUp', Phaser.Animation.generateFrameNames(this.characterKey + '/walkUp-', 1, 3, '', 4), 3, false, false);
             fireball.anchor.setTo(0.5);
             fireball.animations.add('glitch', ['42'], 5, true, true);
             fireball.animations.play('glitch');
@@ -52,9 +51,6 @@ class Tron extends Character {
                 break;
             }
 
-
-            // Hackatron.game.fireballs.push(fireball);
-
             // makes block fade away within a 0.2 seconds
             var tween = this.game.add.tween(fireball).to( { alpha: 0 }, 200, 'Linear', true);
             tween.onComplete.add(function() {
@@ -65,7 +61,20 @@ class Tron extends Character {
                 if (fireball) {
                     fireball.destroy();
                 }
+                Hackatron.game.fireballs.filter(function(fb) {
+                    return (fb !== fireball);
+                });
             }, 1000);
+
+            Hackatron.game.fireEvent({
+                key: 'fireballFired',
+                info: {
+                    x: this.sprite.x,
+                    y: this.sprite.y,
+                    speed: this.speed,
+                    direction: this.direction
+                }
+            });
 
 
             return fireball;
