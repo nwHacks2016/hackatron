@@ -196,7 +196,7 @@ class AI {
                             this.pathToPosition = null;
                             this.resetTrace();
                             var pos = Hackatron.game.getValidPosition();
-                            targetCharacter = {position: {x: pos.x * 16, y: pos.y * 16}};
+                            targetCharacter = {position: {x: pos.x * 16, y: pos.y * 16}, isAlive: true};
                         }
                     } else {
                         // If nothing has changed, we just need to keep updating
