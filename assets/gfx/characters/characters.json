@@ -1,16 +1,8 @@
 {"frames": {
 
-"ghost/default":
-{
-	"frame": {"x":1,"y":1,"w":32,"h":32},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
-	"sourceSize": {"w":32,"h":32}
-},
 "ghost/walkDown-0001":
 {
-	"frame": {"x":1,"y":205,"w":30,"h":32},
+	"frame": {"x":1,"y":137,"w":30,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":30,"h":32},
@@ -18,7 +10,7 @@
 },
 "ghost/walkDown-0002":
 {
-	"frame": {"x":1,"y":35,"w":32,"h":32},
+	"frame": {"x":1,"y":1,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -26,7 +18,7 @@
 },
 "ghost/walkDown-0003":
 {
-	"frame": {"x":33,"y":205,"w":29,"h":32},
+	"frame": {"x":1,"y":205,"w":29,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":32},
@@ -34,7 +26,7 @@
 },
 "ghost/walkLeft-0001":
 {
-	"frame": {"x":33,"y":239,"w":29,"h":32},
+	"frame": {"x":32,"y":205,"w":29,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":32},
@@ -42,7 +34,7 @@
 },
 "ghost/walkLeft-0002":
 {
-	"frame": {"x":1,"y":273,"w":29,"h":32},
+	"frame": {"x":1,"y":239,"w":29,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":32},
@@ -50,7 +42,7 @@
 },
 "ghost/walkLeft-0003":
 {
-	"frame": {"x":32,"y":273,"w":29,"h":32},
+	"frame": {"x":32,"y":239,"w":29,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":32},
@@ -58,7 +50,7 @@
 },
 "ghost/walkRight-0001":
 {
-	"frame": {"x":35,"y":1,"w":27,"h":32},
+	"frame": {"x":34,"y":69,"w":27,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":32},
@@ -66,7 +58,7 @@
 },
 "ghost/walkRight-0002":
 {
-	"frame": {"x":34,"y":137,"w":26,"h":32},
+	"frame": {"x":35,"y":1,"w":26,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":26,"h":32},
@@ -74,7 +66,7 @@
 },
 "ghost/walkRight-0003":
 {
-	"frame": {"x":35,"y":35,"w":27,"h":32},
+	"frame": {"x":34,"y":103,"w":27,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":32},
@@ -82,7 +74,7 @@
 },
 "ghost/walkUp-0001":
 {
-	"frame": {"x":1,"y":307,"w":29,"h":32},
+	"frame": {"x":1,"y":273,"w":29,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":32},
@@ -90,7 +82,7 @@
 },
 "ghost/walkUp-0002":
 {
-	"frame": {"x":1,"y":137,"w":31,"h":32},
+	"frame": {"x":1,"y":69,"w":31,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":31,"h":32},
@@ -98,23 +90,111 @@
 },
 "ghost/walkUp-0003":
 {
-	"frame": {"x":32,"y":307,"w":29,"h":32},
+	"frame": {"x":32,"y":273,"w":29,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":32},
 	"sourceSize": {"w":29,"h":32}
 },
-"tron/default":
+"super-saiyan/walkDown-0001":
 {
-	"frame": {"x":1,"y":69,"w":32,"h":32},
+	"frame": {"x":1,"y":307,"w":29,"h":32},
 	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":0,"w":29,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+"super-saiyan/walkDown-0002":
+{
+	"frame": {"x":32,"y":307,"w":29,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":0,"w":29,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+"super-saiyan/walkDown-0003":
+{
+	"frame": {"x":1,"y":341,"w":29,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":3,"y":0,"w":29,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+"super-saiyan/walkLeft-0001":
+{
+	"frame": {"x":1,"y":477,"w":27,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":1,"y":0,"w":27,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+"super-saiyan/walkLeft-0002":
+{
+	"frame": {"x":30,"y":477,"w":27,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":1,"y":0,"w":27,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+"super-saiyan/walkLeft-0003":
+{
+	"frame": {"x":1,"y":511,"w":27,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":1,"y":0,"w":27,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+"super-saiyan/walkRight-0001":
+{
+	"frame": {"x":30,"y":511,"w":27,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":4,"y":0,"w":27,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+"super-saiyan/walkRight-0002":
+{
+	"frame": {"x":1,"y":545,"w":27,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":4,"y":0,"w":27,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+"super-saiyan/walkRight-0003":
+{
+	"frame": {"x":1,"y":579,"w":27,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":4,"y":0,"w":27,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+"super-saiyan/walkUp-0001":
+{
+	"frame": {"x":33,"y":137,"w":28,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":2,"y":0,"w":28,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+"super-saiyan/walkUp-0002":
+{
+	"frame": {"x":33,"y":171,"w":28,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":2,"y":0,"w":28,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+"super-saiyan/walkUp-0003":
+{
+	"frame": {"x":32,"y":443,"w":28,"h":32},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":2,"y":0,"w":28,"h":32},
 	"sourceSize": {"w":32,"h":32}
 },
 "tron/walkDown-0001":
 {
-	"frame": {"x":1,"y":239,"w":30,"h":32},
+	"frame": {"x":1,"y":171,"w":30,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":30,"h":32},
@@ -122,7 +202,7 @@
 },
 "tron/walkDown-0002":
 {
-	"frame": {"x":1,"y":103,"w":32,"h":32},
+	"frame": {"x":1,"y":35,"w":32,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
@@ -130,7 +210,7 @@
 },
 "tron/walkDown-0003":
 {
-	"frame": {"x":1,"y":341,"w":29,"h":32},
+	"frame": {"x":32,"y":341,"w":29,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":32},
@@ -138,7 +218,7 @@
 },
 "tron/walkLeft-0001":
 {
-	"frame": {"x":32,"y":341,"w":29,"h":32},
+	"frame": {"x":1,"y":375,"w":29,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":32},
@@ -146,7 +226,7 @@
 },
 "tron/walkLeft-0002":
 {
-	"frame": {"x":1,"y":375,"w":29,"h":32},
+	"frame": {"x":32,"y":375,"w":29,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":32},
@@ -162,7 +242,7 @@
 },
 "tron/walkRight-0001":
 {
-	"frame": {"x":35,"y":69,"w":27,"h":32},
+	"frame": {"x":30,"y":545,"w":27,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":32},
@@ -170,7 +250,7 @@
 },
 "tron/walkRight-0002":
 {
-	"frame": {"x":34,"y":171,"w":26,"h":32},
+	"frame": {"x":35,"y":35,"w":26,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":26,"h":32},
@@ -178,7 +258,7 @@
 },
 "tron/walkRight-0003":
 {
-	"frame": {"x":35,"y":103,"w":27,"h":32},
+	"frame": {"x":30,"y":579,"w":27,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":27,"h":32},
@@ -186,7 +266,7 @@
 },
 "tron/walkUp-0001":
 {
-	"frame": {"x":32,"y":375,"w":29,"h":32},
+	"frame": {"x":32,"y":409,"w":29,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":32},
@@ -194,7 +274,7 @@
 },
 "tron/walkUp-0002":
 {
-	"frame": {"x":1,"y":171,"w":31,"h":32},
+	"frame": {"x":1,"y":103,"w":31,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":31,"h":32},
@@ -202,7 +282,7 @@
 },
 "tron/walkUp-0003":
 {
-	"frame": {"x":32,"y":409,"w":29,"h":32},
+	"frame": {"x":1,"y":443,"w":29,"h":32},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":32},
@@ -213,8 +293,8 @@
 	"version": "1.0",
 	"image": "characters.png",
 	"format": "INDEXED",
-	"size": {"w":63,"h":442},
+	"size": {"w":62,"h":612},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:17dbcfc8a798fca229be5e499525fc67:58b1398eb91784c5e7d8bcfa0017923d:a5fe7db4b869eb0f3e0b2940b9577ea8$"
+	"smartupdate": "$TexturePacker:SmartUpdate:04bdb2c064ecfe0538fce6e0bed9d274:75573c3c5497383c6fd8f0da74a877ba:a5fe7db4b869eb0f3e0b2940b9577ea8$"
 }
 }
