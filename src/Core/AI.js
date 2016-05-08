@@ -51,6 +51,10 @@ class AI {
     }
 
     resetTrace() {
+        if (!this.pathTraceSprite) {
+            return;
+        }
+
         this.pathTraceSprite.destroy();
         this.pathTraceSprite = null;
     }
@@ -59,7 +63,7 @@ class AI {
         var targets = [Hackatron.game.player.character];
 
         for (var id in Hackatron.game.players) {
-            if (!Hackatron.game.players[id].isAlive) { continue; }
+            if (!Hackatron.game.players[id].character.isAlive) { continue; }
             targets.push(Hackatron.game.players[id].character);
         }
 
@@ -113,7 +117,7 @@ class AI {
         this.gridDimensions = {y: 32, x: 32};
 
         var sourceCharacter = this.enemy.character;
-        var targetCharacter = this.player.character;
+        var targetCharacter = this.findTarget();
 
         var MODES = {
             'PERSISTENT': 0.7,
@@ -147,15 +151,21 @@ class AI {
 
         this.followInterval = setInterval(() => {
             if (!this.enabled) {
+                this.pathToPosition = null;
+                this.resetTrace();
+                sourceCharacter.resetPath();
+                return;
+            }
+
+            if (!targetCharacter || !targetCharacter.isAlive) {
+                sourceCharacter.resetPath();
+                targetCharacter = this.findTarget();
+                this.pathToPosition = null;
                 return;
             }
 
             if (this.pathToPosition) {
                 this.debug && console.log(currentMode);
-                if (!targetCharacter.isAlive) {
-                    targetCharacter = this.findTarget();
-                    this.pathToPosition = null;
-                }
 
                 // Check if what we're targetting has changed positions
                 if (currentMode === 'PERSISTENT') {
