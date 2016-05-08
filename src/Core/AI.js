@@ -51,6 +51,10 @@ class AI {
     }
 
     resetTrace() {
+        if (!this.pathTraceSprite) {
+            return;
+        }
+
         this.pathTraceSprite.destroy();
         this.pathTraceSprite = null;
     }
@@ -147,12 +151,16 @@ class AI {
 
         this.followInterval = setInterval(() => {
             if (!this.enabled) {
+                this.pathToPosition = null;
+                this.resetTrace();
+                sourceCharacter.resetPath();
                 return;
             }
 
             if (this.pathToPosition) {
                 this.debug && console.log(currentMode);
                 if (!targetCharacter.isAlive) {
+                    sourceCharacter.resetPath();
                     targetCharacter = this.findTarget();
                     this.pathToPosition = null;
                 }
