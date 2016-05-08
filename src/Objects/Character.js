@@ -20,6 +20,10 @@ class Character extends GameObject {
         this.isAlive = false;
     }
 
+    revive() {
+        this.isAlive = true;
+    }
+
     destroy() {
         if (this.sprite.emitter) {
             this.sprite.emitter.destroy();
