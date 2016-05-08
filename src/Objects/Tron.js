@@ -21,16 +21,21 @@ class Tron extends Character {
         var self = this;
         if (!self.isAlive) { return null; }
 
-        if (this.characterKey == "super-saiyan") {
-            var fireball = this.game.add.sprite(this.sprite.x, this.sprite.y, 'gfx/buffs');
+        if (self.characterKey == "super-saiyan") {
+            var fireball = self.game.add.sprite(self.sprite.x, self.sprite.y, 'gfx/buffs');
             fireball.anchor.setTo(0.5);
-            fireball.animations.add('glitch', ['42'], 5, true, true);
-            fireball.animations.play('glitch');
-            this.game.physics.arcade.enable(fireball, Phaser.Physics.ARCADE);
+            fireball.animations.add('fireball', ['42'], 1, true, true);
+            fireball.animations.play('fireball');
+
+            self.game.physics.arcade.enable(fireball, Phaser.Physics.ARCADE);
+            fireball.body.collideWorldBounds = false;
+            fireball.body.immovable = true;
             fireball.scale.x = 0.6;
             fireball.scale.y = 0.6;
-            var FIREBALL_SPEED = this.speed * 2;
-            switch (this.direction) {
+            Hackatron.game.fireballs.push(fireball);
+
+            var FIREBALL_SPEED = self.speed * 2;
+            switch (self.direction) {
             case "walkUp":
                 fireball.body.velocity.y = -FIREBALL_SPEED;
                 fireball.angle = -90;
@@ -52,27 +57,28 @@ class Tron extends Character {
             }
 
             // makes block fade away within a 0.2 seconds
-            var tween = this.game.add.tween(fireball).to( { alpha: 0 }, 200, 'Linear', true);
+            var FIRE_BALL_DURATION = 200;
+            var tween = self.game.add.tween(fireball).to( { alpha: 0 }, FIRE_BALL_DURATION, 'Linear', true);
             tween.onComplete.add(function() {
                 tween.stop();
             });
 
             setTimeout(function() {
                 if (fireball) {
+                    Hackatron.game.fireballs = Hackatron.game.fireballs.filter(function(fb) {
+                        return (fb !== fireball);
+                    });
                     fireball.destroy();
                 }
-                Hackatron.game.fireballs.filter(function(fb) {
-                    return (fb !== fireball);
-                });
-            }, 1000);
+            }, FIRE_BALL_DURATION + 100);
 
             Hackatron.game.fireEvent({
                 key: 'fireballFired',
                 info: {
-                    x: this.sprite.x,
-                    y: this.sprite.y,
-                    speed: this.speed,
-                    direction: this.direction
+                    x: self.sprite.x,
+                    y: self.sprite.y,
+                    speed: FIREBALL_SPEED,
+                    direction: self.direction
                 }
             });
 
@@ -80,10 +86,10 @@ class Tron extends Character {
             return fireball;
         }
 
-        if (this.blocks > 0) {
+        if (self.blocks > 0) {
             self.blocks--;
             if (self.blocks < 0) self.blocks = 0;
-            var blockPosition = Utils.flooredPosition(this.sprite.position);
+            var blockPosition = Utils.flooredPosition(self.sprite.position);
             // Make sure blocks stay within outer world wall
             if (blockPosition.x + 32 >= (Hackatron.TILE_COUNT_HORIZONTAL - 1) * 16) {
                 blockPosition.x -= 16;
@@ -92,11 +98,11 @@ class Tron extends Character {
                 blockPosition.y -= 16;
             }
 
-            var block = this.game.add.sprite(blockPosition.x, blockPosition.y, 'gfx/blocks/glitch');
+            var block = self.game.add.sprite(blockPosition.x, blockPosition.y, 'gfx/blocks/glitch');
             block.anchor.setTo(0);
             block.animations.add('glitch', [0,1,2], 12, true, true);
             block.animations.play('glitch');
-            this.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
+            self.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
 
             block.body.immovable = false;
             block.scale.x = 1;
@@ -104,17 +110,17 @@ class Tron extends Character {
             Hackatron.game.blocks.push(block);
 
             // makes block fade away within a 2.0 seconds
-            var tween = this.game.add.tween(block).to( { alpha: 0 }, 2000, 'Linear', true);
+            var tween = self.game.add.tween(block).to( { alpha: 0 }, 2000, 'Linear', true);
             tween.onComplete.add(function() {
                 tween.stop();
             });
 
             setTimeout(function() {
-                block.destroy();
-                self.blocks++;
-                Hackatron.game.blocks.filter(function(b) {
+                Hackatron.game.blocks = Hackatron.game.blocks.filter(function(b) {
                     return (b !== block);
                 });
+                block.destroy();
+                self.blocks++;
             }, 2000);
 
             Hackatron.game.fireEvent({
