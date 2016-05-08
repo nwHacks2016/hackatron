@@ -794,9 +794,9 @@ Hackatron.Game.prototype = {
             this.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
             block.animations.add('glitch', [0,1,2], 12, true, true);
             block.animations.play('glitch');
-            block.scale.x = 1.25;
-            block.scale.y = 1.25;
-            block.body.immovable = true;
+            block.scale.x = 1;
+            block.scale.y = 1;
+            block.body.immovable = false;
 
             // Make block fade in 2.0 seconds
             this.game.add.tween(block).to({ alpha: 0 }, 2000, 'Linear', true, 0, -1);
