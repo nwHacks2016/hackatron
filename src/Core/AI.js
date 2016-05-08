@@ -63,6 +63,10 @@ class AI {
             targets.push(Hackatron.game.players[id].character);
         }
 
+        if (!targets.length) {
+            return null;
+        }
+
         return targets[Math.floor(Math.random() * (targets.length - 1))];
     }
 
@@ -142,8 +146,17 @@ class AI {
         var currentMode = findMode(MODES);
 
         this.followInterval = setInterval(() => {
+            if (!this.enabled) {
+                return;
+            }
+
             if (this.pathToPosition) {
                 this.debug && console.log(currentMode);
+                if (!targetCharacter.isAlive) {
+                    targetCharacter = this.findTarget();
+                    this.pathToPosition = null;
+                }
+
                 // Check if what we're targetting has changed positions
                 if (currentMode === 'PERSISTENT') {
                     this.debug && console.log('[AI] Sticking with it...');
