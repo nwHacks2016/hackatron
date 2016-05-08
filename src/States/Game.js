@@ -670,6 +670,7 @@ Hackatron.Game.prototype = {
         if (event.key === 'updatePlayer') {
             var id = event.info.id;
             var position = event.info.position;
+            var direction = event.info.direction;
 
             // Don't update ourself (bug?)
             if (event.info.id === this.player.id) { return; }
@@ -680,47 +681,8 @@ Hackatron.Game.prototype = {
 
             // disable animations for now - lag?
             if (player.character.sprite.body) {
-                clearTimeout(updateTimeout);
-
-                switch(event.info.direction) {
-                    case 'walkUp':
-                        player.character.inputUp = true;
-                        player.character.updatePos();
-                        break;
-
-                    case 'walkDown':
-                        player.character.inputDown = true;
-                        player.character.updatePos();
-                        break;
-
-                    case 'walkLeft':
-                        player.character.inputLeft = true;
-                        player.character.updatePos();
-                        break;
-
-                    case 'walkRight':
-                        player.character.inputRight = true;
-                        player.character.updatePos();
-                        break;
-                   default:
-                        player.character.inputRight = false;
-                        player.character.inputLeft = false;
-                        player.character.inputUp = false;
-                        player.character.inputDown = false;
-                        break;
-                }
-
-                updateTimeout = setTimeout(() => {
-                    if (player.character.sprite.body) {
-                        player.character.sprite.body.velocity.x = 0;
-                        player.character.sprite.body.velocity.y = 0;
-                        player.character.position = position;
-                        player.character.inputRight = false;
-                        player.character.inputLeft = false;
-                        player.character.inputUp = false;
-                        player.character.inputDown = false;
-                    }
-                }, 30);
+                player.character.sprite.animations.play(direction, 3, false);
+                player.character.position = position;
             }
         } else if (event.key === 'updateEnemy') {
             if (this.player.id !== this.hostId) {
