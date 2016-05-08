@@ -25,13 +25,13 @@ window.Utils = {
       var i, j, t = [];
 
       // Loop through every item in the outer array (height)
-      for(i=0; i<h; i++) {
+      for(i = 0; i < h; i++) {
 
         // Insert a new row (array)
         t[i] = [];
 
         // Loop through every item per item in outer array (width)
-        for(j=0; j<w; j++) {
+        for(j = 0; j < w; j++) {
 
           // Save transposed data.
           t[i][j] = a[j][i];
@@ -39,5 +39,15 @@ window.Utils = {
       }
 
       return t;
+    },
+    flooredPosition: function(position) {
+        var correctedX = Math.floor(position.x / 16.0) * 16.0;
+        var correctedY = Math.floor(position.y / 16.0) * 16.0;
+
+        var correctedPosition = {
+            x: correctedX,
+            y: correctedY
+        };
+        return correctedPosition;
     }
 };

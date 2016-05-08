@@ -213,14 +213,14 @@ class Character extends GameObject {
 
         // Check if player has gone beyond the right edge
         // And send him to the beginning
-        if (this.sprite.x >=  Hackatron.TILE_WIDTH * 16) {
+        if (this.sprite.x >=  Hackatron.TILE_COUNT_HORIZONTAL * 16) {
             this.sprite.x = 5;
         }
 
         // Check if player has gone beyond the left edge
         // And send him to the end
         if (this.sprite.x < 0) {
-            this.sprite.x =  (Hackatron.TILE_WIDTH - 1) * 16;
+            this.sprite.x =  (Hackatron.TILE_COUNT_HORIZONTAL - 1) * 16;
         }
     }
 }

@@ -38,11 +38,11 @@ Hackatron.Game.prototype = {
     getValidPosition: function() {
         var position = null;
         var currentPosition = 0;
-        var totalPositions = Hackatron.TILE_WIDTH * Hackatron.TILE_HEIGHT * 2;
+        var totalPositions = Hackatron.TILE_COUNT_HORIZONTAL * Hackatron.TILE_COUNT_VERTICAL * 2;
 
         while (!position && currentPosition < totalPositions) {
-            var x = this.game.rnd.integerInRange(1, Hackatron.TILE_WIDTH - 1);
-            var y = this.game.rnd.integerInRange(1, Hackatron.TILE_HEIGHT - 1);
+            var x = this.game.rnd.integerInRange(1, Hackatron.TILE_COUNT_HORIZONTAL - 1);
+            var y = this.game.rnd.integerInRange(1, Hackatron.TILE_COUNT_VERTICAL - 1);
             // mapData goes top to down and left to right
             var tile = this.getTileAt({x: x, y: y});
 
@@ -285,7 +285,7 @@ Hackatron.Game.prototype = {
 
     initPowerUps: function() {
         this.powerups = [];
-        for (var i = 0; i <= Hackatron.TILE_HEIGHT; i++) {
+        for (var i = 0; i <= Hackatron.TILE_COUNT_VERTICAL; i++) {
             this.powerups.push([]);
         }
 
