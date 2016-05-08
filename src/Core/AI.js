@@ -45,7 +45,9 @@ class AI {
             }
         });
 
-        this.pathTraceSprite.endFill();
+        if (this.pathTraceSprite) {
+            this.pathTraceSprite.endFill();
+        }
     }
 
     resetTrace() {
@@ -57,6 +59,7 @@ class AI {
         var targets = [Hackatron.game.player.character];
 
         for (var id in Hackatron.game.players) {
+            if (!Hackatron.game.players[id].isAlive) { continue; }
             targets.push(Hackatron.game.players[id].character);
         }
 

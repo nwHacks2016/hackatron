@@ -6,7 +6,6 @@ class Character extends GameObject {
 
         this.isAlive = true;
         this.dirty = false;
-        this.points = 0;
         this.game = params.game;
         this.speed = params.speed;
         this.emitterKey = params.emitterKey;
@@ -17,22 +16,11 @@ class Character extends GameObject {
         this._addAnimationsToSprite();
     }
 
-    removePoints() {
-        this.points -= points;
-
-        if (this.points < 0) {
-            this.points = 0;
-        }
-    }
-
-    addPoints(points) {
-        this.points += points;
-    }
-
     kill() {
         this.isAlive = false;
-        this.points = 0;
+    }
 
+    destroy() {
         if (this.sprite.emitter) {
             this.sprite.emitter.destroy();
         }

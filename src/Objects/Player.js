@@ -13,6 +13,7 @@ Player.prototype.init = function(params) {
     this.game = params.game;
     this.name = params.name;
     this.keys = params.keys;
+    this.points = 0;
 
     this.setupKeys();
 };
@@ -33,8 +34,27 @@ Player.prototype.setupKeys = function() {
     }
 };
 
+Player.prototype.removePoints = function() {
+    this.points -= points;
+
+    if (this.points < 0) {
+        this.points = 0;
+    }
+};
+
+Player.prototype.addPoints = function(points) {
+    this.points += points;
+};
+
+Player.prototype.hide = function() {
+    this.character.sprite.alpha = 0;
+};
+
+Player.prototype.show = function() {
+    this.character.sprite.alpha = 1;
+};
+
 Player.prototype.kill = function() {
-    this.nameText.destroy();
     this.character.kill();
 
     if (this.keys) {
@@ -45,6 +65,10 @@ Player.prototype.kill = function() {
 
         this.keys.att && this.game.input.keyboard.removeKey(this.keys.att);
     }
+};
+
+Player.prototype.destroy = function() {
+    this.nameText.destroy();
 };
 
 Object.defineProperty(Player.prototype, 'name', {
