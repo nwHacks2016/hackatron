@@ -209,7 +209,7 @@ Hackatron.Game.prototype = {
         var playerParams = {
             id: Utils.generateId(),
             game: this.game,
-            name: Hackatron.playerName,
+            name: this.getRandomName(),
             speed: DEFAULT_PLAYER_SPEED,
             worldPosition: worldPosition,
             keys: {
@@ -590,12 +590,17 @@ Hackatron.Game.prototype = {
         return null;
     },
 
+    getRandomName: function() {
+        var names = ['riffongrief', 'Blood', 'Midnight', 'Puritytempest', 'Jester', 'Goldmagus', 'Lightning', 'Madguard', 'Lionshadow', 'Tempest', 'Eternity', 'Faunaguard', 'Lordbeast', 'Darklord', 'Veil', 'Tombmourner', 'Hateghost', 'Spirittotem', 'Cometzealot', 'Wind', 'Paradox', 'Tombsinner', 'Darkgod', 'Reaper', 'Firereaper', 'Shadowhowl', 'Spiritlord', 'Gust', 'Song', 'Lord', 'Gunner', 'Dawn', 'King', 'King', 'Knightkiller', 'Rubyguard', 'Whitemidnight', 'Flame', 'Roseice', 'Mourner', 'Lordicon', 'Pandemonium', 'Fellkiller', 'Rascalfinder', 'Claw', 'Ragechaos', 'Ragnarok', 'Demonheart', 'Talonknight', 'Bane', 'Windseeker', 'Warsaber', 'Lionslayer', 'Veil', 'Darkbeast', 'Honorreaper', 'Lancequake', 'Victory', 'Warlockmage', 'Nemesis', 'Queen', 'Bloodbattler', 'Jericho', 'Roguegriffon', 'Wanderlust', 'Mageslayer', 'Cursefinder', 'Legend', 'Beastclaw', 'Shadow', 'Faunaknight', 'Grave', 'Demonfinder', 'Fauna', 'Cult', 'Noblewarlock', 'Faunachanter', 'Battler', 'Talonreaper', 'Steeliron'];
+
+        return names[Math.floor(Math.random() * names.length)]
+    },
+
     createPlayer: function(playerId) {
         var player = new Player();
 
         player.init({
             id: playerId,
-            name: playerId.substring(0, 2),
             game: this.game,
             speed: DEFAULT_PLAYER_SPEED
         });
@@ -665,6 +670,7 @@ Hackatron.Game.prototype = {
         if (event.key === 'updatePlayer') {
             var id = event.info.id;
             var position = event.info.position;
+            var direction = event.info.direction;
 
             // Don't update ourself (bug?)
             if (event.info.id === this.player.id) { return; }
@@ -675,47 +681,8 @@ Hackatron.Game.prototype = {
 
             // disable animations for now - lag?
             if (player.character.sprite.body) {
-                clearTimeout(updateTimeout);
-
-                switch(event.info.direction) {
-                    case 'walkUp':
-                        player.character.inputUp = true;
-                        player.character.updatePos();
-                        break;
-
-                    case 'walkDown':
-                        player.character.inputDown = true;
-                        player.character.updatePos();
-                        break;
-
-                    case 'walkLeft':
-                        player.character.inputLeft = true;
-                        player.character.updatePos();
-                        break;
-
-                    case 'walkRight':
-                        player.character.inputRight = true;
-                        player.character.updatePos();
-                        break;
-                   default:
-                        player.character.inputRight = false;
-                        player.character.inputLeft = false;
-                        player.character.inputUp = false;
-                        player.character.inputDown = false;
-                        break;
-                }
-
-                updateTimeout = setTimeout(() => {
-                    if (player.character.sprite.body) {
-                        player.character.sprite.body.velocity.x = 0;
-                        player.character.sprite.body.velocity.y = 0;
-                        player.character.position = position;
-                        player.character.inputRight = false;
-                        player.character.inputLeft = false;
-                        player.character.inputUp = false;
-                        player.character.inputDown = false;
-                    }
-                }, 30);
+                player.character.sprite.animations.play(direction, 3, false);
+                player.character.position = position;
             }
         } else if (event.key === 'updateEnemy') {
             if (this.player.id !== this.hostId) {
