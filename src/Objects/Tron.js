@@ -31,8 +31,8 @@ class Tron extends Character {
             self.game.physics.arcade.enable(fireball, Phaser.Physics.ARCADE);
             fireball.body.collideWorldBounds = false;
             fireball.body.immovable = true;
-            fireball.scale.x = 0.6;
-            fireball.scale.y = 0.6;
+            fireball.scale.x = 0.5;
+            fireball.scale.y = 0.5;
             Hackatron.game.fireballs.push(fireball);
 
             var FIREBALL_SPEED = self.speed * 2;
@@ -71,7 +71,7 @@ class Tron extends Character {
                     });
                     fireball.destroy();
                 }
-            }, FIRE_BALL_DURATION + 100);
+            }, FIRE_BALL_DURATION);
 
             Hackatron.game.fireEvent({
                 key: 'fireballFired',
@@ -106,7 +106,7 @@ class Tron extends Character {
             block.animations.play('glitch');
             self.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
 
-            block.body.immovable = false;
+            block.body.immovable = true;
             block.scale.x = 1;
             block.scale.y = 1;
             Hackatron.game.blocks.push(block);

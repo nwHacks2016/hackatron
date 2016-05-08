@@ -529,12 +529,16 @@ Hackatron.Game.prototype = {
             // We don't want to destroy fireballs on contact
             this.player.character.dirty = true;
             // TODO: dedect pts here
-        }
+        };
+
+        var collideBlockHandler = () => {
+            this.player.character.dirty = true;
+        };
 
         this.blocks.forEach((block) => {
             //console.log(block);
             if (this.player.character.collisionEnabled) {
-                this.game.physics.arcade.collide(this.player.character.sprite, block);
+                this.game.physics.arcade.collide(this.player.character.sprite, block, collideBlockHandler);
             }
 
             if (this.enemy) {
@@ -544,12 +548,20 @@ Hackatron.Game.prototype = {
 
         this.fireballs.forEach((fireball, index) => {
             if (fireball.owner !== this.player.id) {
-                this.game.physics.arcade.collide(this.player.character.sprite, fireball, function() {
-                    collideFireballHandler(index);
-                });
+                var playerBlocked = this.player.character.sprite.body.blocked;
+                if (!(playerBlocked.right && playerBlocked.left) &&
+                    !(playerBlocked.up && playerBlocked.down)) {
+                        this.game.physics.arcade.collide(this.player.character.sprite, fireball, function() {
+                            collideFireballHandler(index);
+                        });
+                }
             }
             if (this.enemy) {
-                this.game.physics.arcade.collide(this.enemy.character.sprite, fireball);
+                var enemyBlocked = this.enemy.character.sprite.body.blocked;
+                if (!(enemyBlocked.right && enemyBlocked.left) &&
+                    !(enemyBlocked.up && enemyBlocked.down)) {
+                        this.game.physics.arcade.collide(this.enemy.character.sprite, fireball);
+                }
             }
         });
 
@@ -816,7 +828,7 @@ Hackatron.Game.prototype = {
             block.animations.play('glitch');
             block.scale.x = 1;
             block.scale.y = 1;
-            block.body.immovable = false;
+            block.body.immovable = true;
 
             // Make block fade in 2.0 seconds
             var BLOCK_DURATION = 2000;
@@ -824,7 +836,7 @@ Hackatron.Game.prototype = {
 
             this.blocks.push(block);
             setTimeout(() => {
-                this.blocks = this.blocks.filter((b) => {
+                Hackatron.game.blocks = Hackatron.game.blocks.filter((b) => {
                     return (b !== block);
                 });
 
@@ -839,9 +851,9 @@ Hackatron.Game.prototype = {
 
             this.game.physics.arcade.enable(fireball, Phaser.Physics.ARCADE);
             fireball.body.collideWorldBounds = false;
-            fireball.body.mass = 1;
-            fireball.scale.x = 0.6;
-            fireball.scale.y = 0.6;
+            fireball.body.mass = .9;
+            fireball.scale.x = 0.5;
+            fireball.scale.y = 0.5;
             Hackatron.game.fireballs.push(fireball);
             var FIREBALL_SPEED = event.info.speed;
             switch (event.info.direction) {
@@ -873,12 +885,12 @@ Hackatron.Game.prototype = {
 
             setTimeout(function() {
                 if (fireball) {
-                    this.fireballs = this.fireballs.filter(function(fb) {
+                    Hackatron.game.fireballs = Hackatron.game.fireballs.filter(function(fb) {
                         return (fb !== fireball);
                     });
                     fireball.destroy();
                 }
-            }, FIRE_BALL_DURATION + 100);
+            }, FIRE_BALL_DURATION);
         } else if (event.key === 'setHost') {
             // Check if we already know this is the host,
             // And if it's this player, we don't need to set ourselves up again
