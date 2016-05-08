@@ -164,6 +164,7 @@ class PowerupHandler {
 // Handlers
 
 class SaiyanHandler extends PowerupHandler {
+
     constructor(params) {
         super(params);
         this.name = 'Super Saiyan!';
@@ -173,9 +174,20 @@ class SaiyanHandler extends PowerupHandler {
     }
 
     onStarted() {
+        this.oldSkinKey = this.player.character.characterKey;
+        this.player.character.changeSkin("super-saiyan");
+
+        window.IngameState.show = false;
+        window.UI_IngameController.setState(window.IngameState);
     }
 
     onStopped() {
+        this.player.character.characterKey = this.oldSkinKey;
+        this.player.character.changeSkin(this.oldSkinKey);
+        this.oldSkinKey = undefined;
+
+        window.IngameState.show = true;
+        window.UI_IngameController.setState(window.IngameState);
     }
 }
 

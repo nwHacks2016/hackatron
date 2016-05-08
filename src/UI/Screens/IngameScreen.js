@@ -1,10 +1,14 @@
+window.IngameState = {
+    show: true,
+    showOthers: false,
+    currentCharacter: 'tron',
+    allCharacters: ['tron', 'ghost'],
+};
+
 window.IngameScreen = React.createClass({
     getInitialState: function() {
-        return {
-            showOthers: false,
-            currentCharacter: 'tron',
-            allCharacters: ['tron', 'ghost'],
-        };
+        window.UI_IngameController = this;
+        return window.IngameState;
     },
   _clickCharacter: function() {
     this.setState({showOthers: !this.state.showOthers});
@@ -15,6 +19,10 @@ window.IngameScreen = React.createClass({
   },
   render: function() {
     var otherElements = null;
+
+    if (!this.state.show) {
+      return <div></div>;
+    }
 
     if (this.state.showOthers) {
         var otherCharacters = this.state.allCharacters.slice(0);
