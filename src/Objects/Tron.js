@@ -30,16 +30,20 @@ class Tron extends Character {
             this.game.physics.arcade.enable(fireball, Phaser.Physics.ARCADE);
             fireball.scale.x = 0.6;
             fireball.scale.y = 0.6;
-            var FIREBALL_SPEED = 300;
+            var FIREBALL_SPEED = this.speed * 2;
             switch (this.direction) {
             case "walkUp":
                 fireball.body.velocity.y = -FIREBALL_SPEED;
+                fireball.angle = -90;
                 break;
             case "walkDown":
                 fireball.body.velocity.y = FIREBALL_SPEED;
+                fireball.angle = 90;
+
                 break;                
             case "walkLeft":
                 fireball.body.velocity.x = -FIREBALL_SPEED;
+                fireball.angle = 180;
                 break;
             case "walkRight":
                 fireball.body.velocity.x = FIREBALL_SPEED;
@@ -70,24 +74,14 @@ class Tron extends Character {
         if (this.blocks > 0) {
             self.blocks--;
             if (self.blocks < 0) self.blocks = 0;
-            var blockPosition = Utils.flooredPosition(this.sprite.position);
-            // Make sure blocks stay within outer world wall
-            if (blockPosition.x + 32 >= (Hackatron.TILE_COUNT_HORIZONTAL - 1) * 16) {
-                blockPosition.x -= 16;
-            }
-            if (blockPosition.y + 32 >= (Hackatron.TILE_COUNT_VERTICAL - 1) * 16) {
-                blockPosition.y -= 16;
-            }
-
-            var block = this.game.add.sprite(blockPosition.x, blockPosition.y, 'gfx/blocks/glitch');
-            block.anchor.setTo(0);
+            var block = this.game.add.sprite(this.sprite.x, this.sprite.y, 'gfx/blocks/glitch');
+            block.anchor.setTo(0.5);
             block.animations.add('glitch', [0,1,2], 12, true, true);
             block.animations.play('glitch');
             this.game.physics.arcade.enable(block, Phaser.Physics.ARCADE);
-
-            block.body.immovable = false;
-            block.scale.x = 1;
-            block.scale.y = 1;
+            block.body.immovable = true;
+            block.scale.x = 1.50;
+            block.scale.y = 1.50;
             Hackatron.game.blocks.push(block);
 
             // makes block fade away within a 2.0 seconds

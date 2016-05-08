@@ -170,10 +170,13 @@ class SaiyanHandler extends PowerupHandler {
         this.name = 'Super Saiyan!';
         this.spriteMode = 'key';
         this.spriteKey = 'gfx/buffs/saiyan';
+        this.durationTime = 10000;
         this.spriteLoop = [0,1,2,3,4,5,6];
     }
 
     onStarted() {
+        this.player.character.invincible = true;
+        this.player.character.speed *= 1.5;
         this.oldSkinKey = this.player.character.characterKey;
         this.player.character.changeSkin("super-saiyan");
 
@@ -182,6 +185,8 @@ class SaiyanHandler extends PowerupHandler {
     }
 
     onStopped() {
+        this.player.character.invincible = false;
+        this.player.character.speed /= 1.5;
         this.player.character.changeSkin(this.oldSkinKey);
         this.player.character.characterKey = this.oldSkinKey;
         this.oldSkinKey = undefined;
