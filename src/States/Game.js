@@ -209,7 +209,7 @@ Hackatron.Game.prototype = {
         var playerParams = {
             id: Utils.generateId(),
             game: this.game,
-            name: Hackatron.playerName,
+            name: this.getRandomName(),
             speed: DEFAULT_PLAYER_SPEED,
             worldPosition: worldPosition,
             keys: {
@@ -590,12 +590,17 @@ Hackatron.Game.prototype = {
         return null;
     },
 
+    getRandomName: function() {
+        var names = ['riffongrief', 'Blood', 'Midnight', 'Puritytempest', 'Jester', 'Goldmagus', 'Lightning', 'Madguard', 'Lionshadow', 'Tempest', 'Eternity', 'Faunaguard', 'Lordbeast', 'Darklord', 'Veil', 'Tombmourner', 'Hateghost', 'Spirittotem', 'Cometzealot', 'Wind', 'Paradox', 'Tombsinner', 'Darkgod', 'Reaper', 'Firereaper', 'Shadowhowl', 'Spiritlord', 'Gust', 'Song', 'Lord', 'Gunner', 'Dawn', 'King', 'King', 'Knightkiller', 'Rubyguard', 'Whitemidnight', 'Flame', 'Roseice', 'Mourner', 'Lordicon', 'Pandemonium', 'Fellkiller', 'Rascalfinder', 'Claw', 'Ragechaos', 'Ragnarok', 'Demonheart', 'Talonknight', 'Bane', 'Windseeker', 'Warsaber', 'Lionslayer', 'Veil', 'Darkbeast', 'Honorreaper', 'Lancequake', 'Victory', 'Warlockmage', 'Nemesis', 'Queen', 'Bloodbattler', 'Jericho', 'Roguegriffon', 'Wanderlust', 'Mageslayer', 'Cursefinder', 'Legend', 'Beastclaw', 'Shadow', 'Faunaknight', 'Grave', 'Demonfinder', 'Fauna', 'Cult', 'Noblewarlock', 'Faunachanter', 'Battler', 'Talonreaper', 'Steeliron'];
+
+        return names[Math.floor(Math.random() * names.length)]
+    },
+
     createPlayer: function(playerId) {
         var player = new Player();
 
         player.init({
             id: playerId,
-            name: playerId.substring(0, 2),
             game: this.game,
             speed: DEFAULT_PLAYER_SPEED
         });

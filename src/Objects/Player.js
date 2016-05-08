@@ -83,14 +83,13 @@ Object.defineProperty(Player.prototype, 'name', {
         var style = {
             font: '15px Arial',
             fill: '#ffffff',
-            align: 'center',
-            backgroundColor: '#000000'
+            align: 'center'
         };
 
         this._name = name;
 
         this.nameText = this.game.add.text(0, 0, name, style);
-        this.nameText.anchor.set(1.5, 1.5);
+        this.nameText.anchor.set(0.5, -1);
 
         this.character.sprite.addChild(this.nameText);
     }
