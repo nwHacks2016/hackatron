@@ -262,6 +262,9 @@ Hackatron.Game.prototype = {
     initDeathScreen: function() {
         this.game.plugins.cameraShake.shake();
 
+        this.enemy.character.worldPosition = this.getValidPosition();
+        this.enemy.character.frozen = true;
+
         var death = new Gameover();
         death.init(this.game);
         death.start();
@@ -272,6 +275,15 @@ Hackatron.Game.prototype = {
 
             this.newGameKey.onDown.remove();
         });
+
+        setTimeout(() => {
+            death.sprite.destroy();
+            this.player.character.revive();
+
+            setTimeout(() => {
+                this.enemy.character.frozen = false;
+            }, 1000);
+        }, 2000);
     },
 
     initSFX: function() {

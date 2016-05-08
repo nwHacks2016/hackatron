@@ -120,9 +120,10 @@ class AI {
         var targetCharacter = this.findTarget();
 
         var MODES = {
-            'PERSISTENT': 0.7,
-            'CONFUSED': 0.1,
-            'SWITCHER': 0.2
+            'FOLLOW': 0.95,
+            'PERSISTENT': 0.01,
+            'CONFUSED': 0.01,
+            'SWITCHER': 0.03
         };
 
         const findMode = (values) => {
@@ -168,7 +169,40 @@ class AI {
                 this.debug && console.log(currentMode);
 
                 // Check if what we're targetting has changed positions
-                if (currentMode === 'PERSISTENT') {
+                if (currentMode === 'FOLLOW') {
+                    this.debug && console.log('[AI] Sticking with it...');
+                    // Keep chasing this mother down...
+
+                    for (var i = 0; i < 10; i++) {
+                        sourceCharacter.pathFind();
+                    }
+
+                    if (this.pathToPosition.x !== targetCharacter.position.x || this.pathToPosition.y !== targetCharacter.position.y) {
+                        this.debug && console.log('[AI] Repathing...');
+                        sourceCharacter.resetPath();
+                        this.pathToPosition = null;
+                        this.resetTrace();
+                        currentMode = findMode(MODES);
+                        targetCharacter = targetCharacter;
+
+                        this.findPath(sourceCharacter.position, targetCharacter.position, (pathCoords) => {
+                            if (!pathCoords) { return; }
+
+                            var path = pathCoords.map((pathCoord) => {
+                                return this.getPointFromCoord({y: pathCoord.y, x: pathCoord.x});
+                            });
+
+                            this.tracePath(path);
+                            sourceCharacter.moveThroughPath(path);
+
+                            this.pathToPosition = targetCharacter.position;
+
+                            for (var i = 0; i < 10; i++) {
+                                sourceCharacter.pathFind();
+                            }
+                        });
+                    }
+                } else if (currentMode === 'PERSISTENT') {
                     this.debug && console.log('[AI] Sticking with it...');
                     // Keep chasing this mother down...
                     var finished = sourceCharacter.pathFind();
@@ -196,7 +230,7 @@ class AI {
                             this.pathToPosition = null;
                             this.resetTrace();
                             var pos = Hackatron.game.getValidPosition();
-                            targetCharacter = {position: {x: pos.x * 16, y: pos.y * 16}};
+                            targetCharacter = {position: {x: pos.x * 16, y: pos.y * 16}, isAlive: true};
                         }
                     } else {
                         // If nothing has changed, we just need to keep updating

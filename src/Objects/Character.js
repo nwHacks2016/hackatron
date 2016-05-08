@@ -20,6 +20,10 @@ class Character extends GameObject {
         this.isAlive = false;
     }
 
+    revive() {
+        this.isAlive = true;
+    }
+
     destroy() {
         if (this.sprite.emitter) {
             this.sprite.emitter.destroy();
@@ -116,18 +120,23 @@ class Character extends GameObject {
                 velocity.x = Math.round(velocity.x);
                 velocity.y = Math.round(velocity.y);
 
+                this.speed = 200;
+                this.inputRight = false;
+                this.inputLeft = false;
+                this.inputDown = false;
+                this.inputUp = false;
+
                 if (velocity.x === 1) {
-                    this.sprite.animations.play('walkRight', 3, false);
+                    this.inputRight = true;
                 } else if (velocity.x === -1) {
-                    this.sprite.animations.play('walkLeft', 3, false);
+                    this.inputLeft = true;
                 } else if (velocity.y === 1) {
-                    this.sprite.animations.play('walkDown', 3, false);
+                    this.inputDown = true;
                 } else if (velocity.y === -1) {
-                    this.sprite.animations.play('walkUp', 3, false);
+                    this.inputUp = true;
                 }
 
-                this.sprite.body.velocity.x = velocity.x * speed;
-                this.sprite.body.velocity.y = velocity.y * speed;
+                this.updatePos();
             } else {
                 this.position = nextPosition;
 

@@ -56,6 +56,10 @@ Player.prototype.show = function() {
 
 Player.prototype.kill = function() {
     this.character.kill();
+};
+
+Player.prototype.destroy = function() {
+    this.nameText.destroy();
 
     if (this.keys) {
         this.keys.up && this.game.input.keyboard.removeKey(this.keys.up);
@@ -65,10 +69,6 @@ Player.prototype.kill = function() {
 
         this.keys.att && this.game.input.keyboard.removeKey(this.keys.att);
     }
-};
-
-Player.prototype.destroy = function() {
-    this.nameText.destroy();
 };
 
 Object.defineProperty(Player.prototype, 'name', {
